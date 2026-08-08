@@ -1,0 +1,37 @@
+{
+  "TSLA": {
+    "status": "NORMAL",
+    "price": null,
+    "drawdown": null,
+    "rebound": null,
+    "updated_utc": null
+  },
+  "NVDA": {
+    "status": "NORMAL",
+    "price": null,
+    "drawdown": null,
+    "rebound": null,
+    "updated_utc": null
+  },
+  "META": {
+    "status": "NORMAL",
+    "price": null,
+    "drawdown": null,
+    "rebound": null,
+    "updated_utc": null
+  },
+  "AMZN": {
+    "status": "NORMAL",
+    "price": null,
+    "drawdown": null,
+    "rebound": null,
+    "updated_utc": null
+  },
+  "GOOGL": {
+    "status": "NORMAL",
+    "price": null,
+    "drawdown": null,
+    "rebound": null,
+    "updated_utc": null
+  }
+}
