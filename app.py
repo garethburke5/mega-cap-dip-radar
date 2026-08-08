@@ -344,7 +344,12 @@ def entry_zone(df,f,matches):
 
 def rebound_strategy_snapshot(df, matches, stake_gbp=20000):
     price=float(df["Close"].iloc[-1])
-    peak3=float(df["Close"].tail(63).max())
+    c=df["Close"]
+    peak1=float(c.tail(21).max())
+    peak3=float(c.tail(63).max())
+    peak6=float(c.tail(126).max())
+    low21=float(c.tail(21).min())
+    low63=float(c.tail(63).min())
     target10=price*1.10
     target20=price*1.20
 
@@ -356,46 +361,108 @@ def rebound_strategy_snapshot(df, matches, stake_gbp=20000):
     p20=hit20/n*100 if n else np.nan
     d10=full1y["Days +10%"].dropna().median() if n else np.nan
     d20=full1y["Days +20%"].dropna().median() if n else np.nan
-
     full6 = matches.dropna(subset=["Further downside %"]) if not matches.empty else pd.DataFrame()
     meddown=full6["Further downside %"].median() if len(full6) else np.nan
 
-    # How demanding are the user's rebound goals relative to the recent peak?
+    dd1=(price/peak1-1)*100
+    dd3=(price/peak3-1)*100
+    dd6=(price/peak6-1)*100
+    bounce21=(price/low21-1)*100 if low21 else np.nan
+    bounce63=(price/low63-1)*100 if low63 else np.nan
+    r5=(price/float(c.iloc[-6])-1)*100 if len(c)>5 else np.nan
+    r10=(price/float(c.iloc[-11])-1)*100 if len(c)>10 else np.nan
+    rsi=float(calc_rsi(c).iloc[-1])
+
+    # ENTRY QUALITY is deliberately the dominant component.
+    # A stock cannot score as a strong dip entry merely because old analogues later rallied.
+    depth=max(abs(min(dd3,0)), abs(min(dd6,0)))
+    if depth >= 25: entry_depth=30
+    elif depth >= 20: entry_depth=26
+    elif depth >= 15: entry_depth=20
+    elif depth >= 10: entry_depth=12
+    elif depth >= 7: entry_depth=6
+    else: entry_depth=0
+
+    # Penalise a rebound that has already delivered much of the user's desired 10–20%.
+    chase_penalty=0
+    chase_notes=[]
+    if pd.notna(r5) and r5 >= 15:
+        chase_penalty += 24; chase_notes.append(f"already up {r5:.1f}% in 5 trading days")
+    elif pd.notna(r5) and r5 >= 10:
+        chase_penalty += 16; chase_notes.append(f"already up {r5:.1f}% in 5 trading days")
+    elif pd.notna(r5) and r5 >= 7:
+        chase_penalty += 9; chase_notes.append(f"already up {r5:.1f}% in 5 trading days")
+    if pd.notna(r10) and r10 >= 20:
+        chase_penalty += 20; chase_notes.append(f"already up {r10:.1f}% in 10 trading days")
+    elif pd.notna(r10) and r10 >= 15:
+        chase_penalty += 14; chase_notes.append(f"already up {r10:.1f}% in 10 trading days")
+    elif pd.notna(r10) and r10 >= 10:
+        chase_penalty += 8; chase_notes.append(f"already up {r10:.1f}% in 10 trading days")
+    if pd.notna(bounce21) and bounce21 >= 18:
+        chase_penalty += 12; chase_notes.append(f"{bounce21:.1f}% above its 1-month low")
+    elif pd.notna(bounce21) and bounce21 >= 12:
+        chase_penalty += 7; chase_notes.append(f"{bounce21:.1f}% above its 1-month low")
+
+    # RSI can help distinguish depressed from already-hot entries, but is not a buy signal alone.
+    if rsi < 30: momentum_score=12
+    elif rsi < 40: momentum_score=9
+    elif rsi < 50: momentum_score=5
+    elif rsi < 60: momentum_score=1
+    elif rsi < 70: momentum_score=-5
+    else: momentum_score=-12
+
+    history_score=0
+    if pd.notna(p10): history_score += 10 if p10>=75 else 6 if p10>=60 else -3 if p10<45 else 2
+    if pd.notna(p20): history_score += 12 if p20>=65 else 7 if p20>=50 else -5 if p20<35 else 1
+    downside_score=0
+    if pd.notna(meddown):
+        downside_score = -12 if meddown<=-20 else -7 if meddown<=-12 else 4 if meddown>=-7 else 0
+
     gap10=(target10/peak3-1)*100
     gap20=(target20/peak3-1)*100
     if target20 <= peak3:
-        peak_context=f"A 20% rebound only requires ${target20:,.2f}, which is still {abs(gap20):.1f}% below the recent 3-month high of ${peak3:,.2f}."
-        peak_score=12
+        peak_score=8
+        peak_context=f"A 20% rise from today would still leave the share {abs(gap20):.1f}% below its recent 3-month high of ${peak3:,.2f}."
     elif target10 <= peak3:
-        peak_context=f"A 10% rebound stays below the recent high, but a 20% rebound to ${target20:,.2f} would require the share to move {gap20:.1f}% above the recent 3-month high of ${peak3:,.2f}."
-        peak_score=5
+        peak_score=3
+        peak_context=f"A 10% rise stays below the recent 3-month high, but +20% would require a new 3-month high."
     else:
-        peak_context=f"Even a 10% rebound to ${target10:,.2f} would require the share to exceed its recent 3-month high of ${peak3:,.2f}. That makes this a less natural dip-rebound setup."
         peak_score=-8
+        peak_context=f"Even +10% from today would require the share to exceed its recent 3-month high of ${peak3:,.2f}."
 
-    # Strategy-specific score: deliberately focused on 10–20% rebound capture.
-    s=50 + peak_score
-    if pd.notna(p10):
-        s += 12 if p10>=75 else 6 if p10>=60 else -5 if p10<45 else 0
-    if pd.notna(p20):
-        s += 16 if p20>=65 else 8 if p20>=50 else -8 if p20<35 else 0
-    if pd.notna(meddown):
-        if meddown <= -20: s-=14
-        elif meddown <= -12: s-=8
-        elif meddown >= -7: s+=5
+    s=25 + entry_depth + momentum_score + history_score + downside_score + peak_score - chase_penalty
+
+    # Hard gates: stop historical rebound statistics overpowering poor entry quality.
+    gate=""
+    if dd3 > -5 and dd6 > -7:
+        s=min(s,39); gate="There is no meaningful current dip."
+    if chase_penalty >= 24:
+        s=min(s,44); gate="A large part of the rebound may already have happened."
+    elif chase_penalty >= 14:
+        s=min(s,54); gate="The share has already rebounded sharply, so entry quality is reduced."
     s=int(max(0,min(100,round(s))))
 
-    if s>=78: verdict="STRONG OPPORTUNITY"
-    elif s>=63: verdict="INVESTIGATE BUY"
-    elif s>=48: verdict="WATCH CLOSELY"
-    else: verdict="WAIT"
-
-    if pd.notna(p20) and p20>=60 and target20<=peak3:
-        summary="The historical rebound record and the distance back to the recent high both support the 20% objective."
-    elif pd.notna(p10) and p10>=60 and target10<=peak3:
-        summary="A 10% rebound looks more naturally supported than a full 20% rebound from today's price."
+    if gate=="There is no meaningful current dip.":
+        verdict="WAIT — NO REAL DIP"
+    elif chase_penalty>=24:
+        verdict="DON'T CHASE — REBOUND ALREADY UNDERWAY"
+    elif chase_penalty>=14:
+        verdict="RECOVERY UNDERWAY — WAIT / ASSESS"
+    elif s>=78:
+        verdict="STRONG DIP OPPORTUNITY"
+    elif s>=63:
+        verdict="EARLY RECOVERY — INVESTIGATE"
+    elif s>=48:
+        verdict="WATCH FOR ENTRY"
     else:
-        summary="The 10–20% rebound objective is not yet strongly supported from today's entry price."
+        verdict="WAIT"
+
+    if chase_notes:
+        summary="Entry warning: " + "; ".join(chase_notes) + ". " + (gate or "This reduces the attractiveness of buying at today's price.")
+    elif depth>=15:
+        summary=f"The share remains meaningfully depressed: {abs(dd3):.1f}% below its 3-month high and {abs(dd6):.1f}% below its 6-month high."
+    else:
+        summary="Today's price is not far enough below recent highs to qualify as a strong dip entry under this strategy."
 
     return {
         "stake":stake_gbp,"target10":target10,"target20":target20,
@@ -403,7 +470,10 @@ def rebound_strategy_snapshot(df, matches, stake_gbp=20000):
         "peak3":peak3,"gap10":gap10,"gap20":gap20,"peak_context":peak_context,
         "n":n,"hit10":hit10,"hit20":hit20,"p10":p10,"p20":p20,
         "days10":d10,"days20":d20,"meddown":meddown,
-        "score":s,"verdict":verdict,"summary":summary
+        "score":s,"verdict":verdict,"summary":summary,
+        "dd1":dd1,"dd3":dd3,"dd6":dd6,"bounce21":bounce21,"bounce63":bounce63,
+        "r5":r5,"r10":r10,"rsi":rsi,"chase_penalty":chase_penalty,
+        "entry_depth":entry_depth,"gate":gate
     }
 
 # ---------- NEWS ----------
@@ -569,19 +639,21 @@ st.caption("Find unusually attractive corrections and follow the trade from sell
 st.info(f"CORE STRATEGY: Deploy about £{stake_gbp:,.0f} into an unusually attractive mega-cap dip. Aim to capture at least +10% (about £{stake_gbp*.10:,.0f} gross), with +20% (about £{stake_gbp*.20:,.0f} gross) as the preferred rebound objective.")
 
 if stocks:
-    ranked=sorted(stocks.items(),key=lambda kv:kv[1]["engine"]["score"],reverse=True)
+    ranked=sorted(stocks.items(), key=lambda kv: rebound_strategy_snapshot(kv[1]["df"],kv[1]["matches"],stake_gbp)["score"], reverse=True)
     best_t,best=ranked[0]
-    if best["engine"]["score"]>=50:
-        st.success(f'BEST OPPORTUNITY TODAY: {best_t} — {best["engine"]["status"]} · {best["engine"]["score"]}/100')
-        st.write(best["engine"]["narrative"])
+    best_snap=rebound_strategy_snapshot(best["df"],best["matches"],stake_gbp)
+    if best_snap["score"]>=63:
+        st.success(f'BEST DIP-ENTRY SETUP TODAY: {best_t} — {best_snap["verdict"]} · {best_snap["score"]}/100')
+        st.write(best_snap["summary"])
     else:
-        st.info("NO COMPELLING SETUP TODAY — none of the five shares currently clears the stronger opportunity threshold.")
+        st.info("NO COMPELLING DIP ENTRY TODAY — none of the five shares currently clears the stronger entry-quality threshold.")
 
     st.subheader("Opportunity board")
     for t,x in ranked:
         df=x["df"]; f=x["f"]; matches=x["matches"]; e=x["engine"]; hs=x["hs"]; cur=f.iloc[-1]; price=float(df["Close"].iloc[-1])
         with st.container(border=True):
-            label, meaning, instinct = score_explanation(e["score"])
+            snap=rebound_strategy_snapshot(df,matches,stake_gbp)
+            label, meaning, instinct = score_explanation(snap["score"])
             st.markdown(f"### {t} · ${price:,.2f}")
             if cur["3M_DD"] <= -12 and cur["5D"] > 2:
                 plain_state = "SHARE PRICE MAY BE STARTING TO RISE AGAIN"
@@ -592,14 +664,13 @@ if stocks:
             else:
                 plain_state = "NO MAJOR BUYING OPPORTUNITY DETECTED"
             st.markdown(f"**{plain_state}**")
-            st.write(f"Opportunity score: {e['score']}/100 — {label}. {meaning}")
+            st.write(f"Dip-entry score: {snap['score']}/100 — {snap['verdict']}. {snap['summary']}")
             st.write(f"Today: {cur['1D']:+.1f}% · Last 5 trading days: {cur['5D']:+.1f}% · Last month: {cur['1M']:+.1f}% · From 3-month high: {cur['3M_DD']:.1f}%")
             if hs:
                 n = hs["n"]
                 up3 = int((matches["3M %"] > 0).sum())
                 valid3 = int(matches["3M %"].notna().sum())
                 st.write(f"History: Tesla's share price was higher 3 months later in {up3} of {valid3} similar situations." if t=="TSLA" else f"History: {t}'s share price was higher 3 months later in {up3} of {valid3} similar situations.")
-            snap=rebound_strategy_snapshot(df,matches,stake_gbp)
             st.write(f"What this means for you: {instinct}.")
             st.write(f"£{stake_gbp:,.0f} rebound view: +10% = about £{snap['gain10']:,.0f} gross; +20% = about £{snap['gain20']:,.0f} gross.")
             st.write(f"Strategy verdict: {snap['verdict']} · {snap['summary']}")
@@ -613,6 +684,7 @@ for tab,t in zip(tabs,WATCHLIST):
     x=stocks[t]
     with tab:
         df=x["df"]; f=x["f"]; matches=x["matches"]; info=x["info"]; e=x["engine"]; hs=x["hs"]
+        snap=rebound_strategy_snapshot(df,matches,stake_gbp)
         cur=f.iloc[-1]; price=float(df["Close"].iloc[-1])
 
         label, meaning, instinct = score_explanation(e["score"])
@@ -631,7 +703,7 @@ for tab,t in zip(tabs,WATCHLIST):
             plain_explain = "The current price pattern does not show the combination of a major fall and an emerging recovery that this tool is designed to find."
         st.markdown(f"### {plain_state}")
         st.write(plain_explain)
-        st.markdown(f"### Opportunity score: {e['score']}/100 — {label}")
+        st.markdown(f"### Dip-entry score: {snap['score']}/100 — {snap['verdict']}")
         st.write(meaning)
         st.write(f"Your instinct: {instinct}.")
         a,b,c=st.columns(3)
