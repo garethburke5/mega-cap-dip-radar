@@ -341,6 +341,71 @@ def entry_zone(df,f,matches):
         return lower,upper,note
     return np.nan,np.nan,"No useful dip-entry zone is identified at the moment."
 
+
+def rebound_strategy_snapshot(df, matches, stake_gbp=20000):
+    price=float(df["Close"].iloc[-1])
+    peak3=float(df["Close"].tail(63).max())
+    target10=price*1.10
+    target20=price*1.20
+
+    full1y = matches[matches["Full 1Y history"]==True].copy() if (not matches.empty and "Full 1Y history" in matches.columns) else pd.DataFrame()
+    n=len(full1y)
+    hit10=int(full1y["Days +10%"].notna().sum()) if n else 0
+    hit20=int(full1y["Days +20%"].notna().sum()) if n else 0
+    p10=hit10/n*100 if n else np.nan
+    p20=hit20/n*100 if n else np.nan
+    d10=full1y["Days +10%"].dropna().median() if n else np.nan
+    d20=full1y["Days +20%"].dropna().median() if n else np.nan
+
+    full6 = matches.dropna(subset=["Further downside %"]) if not matches.empty else pd.DataFrame()
+    meddown=full6["Further downside %"].median() if len(full6) else np.nan
+
+    # How demanding are the user's rebound goals relative to the recent peak?
+    gap10=(target10/peak3-1)*100
+    gap20=(target20/peak3-1)*100
+    if target20 <= peak3:
+        peak_context=f"A 20% rebound only requires ${target20:,.2f}, which is still {abs(gap20):.1f}% below the recent 3-month high of ${peak3:,.2f}."
+        peak_score=12
+    elif target10 <= peak3:
+        peak_context=f"A 10% rebound stays below the recent high, but a 20% rebound to ${target20:,.2f} would require the share to move {gap20:.1f}% above the recent 3-month high of ${peak3:,.2f}."
+        peak_score=5
+    else:
+        peak_context=f"Even a 10% rebound to ${target10:,.2f} would require the share to exceed its recent 3-month high of ${peak3:,.2f}. That makes this a less natural dip-rebound setup."
+        peak_score=-8
+
+    # Strategy-specific score: deliberately focused on 10–20% rebound capture.
+    s=50 + peak_score
+    if pd.notna(p10):
+        s += 12 if p10>=75 else 6 if p10>=60 else -5 if p10<45 else 0
+    if pd.notna(p20):
+        s += 16 if p20>=65 else 8 if p20>=50 else -8 if p20<35 else 0
+    if pd.notna(meddown):
+        if meddown <= -20: s-=14
+        elif meddown <= -12: s-=8
+        elif meddown >= -7: s+=5
+    s=int(max(0,min(100,round(s))))
+
+    if s>=78: verdict="STRONG OPPORTUNITY"
+    elif s>=63: verdict="INVESTIGATE BUY"
+    elif s>=48: verdict="WATCH CLOSELY"
+    else: verdict="WAIT"
+
+    if pd.notna(p20) and p20>=60 and target20<=peak3:
+        summary="The historical rebound record and the distance back to the recent high both support the 20% objective."
+    elif pd.notna(p10) and p10>=60 and target10<=peak3:
+        summary="A 10% rebound looks more naturally supported than a full 20% rebound from today's price."
+    else:
+        summary="The 10–20% rebound objective is not yet strongly supported from today's entry price."
+
+    return {
+        "stake":stake_gbp,"target10":target10,"target20":target20,
+        "gain10":stake_gbp*.10,"gain20":stake_gbp*.20,
+        "peak3":peak3,"gap10":gap10,"gap20":gap20,"peak_context":peak_context,
+        "n":n,"hit10":hit10,"hit20":hit20,"p10":p10,"p20":p20,
+        "days10":d10,"days20":d20,"meddown":meddown,
+        "score":s,"verdict":verdict,"summary":summary
+    }
+
 # ---------- NEWS ----------
 def classify_news(news):
     text=" ".join((x["title"]+" "+x.get("summary","")).lower() for x in news[:8])
@@ -357,7 +422,7 @@ def classify_news(news):
     return cats[:3] if cats else ["UNCLEAR / MIXED"]
 
 # ---------- CHART ----------
-def mobile_chart(df,ticker,entry=None):
+def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
     data=[]
     for idx,row in df.iterrows():
         data.append({"time":idx.strftime("%Y-%m-%d"),"value":round(float(row["Close"]),4)})
@@ -381,6 +446,10 @@ def mobile_chart(df,ticker,entry=None):
     price_lines += f"""series.createPriceLine({{price:{recent_low},color:'#999',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'Recent low'}});"""
     if entry:
         price_lines += f"""series.createPriceLine({{price:{float(entry)},color:'#444',lineWidth:2,lineStyle:1,axisLabelVisible:true,title:'My entry'}});"""
+    if strategy10:
+        price_lines += f"""series.createPriceLine({{price:{float(strategy10)},color:'#777',lineWidth:1,lineStyle:3,axisLabelVisible:true,title:'+10% from today'}});"""
+    if strategy20:
+        price_lines += f"""series.createPriceLine({{price:{float(strategy20)},color:'#999',lineWidth:1,lineStyle:3,axisLabelVisible:true,title:'+20% from today'}});"""
     chart_html=f"""
     <div style="font-family:Arial,sans-serif">
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
@@ -485,6 +554,9 @@ for t in WATCHLIST:
                "fund_notes":fund_notes,"engine":engine,"hs":hs}
 
 # ---------- SIDEBAR / POSITION TRACKER ----------
+st.sidebar.header("My rebound strategy")
+stake_gbp=st.sidebar.number_input("Typical amount to deploy (£)",min_value=1000.0,value=20000.0,step=1000.0)
+st.sidebar.caption("Core objective: capture roughly 10–20% rebounds after unusually attractive falls.")
 st.sidebar.header("My position (optional)")
 held=st.sidebar.selectbox("Stock",["None"]+WATCHLIST)
 entry_price=st.sidebar.number_input("Entry price ($)",min_value=0.0,value=0.0,step=1.0)
@@ -494,6 +566,7 @@ risk_budget=st.sidebar.number_input("Maximum acceptable loss",min_value=0.0,valu
 # ---------- HOME ----------
 st.title("🎯 Mega-Cap Sniper")
 st.caption("Find unusually attractive corrections and follow the trade from sell-off to recovery.")
+st.info(f"CORE STRATEGY: Deploy about £{stake_gbp:,.0f} into an unusually attractive mega-cap dip. Aim to capture at least +10% (about £{stake_gbp*.10:,.0f} gross), with +20% (about £{stake_gbp*.20:,.0f} gross) as the preferred rebound objective.")
 
 if stocks:
     ranked=sorted(stocks.items(),key=lambda kv:kv[1]["engine"]["score"],reverse=True)
@@ -526,7 +599,10 @@ if stocks:
                 up3 = int((matches["3M %"] > 0).sum())
                 valid3 = int(matches["3M %"].notna().sum())
                 st.write(f"History: Tesla's share price was higher 3 months later in {up3} of {valid3} similar situations." if t=="TSLA" else f"History: {t}'s share price was higher 3 months later in {up3} of {valid3} similar situations.")
+            snap=rebound_strategy_snapshot(df,matches,stake_gbp)
             st.write(f"What this means for you: {instinct}.")
+            st.write(f"£{stake_gbp:,.0f} rebound view: +10% = about £{snap['gain10']:,.0f} gross; +20% = about £{snap['gain20']:,.0f} gross.")
+            st.write(f"Strategy verdict: {snap['verdict']} · {snap['summary']}")
 
 st.divider()
 st.subheader("Deep analysis")
@@ -569,6 +645,31 @@ for tab,t in zip(tabs,WATCHLIST):
             st.write("Why the score is where it is: " + "; ".join(e["reasons"]) + ".")
         if e["cautions"]:
             st.warning("Cautions: " + "; ".join(e["cautions"]) + ".")
+
+        st.markdown("### Your £20k-style rebound setup")
+        snap=rebound_strategy_snapshot(df,matches,stake_gbp)
+        st.markdown(f"#### {snap['verdict']} — rebound-fit score {snap['score']}/100")
+        st.write(f"The question here is simple: does today's price look like a good place to deploy about £{stake_gbp:,.0f} if the goal is to capture the next 10–20% rebound?")
+        s1,s2,s3=st.columns(3)
+        s1.metric("Today's share price",f"${price:,.2f}")
+        s2.metric("+10% share price",f"${snap['target10']:,.2f}",f"≈ £{snap['gain10']:,.0f} gross")
+        s3.metric("+20% share price",f"${snap['target20']:,.2f}",f"≈ £{snap['gain20']:,.0f} gross")
+        st.write(snap["peak_context"])
+
+        if snap["n"] >= 5:
+            st.markdown("#### What happened in comparable historical situations?")
+            if pd.notna(snap["p10"]):
+                d10txt=f" The typical successful case took about {snap['days10']:.0f} trading days." if pd.notna(snap["days10"]) else ""
+                st.write(f"In {snap['hit10']} of {snap['n']} comparable situations with a full year of later price history, the share subsequently rose at least 10% above the comparison price.{d10txt}")
+            if pd.notna(snap["p20"]):
+                d20txt=f" The typical successful case took about {snap['days20']:.0f} trading days." if pd.notna(snap["days20"]) else ""
+                st.write(f"In {snap['hit20']} of {snap['n']} comparable situations, the share subsequently rose at least 20% above the comparison price.{d20txt}")
+            if pd.notna(snap["meddown"]):
+                st.write(f"But before/during those later outcomes, the typical lowest price in completed 6-month comparisons was another {abs(snap['meddown']):.1f}% below the historical comparison price.")
+        else:
+            st.write("There are not yet enough completed one-year historical comparisons to give a reliable 10%/20% success rate.")
+
+        st.info("What this means for your strategy: " + snap["summary"] + " The app treats the further-downside history as important because a later 20% rebound is much less useful if the share commonly falls much further first.")
 
         st.markdown("### Price behaviour — in plain English")
         moves=period_rows(df,f)
@@ -720,9 +821,10 @@ for tab,t in zip(tabs,WATCHLIST):
         st.caption("Headline classification is a screening aid. The app does not assume that a headline proves the cause of a price move.")
 
         st.markdown("### Main price chart")
-        st.caption("Clean line chart by default. Pinch to zoom, swipe to pan, and tap/drag for the exact date and price.")
+        st.caption("Pinch to zoom and swipe to pan. The +10% and +20% lines are your rebound objectives from today’s price — not analyst forecasts.")
         entry_for_chart=entry_price if held==t and entry_price>0 else None
-        mobile_chart(df,t,entry_for_chart)
+        strategy_snap=rebound_strategy_snapshot(df,matches,stake_gbp)
+        mobile_chart(df,t,entry_for_chart,strategy_snap["target10"],strategy_snap["target20"])
 
         if held==t and entry_price>0:
             st.markdown("### My trade")
