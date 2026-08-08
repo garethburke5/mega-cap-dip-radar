@@ -471,16 +471,16 @@ def rebound_strategy_snapshot(df, matches, stake_gbp=20000):
     entry_score=int(max(0,min(100,round(entry))))
 
     if entry_score >= 78:
-        verdict="STRONG ENTRY OPPORTUNITY"
+        verdict="STRONG BUYING OPPORTUNITY"
         instinct="INVESTIGATE BUY"
     elif entry_score >= 63:
-        verdict="ATTRACTIVE, BUT CHECK ENTRY"
+        verdict="POSSIBLE OPPORTUNITY — CHECK THE PRICE"
         instinct="INVESTIGATE"
     elif entry_score >= 48:
-        verdict="WATCH / CONSIDER ON PULLBACK"
+        verdict="WAIT — SEE IF THE PRICE FALLS FURTHER"
         instinct="WATCH"
     elif chase_penalty >= 12:
-        verdict="DON'T CHASE — REBOUND ALREADY UNDERWAY"
+        verdict="WAIT — PRICE HAS ALREADY RISEN SHARPLY"
         instinct="WAIT"
     else:
         verdict="WAIT"
@@ -497,7 +497,9 @@ def rebound_strategy_snapshot(df, matches, stake_gbp=20000):
         situation = "The dip is interesting, but entry quality is mixed."
 
     if chase_reasons:
-        entry_explain = "What is holding the entry score back: " + "; ".join(chase_reasons) + "."
+        entry_explain = "Why the buying score is lower: " + "; ".join(chase_reasons) + "."
+        if entry_score < 63:
+            entry_explain += " The recent dip was substantial, but the share has already bounced. Wait and see if the price falls further and gives you a better entry."
     else:
         entry_explain = "There has not yet been a large enough rebound to trigger the app's main 'don't chase' penalties."
 
@@ -711,8 +713,8 @@ if stocks:
             else:
                 plain_state = "NO MAJOR BUYING OPPORTUNITY DETECTED"
             st.markdown(f"**{plain_state}**")
-            st.write(f"Entry quality today: {snap['entry_score']}/100 — {snap['verdict']}.")
-            st.write(f"Dip quality: {snap['dip_quality']}/100. {snap['summary']}")
+            st.write(f"Buying opportunity today: {snap['entry_score']}/100 — {snap['verdict']}.")
+            st.write(f"Size of recent dip: {snap['dip_quality']}/100. {snap['summary']}")
             st.write(snap["entry_explain"])
             st.write(f"Today: {cur['1D']:+.1f}% · Last 5 trading days: {cur['5D']:+.1f}% · Last month: {cur['1M']:+.1f}% · From 3-month high: {cur['3M_DD']:.1f}%")
             if hs:
@@ -720,7 +722,7 @@ if stocks:
                 up3 = int((matches["3M %"] > 0).sum())
                 valid3 = int(matches["3M %"].notna().sum())
                 st.write(f"History: Tesla's share price was higher 3 months later in {up3} of {valid3} similar situations." if t=="TSLA" else f"History: {t}'s share price was higher 3 months later in {up3} of {valid3} similar situations.")
-            st.write(f"What this means for you: {snap['instinct']}.")
+            st.write("What this means for you: WAIT — SEE IF THE PRICE FALLS FURTHER." if 48 <= snap["entry_score"] < 63 else f"What this means for you: {snap['instinct']}.")
             st.write(f"£{stake_gbp:,.0f} rebound view: +10% = about £{snap['gain10']:,.0f} gross; +20% = about £{snap['gain20']:,.0f} gross.")
             st.write(f"Strategy verdict: {snap['verdict']} · {snap['summary']}")
 
@@ -752,14 +754,14 @@ for tab,t in zip(tabs,WATCHLIST):
             plain_explain = "The current price pattern does not show the combination of a major fall and an emerging recovery that this tool is designed to find."
         st.markdown(f"### {plain_state}")
         st.write(plain_explain)
-        st.markdown(f"### Entry quality today: {snap['entry_score']}/100 — {snap['verdict']}")
+        st.markdown(f"### Buying opportunity today: {snap['entry_score']}/100 — {snap['verdict']}")
         st.write(snap["summary"])
         st.write(snap["entry_explain"])
         st.write(f"Your instinct: {snap['instinct']}.")
         d1,d2=st.columns(2)
-        d1.metric("Dip quality",f"{snap['dip_quality']}/100")
-        d2.metric("Entry quality today",f"{snap['entry_score']}/100")
-        st.caption("Dip quality asks: 'Has this stock suffered a major fall?' Entry quality asks the more important question: 'Is today's actual price attractive enough to buy now?'")
+        d1.metric("Size of recent dip",f"{snap['dip_quality']}/100")
+        d2.metric("Buying opportunity today",f"{snap['entry_score']}/100")
+        st.caption("Size of recent dip asks: 'Has this stock suffered a major fall?' Buying opportunity today asks the more important question: 'Is today's actual price attractive enough to put money in now?'")
         a,b,c=st.columns(3)
         a.metric("Share price",f"${price:,.2f}",f"{cur['1D']:+.1f}% today")
         b.metric("Below 3M high",f"{cur['3M_DD']:.1f}%")
@@ -774,7 +776,7 @@ for tab,t in zip(tabs,WATCHLIST):
 
         st.markdown("### Your £20k-style rebound setup")
         snap=rebound_strategy_snapshot(df,matches,stake_gbp)
-        st.markdown(f"#### {snap['verdict']} — entry quality {snap['entry_score']}/100")
+        st.markdown(f"#### {snap['verdict']} — buying opportunity {snap['entry_score']}/100")
         st.write(f"The question here is simple: does today's price look like a good place to deploy about £{stake_gbp:,.0f} if the goal is to capture the next 10–20% rebound?")
         s1,s2,s3=st.columns(3)
         s1.metric("Today's share price",f"${price:,.2f}")
