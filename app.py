@@ -265,6 +265,18 @@ def opportunity_engine(df,f,matches,bench5,fund_label):
     return {"score":score,"status":status,"action":action,"reasons":reasons[:6],
             "cautions":cautions[:4],"narrative":narrative,"rel5":rel5}
 
+
+def score_explanation(score):
+    if score < 30:
+        return "LOW INTEREST", "There is not enough evidence of an unusually attractive buying opportunity at the moment.", "IGNORE FOR NOW"
+    if score < 50:
+        return "WATCH", "There are some encouraging signs, but the evidence for buying is still fairly weak.", "WATCH"
+    if score < 65:
+        return "INTERESTING", "The setup is becoming interesting. It is worth investigating more closely, but it is not yet one of the strongest signals.", "INVESTIGATE"
+    if score < 80:
+        return "STRONG OPPORTUNITY", "Several useful signals are lining up. This deserves serious investigation as a possible entry.", "INVESTIGATE BUY"
+    return "EXCEPTIONAL SETUP", "This is one of the strongest combinations of sell-off, recovery evidence and historical support detected by the model.", "HIGHEST PRIORITY"
+
 # ---------- NEWS ----------
 def classify_news(news):
     text=" ".join((x["title"]+" "+x.get("summary","")).lower() for x in news[:8])
@@ -428,12 +440,25 @@ if stocks:
     for t,x in ranked:
         df=x["df"]; f=x["f"]; e=x["engine"]; hs=x["hs"]; cur=f.iloc[-1]; price=float(df["Close"].iloc[-1])
         with st.container(border=True):
+            label, meaning, instinct = score_explanation(e["score"])
             st.markdown(f"### {t} · ${price:,.2f}")
-            st.markdown(f"**{e['status']} · {e['score']}/100**")
-            st.write(f"Today {cur['1D']:+.1f}% · 5D {cur['5D']:+.1f}% · 1M {cur['1M']:+.1f}% · 3M drawdown {cur['3M_DD']:.1f}%")
+            if cur["3M_DD"] <= -12 and cur["5D"] > 2:
+                plain_state = "SHARE PRICE MAY BE STARTING TO RISE AGAIN"
+            elif cur["5D"] <= -5:
+                plain_state = "SHARE PRICE IS STILL FALLING"
+            elif cur["3M_DD"] <= -12:
+                plain_state = "SHARE PRICE REMAINS WELL BELOW ITS RECENT HIGH"
+            else:
+                plain_state = "NO MAJOR BUYING OPPORTUNITY DETECTED"
+            st.markdown(f"**{plain_state}**")
+            st.write(f"Opportunity score: {e['score']}/100 — {label}. {meaning}")
+            st.write(f"Today: {cur['1D']:+.1f}% · Last 5 trading days: {cur['5D']:+.1f}% · Last month: {cur['1M']:+.1f}% · From 3-month high: {cur['3M_DD']:.1f}%")
             if hs:
-                st.write(f"Historical setup: {hs['p20']:.0f}% reached +20% · median further downside {hs['meddown']:.1f}% · median 6M outcome {hs['med6']:+.1f}%")
-            st.write(f"Fundamentals: {x['fund_label']} · Action: {e['action']}")
+                n = hs["n"]
+                up3 = int((matches["3M %"] > 0).sum())
+                valid3 = int(matches["3M %"].notna().sum())
+                st.write(f"History: Tesla's share price was higher 3 months later in {up3} of {valid3} similar situations." if t=="TSLA" else f"History: {t}'s share price was higher 3 months later in {up3} of {valid3} similar situations.")
+            st.write(f"What this means for you: {instinct}.")
 
 st.divider()
 st.subheader("Deep analysis")
@@ -446,16 +471,32 @@ for tab,t in zip(tabs,WATCHLIST):
         df=x["df"]; f=x["f"]; matches=x["matches"]; info=x["info"]; e=x["engine"]; hs=x["hs"]
         cur=f.iloc[-1]; price=float(df["Close"].iloc[-1])
 
-        st.markdown(f"## {t} — {e['status']}")
-        a,b,c,d=st.columns(4)
-        a.metric("Price",f"${price:,.2f}",f"{cur['1D']:+.1f}% today")
-        b.metric("Opportunity",f"{e['score']}/100")
-        c.metric("3M drawdown",f"{cur['3M_DD']:.1f}%")
-        d.metric("RSI",f"{cur['RSI']:.0f}")
+        label, meaning, instinct = score_explanation(e["score"])
+        st.markdown(f"## {t} — ${price:,.2f}")
+        if cur["3M_DD"] <= -12 and cur["5D"] > 2:
+            plain_state = "SHARE PRICE MAY BE STARTING TO RISE AGAIN"
+            plain_explain = f"{t} is still {abs(cur['3M_DD']):.1f}% below its 3-month high, but its share price has risen {cur['5D']:.1f}% over the last 5 trading days. That may be an early sign that the recent fall is ending and the share price is beginning to move higher again."
+        elif cur["5D"] <= -5:
+            plain_state = "SHARE PRICE IS STILL FALLING"
+            plain_explain = f"{t}'s share price has fallen {abs(cur['5D']):.1f}% over the last 5 trading days. The lower price may eventually create an opportunity, but there is not yet clear evidence that the fall has stopped."
+        elif cur["3M_DD"] <= -12:
+            plain_state = "SHARE PRICE REMAINS DEPRESSED"
+            plain_explain = f"{t} remains {abs(cur['3M_DD']):.1f}% below its 3-month high. The price is cheaper than at its recent peak, but there is not yet a strong upward move confirming a recovery."
+        else:
+            plain_state = "NO MAJOR PRICE OPPORTUNITY DETECTED"
+            plain_explain = "The current price pattern does not show the combination of a major fall and an emerging recovery that this tool is designed to find."
+        st.markdown(f"### {plain_state}")
+        st.write(plain_explain)
+        st.markdown(f"### Opportunity score: {e['score']}/100 — {label}")
+        st.write(meaning)
+        st.write(f"Your instinct: {instinct}.")
+        a,b,c=st.columns(3)
+        a.metric("Share price",f"${price:,.2f}",f"{cur['1D']:+.1f}% today")
+        b.metric("Below 3M high",f"{cur['3M_DD']:.1f}%")
+        c.metric("RSI",f"{cur['RSI']:.0f}")
 
-        st.markdown("### Analysis & suggested action")
+        st.markdown("### Why the app thinks this")
         st.write(e["narrative"])
-        st.write(f"Suggested action: {e['action']}.")
         if e["reasons"]:
             st.write("Why the score is where it is: " + "; ".join(e["reasons"]) + ".")
         if e["cautions"]:
@@ -482,28 +523,49 @@ for tab,t in zip(tabs,WATCHLIST):
         if hs:
             h1,h2,h3,h4=st.columns(4)
             h1.metric("Similar episodes",hs["n"])
-            h2.metric("Reached +20%",f"{hs['p20']:.0f}%")
-            h3.metric("Median 6M",f"{hs['med6']:+.1f}%")
-            h4.metric("Further downside",f"{hs['meddown']:.1f}%")
-            st.write(f"Across the {hs['n']} closest historical setups, the median 1-month outcome was {hs['med1']:+.1f}%, the median 3-month outcome {hs['med3']:+.1f}%, and the median 6-month outcome {hs['med6']:+.1f}%. {hs['p10']:.0f}% reached +10%, {hs['p20']:.0f}% reached +20%, and {hs['p30']:.0f}% reached +30% within the following year.")
-            st.write(f"Median further downside after a comparable signal was {hs['meddown']:.1f}%. In other words, historical analogues suggest signals like this were typically within about {abs(hs['meddown']):.1f}% of their subsequent six-month low, although individual outcomes varied considerably.")
-            st.dataframe(matches.style.format({
-                "Similarity":"{:.2f}","1M %":"{:+.1f}%","3M %":"{:+.1f}%","6M %":"{:+.1f}%",
-                "Best 6M %":"{:+.1f}%","Further downside %":"{:+.1f}%","Low proximity %":"{:.1f}%"
-            }),hide_index=True,use_container_width=True)
+            h2.metric("Later rose 20%+",f"{int(matches['Days +20%'].notna().sum())} of {len(matches)}")
+            h3.metric("Typical 6M return",f"{hs['med6']:+.1f}%")
+            h4.metric("Typical further fall",f"{abs(hs['meddown']):.1f}%")
+            valid1 = matches["1M %"].dropna()
+            valid3 = matches["3M %"].dropna()
+            valid6 = matches["6M %"].dropna()
+            up1 = int((valid1 > 0).sum())
+            up3 = int((valid3 > 0).sum())
+            up6 = int((valid6 > 0).sum())
+            st.write(f"We found {hs['n']} previous situations in {t}'s price history that most closely resemble what is happening now.")
+            if len(valid1):
+                st.write(f"• 1 month later, the share price was higher in {up1} of {len(valid1)} comparable situations. The typical return was {hs['med1']:+.1f}%.")
+            if len(valid3):
+                st.write(f"• 3 months later, the share price was higher in {up3} of {len(valid3)} comparable situations. The typical return was {hs['med3']:+.1f}%.")
+            if len(valid6):
+                st.write(f"• 6 months later, the share price was higher in {up6} of {len(valid6)} comparable situations. The typical return was {hs['med6']:+.1f}%.")
+            hit20 = int(matches["Days +20%"].notna().sum())
+            st.write(f"• In {hit20} of the {len(matches)} comparable situations, the share price at some point rose at least 20% above the historical comparison price within the following year. This does not mean an investor necessarily made 20%, because the price may have fallen substantially first.")
+            st.write(f"• In these similar situations, the typical lowest point afterwards was another {abs(hs['meddown']):.1f}% below the comparison price.")
+            if hs["med6"] > 0:
+                conclusion = "Historically, buying at a similar stage often worked reasonably well, although further falls were still possible."
+            else:
+                conclusion = "Historically, this exact stage was often too early to buy: the share frequently fell further and the typical 6-month return was still negative."
+            st.info("What this means: " + conclusion)
+            with st.expander("Show the individual historical examples"):
+                display_matches = matches.drop(columns=["Similarity","Low proximity %"], errors="ignore")
+                st.dataframe(display_matches.style.format({
+                    "1M %":"{:+.1f}%","3M %":"{:+.1f}%","6M %":"{:+.1f}%",
+                    "Best 6M %":"{:+.1f}%","Further downside %":"{:+.1f}%"
+                }),hide_index=True,use_container_width=True)
 
-            st.markdown("#### Similar sell-offs — visual comparison")
-            st.caption("Current and five closest historical episodes are normalised to 100 so their shapes can be compared. Historical failures are not excluded.")
-            analogue_chart(df,matches,t)
+            with st.expander("Show visual comparison with similar historical falls"):
+                st.write("Each line shows how the share price moved around one of the most similar historical situations. The lines are rebased to the same starting value so their shapes can be compared; they are not actual share prices.")
+                analogue_chart(df,matches,t)
 
         st.markdown("### Trade economics")
         if hs:
             target=hs["target"]; adverse=hs["adverse"]
             q1,q2,q3,q4=st.columns(4)
-            q1.metric("Historical median target",f"${target:,.2f}",f"{hs['target_pct']:+.1f}%")
-            q2.metric("Historical adverse level",f"${adverse:,.2f}",f"{hs['meddown']:.1f}%")
-            q3.metric("Indicative reward/risk",f"{hs['rr']:.1f}:1" if hs['rr']==hs['rr'] else "N/A")
-            q4.metric("+20% hit-rate",f"{hs['p20']:.0f}%")
+            q1.metric("Typical 6M price if history repeated",f"${target:,.2f}",f"{hs['target_pct']:+.1f}%")
+            q2.metric("Price after typical further fall",f"${adverse:,.2f}",f"{hs['meddown']:.1f}%")
+            q3.metric("Possible upside vs downside",f"{hs['rr']:.1f}:1" if hs['rr']==hs['rr'] else "N/A")
+            q4.metric("Historical cases that later rose 20%+",f"{int(matches['Days +20%'].notna().sum())}/{len(matches)}")
             st.caption("These are scenario estimates derived from comparable historical episodes, not forecasts or guaranteed targets.")
 
         st.markdown("### Market context")
