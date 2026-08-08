@@ -5,214 +5,243 @@ import numpy as np
 import yfinance as yf
 from datetime import datetime, timedelta, timezone
 
-st.set_page_config(page_title="Mega-Cap Dip Radar", page_icon="📉", layout="wide")
+st.set_page_config(page_title="Mega-Cap Dip Radar v2", page_icon="🎯", layout="wide")
 
-WATCHLIST = {
-    "TSLA": {"name": "Tesla", "opportunity": -20, "extreme": -30},
-    "NVDA": {"name": "Nvidia", "opportunity": -20, "extreme": -30},
-    "META": {"name": "Meta", "opportunity": -20, "extreme": -30},
-    "AMZN": {"name": "Amazon", "opportunity": -15, "extreme": -25},
-    "GOOGL": {"name": "Alphabet", "opportunity": -15, "extreme": -25},
-}
-
-DEFAULT_LOOKBACK = 90
-DEFAULT_REVERSAL = 5.0
+WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL"]
+PERIODS = {"1D":1,"2D":2,"5D":5,"7D":7,"10D":10,"1M":21,"3M":63,"6M":126,"12M":252}
+MATCH_COLS = ["1D","5D","10D","1M","3M_DD","6M_DD","RSI","Dist50"]
 
 @st.cache_data(ttl=300)
-def load_prices(ticker, days=500):
+def load(ticker, years=10):
     end = datetime.now(timezone.utc).date() + timedelta(days=1)
-    start = end - timedelta(days=days)
+    start = end - timedelta(days=int(years*365.25)+30)
     df = yf.download(ticker, start=start, end=end, auto_adjust=True, progress=False)
     if df.empty:
-        return pd.DataFrame()
+        return df
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
-    cols = [c for c in ["Close", "Volume"] if c in df.columns]
-    return df[cols].dropna()
+    return df[["Close","Volume"]].dropna()
 
-def calc_rsi(series, period=14):
-    delta = series.diff()
-    gain = delta.clip(lower=0).rolling(period).mean()
-    loss = -delta.clip(upper=0).rolling(period).mean()
-    rs = gain / loss.replace(0, np.nan)
-    return 100 - (100 / (1 + rs))
+def rsi(s, n=14):
+    d=s.diff()
+    g=d.clip(lower=0).rolling(n).mean()
+    l=-d.clip(upper=0).rolling(n).mean()
+    rs=g/l.replace(0,np.nan)
+    return 100-(100/(1+rs))
 
-def score_stock(drawdown, rsi, dist50, vol_ratio, rebound, opportunity, extreme, reversal):
-    score = 0
-    if drawdown <= extreme:
-        score += 55
-    elif drawdown <= opportunity:
-        score += 42
-    elif drawdown <= opportunity * 0.75:
-        score += 28
-    elif drawdown <= opportunity * 0.5:
-        score += 15
+def ret(s,d,i=None):
+    if i is None: i=len(s)-1
+    if i-d < 0: return np.nan
+    return (s.iloc[i]/s.iloc[i-d]-1)*100
 
-    if np.isfinite(rsi):
-        if rsi < 25: score += 18
-        elif rsi < 30: score += 15
-        elif rsi < 35: score += 10
-        elif rsi < 40: score += 5
+def dd(s,days,i=None):
+    if i is None: i=len(s)-1
+    a=max(0,i-days+1)
+    h=s.iloc[a:i+1].max()
+    return (s.iloc[i]/h-1)*100
 
-    if np.isfinite(dist50):
-        if dist50 < -15: score += 12
-        elif dist50 < -10: score += 9
-        elif dist50 < -5: score += 5
+def features(df):
+    c=df["Close"]
+    out=pd.DataFrame(index=df.index)
+    for k,d in PERIODS.items():
+        out[k]=c.pct_change(d)*100
+    out["3M_DD"]=c/c.rolling(63).max()*100-100
+    out["6M_DD"]=c/c.rolling(126).max()*100-100
+    out["12M_DD"]=c/c.rolling(252).max()*100-100
+    out["RSI"]=rsi(c)
+    out["Dist50"]=(c/c.rolling(50).mean()-1)*100
+    out["VolRatio"]=df["Volume"]/df["Volume"].rolling(20).mean()
+    return out
 
-    if np.isfinite(vol_ratio):
-        if vol_ratio >= 2: score += 8
-        elif vol_ratio >= 1.5: score += 5
-        elif vol_ratio >= 1.2: score += 3
+def closest_matches(df, n=8, gap=40):
+    f=features(df).dropna()
+    if len(f)<350:
+        return pd.DataFrame(), f
 
-    if drawdown <= opportunity:
-        if rebound >= reversal: score += 12
-        elif rebound >= max(2, reversal/2): score += 6
+    today=f.iloc[-1]
+    hist=f.iloc[:-30].copy()
+    dist=pd.Series(0.0,index=hist.index)
+    used=0
+    for col in MATCH_COLS:
+        sd=hist[col].std()
+        if pd.notna(sd) and sd>0:
+            dist += ((hist[col]-today[col])/sd)**2
+            used += 1
+    dist=np.sqrt(dist/max(used,1)).sort_values()
 
-    return min(100, int(round(score)))
+    picked=[]
+    picked_pos=[]
+    for dt,val in dist.items():
+        pos=df.index.get_loc(dt)
+        if all(abs(pos-p)>=gap for p in picked_pos):
+            picked.append((dt,float(val),pos))
+            picked_pos.append(pos)
+        if len(picked)>=n:
+            break
 
-def get_status(drawdown, rebound, score, opportunity, extreme, reversal):
-    if drawdown <= extreme and rebound >= reversal:
-        return "EXTREME + REVERSAL"
-    if score >= 80:
-        return "HIGH PRIORITY"
-    if drawdown <= opportunity and rebound >= reversal:
-        return "REVERSAL ALERT"
-    if drawdown <= opportunity:
-        return "OPPORTUNITY"
-    if score >= 45:
-        return "WATCH"
+    rows=[]
+    c=df["Close"]
+    for dt,distance,pos in picked:
+        entry=float(c.iloc[pos])
+        future=c.iloc[pos+1:min(len(c),pos+127)]
+        if future.empty: continue
+        best=(future.max()/entry-1)*100
+        worst=(future.min()/entry-1)*100
+
+        d10=d20=None
+        for j in range(pos+1,min(len(c),pos+253)):
+            rr=(c.iloc[j]/entry-1)*100
+            if d10 is None and rr>=10: d10=j-pos
+            if d20 is None and rr>=20: d20=j-pos
+            if d10 is not None and d20 is not None: break
+
+        rows.append({
+            "Date":dt.date(),
+            "Similarity":distance,
+            "Best next 6M %":best,
+            "Worst next 6M %":worst,
+            "Days to +10%":d10,
+            "Days to +20%":d20
+        })
+    return pd.DataFrame(rows), f
+
+def score(row, matches, rel5):
+    s=0
+    if row["1D"]<=-7: s+=12
+    elif row["1D"]<=-4: s+=7
+    if row["5D"]<=-12: s+=14
+    elif row["5D"]<=-8: s+=9
+    if row["1M"]<=-18: s+=14
+    elif row["1M"]<=-10: s+=8
+    if row["3M_DD"]<=-30: s+=18
+    elif row["3M_DD"]<=-20: s+=12
+    elif row["3M_DD"]<=-12: s+=6
+    if rel5<=-5: s+=7
+    if row["RSI"]<30: s+=10
+    elif row["RSI"]<40: s+=5
+    if row["VolRatio"]>=1.5: s+=5
+    if len(matches)>=4:
+        p20=matches["Days to +20%"].notna().mean()
+        medbest=matches["Best next 6M %"].median()
+        if p20>=0.65: s+=10
+        elif p20>=0.5: s+=6
+        if medbest>=20: s+=5
+    return min(100,int(round(s)))
+
+def verdict(sc):
+    if sc>=80:return "HIGH-PRIORITY REVIEW"
+    if sc>=65:return "STRONG SETUP"
+    if sc>=50:return "INTERESTING"
+    if sc>=35:return "WATCH"
     return "NORMAL"
 
-def analyse(ticker, cfg, lookback, reversal):
-    df = load_prices(ticker)
-    if df.empty or len(df) < 60:
-        return None, df
+qqq=load("QQQ",10)
+spy=load("SPY",10)
+qqq5=ret(qqq["Close"],5) if not qqq.empty else np.nan
+spy5=ret(spy["Close"],5) if not spy.empty else np.nan
 
-    close = df["Close"]
-    current = float(close.iloc[-1])
-    rolling_high = float(close.rolling(lookback, min_periods=20).max().iloc[-1])
-    drawdown = (current / rolling_high - 1) * 100
+st.title("Mega-Cap Dip Radar v2")
+st.caption("Short-term shock + longer-term drawdown + market-relative weakness + historical pattern matching.")
 
-    low = float(close.iloc[-lookback:].min())
-    rebound = (current / low - 1) * 100
+summary=[]
+details={}
 
-    rsi = float(calc_rsi(close).iloc[-1])
-    ma50 = float(close.rolling(50).mean().iloc[-1])
-    dist50 = (current / ma50 - 1) * 100
+for t in WATCHLIST:
+    df=load(t,10)
+    if df.empty or len(df)<350:
+        continue
 
-    vol20 = float(df["Volume"].rolling(20).mean().iloc[-1])
-    vol_ratio = float(df["Volume"].iloc[-1] / vol20) if vol20 else np.nan
+    f=features(df).dropna()
+    cur=f.iloc[-1].copy()
+    rel5=cur["5D"]-qqq5
+    matches,_=closest_matches(df)
 
-    score = score_stock(
-        drawdown, rsi, dist50, vol_ratio, rebound,
-        cfg["opportunity"], cfg["extreme"], reversal
-    )
-    status = get_status(
-        drawdown, rebound, score,
-        cfg["opportunity"], cfg["extreme"], reversal
-    )
+    sc=score(cur,matches,rel5)
 
-    return {
-        "Ticker": ticker,
-        "Company": cfg["name"],
-        "Price": current,
-        "Rolling High": rolling_high,
-        "Drawdown %": drawdown,
-        "Correction Low": low,
-        "Rebound %": rebound,
-        "RSI": rsi,
-        "50DMA Distance %": dist50,
-        "Volume Ratio": vol_ratio,
-        "Score": score,
-        "Status": status,
-        "Opportunity Trigger": cfg["opportunity"],
-        "Extreme Trigger": cfg["extreme"],
-    }, df
+    row={"Ticker":t,"Price":float(df["Close"].iloc[-1])}
+    for p in PERIODS:
+        row[p]=cur[p]
+    row.update({
+        "3M DD":cur["3M_DD"],
+        "6M DD":cur["6M_DD"],
+        "12M DD":cur["12M_DD"],
+        "Rel vs QQQ 5D":rel5,
+        "RSI":cur["RSI"],
+        "Volume x":cur["VolRatio"],
+        "Score":sc,
+        "Verdict":verdict(sc)
+    })
+    summary.append(row)
+    details[t]=(df,cur,matches,rel5)
 
-st.title("Mega-Cap Dip Radar")
-st.caption("Focused on large corrections and rebound opportunities in five mega-cap shares.")
+sumdf=pd.DataFrame(summary).sort_values(["Score","3M DD"],ascending=[False,True])
 
-with st.sidebar:
-    st.header("Live settings")
-    lookback = st.selectbox("Rolling high window", [60, 90, 126, 252], index=1)
-    reversal = st.slider("Reversal confirmation %", 0, 10, 5, 1)
-    st.caption("Scheduled Telegram alerts use the defaults in notifier.py.")
+st.subheader("Sniper board")
+cols=["Ticker","Price","1D","2D","5D","7D","10D","1M","3M","6M","12M",
+      "3M DD","6M DD","12M DD","Rel vs QQQ 5D","RSI","Score","Verdict"]
+fmt={c:"{:.1f}%" for c in ["1D","2D","5D","7D","10D","1M","3M","6M","12M",
+                            "3M DD","6M DD","12M DD","Rel vs QQQ 5D"]}
+fmt["Price"]="${:,.2f}"
+fmt["RSI"]="{:.0f}"
+fmt["Score"]="{:.0f}"
+st.dataframe(sumdf[cols].style.format(fmt),use_container_width=True,hide_index=True)
 
-rows = []
-series = {}
-for ticker, cfg in WATCHLIST.items():
-    row, df = analyse(ticker, cfg, lookback, reversal)
-    if row:
-        rows.append(row)
-        series[ticker] = df
+top=sumdf.iloc[0]
+st.info(f'Highest-priority setup: {top["Ticker"]} · {top["Verdict"]} · score {top["Score"]}/100.')
 
-if not rows:
-    st.error("Market data is unavailable right now.")
-    st.stop()
+st.subheader("Historical pattern engine")
+tabs=st.tabs(WATCHLIST)
 
-summary = pd.DataFrame(rows).sort_values(["Score", "Drawdown %"], ascending=[False, True])
-
-cards = st.columns(5)
-for col, (_, row) in zip(cards, summary.sort_values("Ticker").iterrows()):
-    with col:
-        st.metric(
-            f'{row["Ticker"]} · {row["Status"]}',
-            f'${row["Price"]:,.2f}',
-            f'{row["Drawdown %"]:.1f}% from high'
-        )
-        st.caption(f'Score {row["Score"]}/100 · RSI {row["RSI"]:.0f}')
-
-st.subheader("Opportunity ranking")
-show = summary[[
-    "Ticker","Price","Drawdown %","Rebound %","RSI",
-    "50DMA Distance %","Volume Ratio","Score","Status"
-]].copy()
-
-st.dataframe(
-    show.style.format({
-        "Price": "${:,.2f}",
-        "Drawdown %": "{:.1f}%",
-        "Rebound %": "{:.1f}%",
-        "RSI": "{:.0f}",
-        "50DMA Distance %": "{:.1f}%",
-        "Volume Ratio": "{:.2f}×",
-        "Score": "{:.0f}",
-    }),
-    use_container_width=True,
-    hide_index=True
-)
-
-top = summary.iloc[0]
-st.info(
-    f'Highest-priority stock: {top["Ticker"]} · {top["Status"]} · '
-    f'score {top["Score"]}/100 · drawdown {top["Drawdown %"]:.1f}%.'
-)
-
-st.subheader("Charts")
-tabs = st.tabs(list(WATCHLIST.keys()))
-for tab, ticker in zip(tabs, WATCHLIST.keys()):
+for tab,t in zip(tabs,WATCHLIST):
+    if t not in details: continue
     with tab:
-        row = summary[summary["Ticker"] == ticker].iloc[0]
-        df = series[ticker].copy()
-        chart = pd.DataFrame(index=df.index)
-        chart["Close"] = df["Close"]
-        chart["50DMA"] = df["Close"].rolling(50).mean()
-        chart[f"{lookback}d High"] = df["Close"].rolling(lookback, min_periods=20).max()
-        st.line_chart(chart.tail(max(180, lookback*2)))
+        df,cur,matches,rel5=details[t]
+        row=sumdf[sumdf["Ticker"]==t].iloc[0]
 
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Drawdown", f'{row["Drawdown %"]:.1f}%')
-        c2.metric("Rebound", f'{row["Rebound %"]:.1f}%')
-        c3.metric("RSI", f'{row["RSI"]:.0f}')
-        c4.metric("Score", f'{row["Score"]}/100')
+        c1,c2,c3,c4=st.columns(4)
+        c1.metric("Price",f'${row["Price"]:,.2f}')
+        c2.metric("Score",f'{row["Score"]}/100')
+        c3.metric("3M drawdown",f'{row["3M DD"]:.1f}%')
+        c4.metric("5D vs QQQ",f'{row["Rel vs QQQ 5D"]:.1f}%')
 
-        if row["Drawdown %"] <= row["Opportunity Trigger"] and row["Rebound %"] < reversal:
-            st.warning("Opportunity threshold reached, but rebound confirmation has not yet appeared.")
-        elif row["Drawdown %"] <= row["Opportunity Trigger"] and row["Rebound %"] >= reversal:
-            st.success("Opportunity threshold + rebound confirmation are both present. Review the setup.")
+        st.markdown("#### Recent price behaviour")
+        temp=pd.DataFrame({"Period":list(PERIODS.keys()),"Return %":[cur[p] for p in PERIODS]})
+        st.dataframe(temp.style.format({"Return %":"{:.1f}%"}),hide_index=True,use_container_width=True)
+
+        st.markdown("#### Closest historical setups")
+        if matches.empty:
+            st.warning("Not enough historical matches.")
+        else:
+            st.dataframe(matches.style.format({
+                "Similarity":"{:.2f}",
+                "Best next 6M %":"{:.1f}%",
+                "Worst next 6M %":"{:.1f}%"
+            }),hide_index=True,use_container_width=True)
+
+            medbest=matches["Best next 6M %"].median()
+            medworst=matches["Worst next 6M %"].median()
+            p20=matches["Days to +20%"].notna().mean()*100
+            meddays=matches["Days to +20%"].median() if matches["Days to +20%"].notna().any() else np.nan
+
+            a,b,c,d=st.columns(4)
+            a.metric("Median best 6M",f"{medbest:.1f}%")
+            b.metric("Median worst 6M",f"{medworst:.1f}%")
+            c.metric("Reached +20%",f"{p20:.0f}%")
+            d.metric("Median days to +20%",f"{meddays:.0f}" if pd.notna(meddays) else "N/A")
+
+            downside=abs(medworst)
+            rr=medbest/downside if downside>0 else np.nan
+            st.write(
+                f"Historical trade profile: median best 6-month move {medbest:.1f}%, "
+                f"median adverse move {downside:.1f}%"
+                + (f", indicative reward/risk about {rr:.1f}:1." if pd.notna(rr) else ".")
+            )
+
+        st.markdown("#### Market context")
+        st.write(
+            f'{t} 5D: {cur["5D"]:.1f}% · QQQ 5D: {qqq5:.1f}% · '
+            f'SPY 5D: {spy5:.1f}% · relative to QQQ: {rel5:.1f}%'
+        )
 
 st.divider()
-st.caption(
-    "Decision-support only. A large drawdown is not an automatic buy signal. "
-    "Review current fundamentals and the reason for the fall before trading."
-)
+st.caption("Historical similarity is descriptive, not predictive. Use this to focus research, not to trade automatically.")
