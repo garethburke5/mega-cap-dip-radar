@@ -140,48 +140,56 @@ def historical_matches(df,f,n=10,gap=42):
     c=df["Close"]; rows=[]
     for dt,dist,pos in chosen:
         entry=float(c.iloc[pos])
-        fut=c.iloc[pos+1:min(len(c),pos+127)]
-        if fut.empty:continue
-        best=float((fut.max()/entry-1)*100)
-        worst=float((fut.min()/entry-1)*100)
+        full6m = (pos+126) < len(c)
+        fut6 = c.iloc[pos+1:pos+127] if full6m else pd.Series(dtype=float)
+        best=float((fut6.max()/entry-1)*100) if full6m and not fut6.empty else np.nan
+        worst=float((fut6.min()/entry-1)*100) if full6m and not fut6.empty else np.nan
         returns={}
         for lab,d in [("1M",21),("3M",63),("6M",126)]:
             returns[lab]=float((c.iloc[pos+d]/entry-1)*100) if pos+d<len(c) else np.nan
         days={}
+        full1y = (pos+252) < len(c)
         for threshold in [10,20,30]:
             hit=None
-            for j in range(pos+1,min(len(c),pos+253)):
-                if (float(c.iloc[j])/entry-1)*100>=threshold:
-                    hit=j-pos;break
+            if full1y:
+                for j in range(pos+1,pos+253):
+                    if (float(c.iloc[j])/entry-1)*100>=threshold:
+                        hit=j-pos;break
             days[threshold]=hit
-        # How far was this signal from the next 6m low?
-        low=float(fut.min())
         rows.append({
             "Date":dt.date(),"Similarity":dist,"1M %":returns["1M"],"3M %":returns["3M"],
             "6M %":returns["6M"],"Best 6M %":best,"Further downside %":worst,
             "Days +10%":days[10],"Days +20%":days[20],"Days +30%":days[30],
-            "Low proximity %":abs(worst)
+            "Full 1Y history":full1y,
+            "Low proximity %":abs(worst) if pd.notna(worst) else np.nan
         })
     return pd.DataFrame(rows)
 
 def hist_summary(matches,current_price):
     if matches.empty:return {}
-    med1=matches["1M %"].median()
-    med3=matches["3M %"].median()
-    med6=matches["6M %"].median()
-    medbest=matches["Best 6M %"].median()
-    meddown=matches["Further downside %"].median()
-    p10=matches["Days +10%"].notna().mean()*100
-    p20=matches["Days +20%"].notna().mean()*100
-    p30=matches["Days +30%"].notna().mean()*100
-    target_pct=max(0,med6 if pd.notna(med6) else medbest)
+    v1=matches["1M %"].dropna()
+    v3=matches["3M %"].dropna()
+    v6=matches["6M %"].dropna()
+    full6=matches.dropna(subset=["6M %","Further downside %"])
+    full1y=matches[matches.get("Full 1Y history",False)==True] if "Full 1Y history" in matches.columns else matches.iloc[0:0]
+    med1=v1.median() if len(v1) else np.nan
+    med3=v3.median() if len(v3) else np.nan
+    med6=v6.median() if len(v6) else np.nan
+    medbest=full6["Best 6M %"].median() if len(full6) else np.nan
+    meddown=full6["Further downside %"].median() if len(full6) else np.nan
+    p10=full1y["Days +10%"].notna().mean()*100 if len(full1y) else np.nan
+    p20=full1y["Days +20%"].notna().mean()*100 if len(full1y) else np.nan
+    p30=full1y["Days +30%"].notna().mean()*100 if len(full1y) else np.nan
+    enough6 = len(v6) >= 5
+    target_pct = med6 if enough6 and pd.notna(med6) and med6 > 0 else np.nan
     return {
-        "n":len(matches),"med1":med1,"med3":med3,"med6":med6,"medbest":medbest,
+        "n":len(matches),"n1":len(v1),"n3":len(v3),"n6":len(v6),"n1y":len(full1y),
+        "med1":med1,"med3":med3,"med6":med6,"medbest":medbest,
         "meddown":meddown,"p10":p10,"p20":p20,"p30":p30,
-        "target":current_price*(1+target_pct/100),
+        "target":current_price*(1+target_pct/100) if pd.notna(target_pct) else np.nan,
         "target_pct":target_pct,
-        "adverse":current_price*(1+meddown/100),
-        "rr": target_pct/abs(meddown) if meddown<0 else np.nan
+        "adverse":current_price*(1+meddown/100) if pd.notna(meddown) else np.nan,
+        "rr": target_pct/abs(meddown) if pd.notna(target_pct) and pd.notna(meddown) and meddown<0 else np.nan
     }
 
 # ---------- INTERPRETATION ----------
@@ -235,11 +243,14 @@ def opportunity_engine(df,f,matches,bench5,fund_label):
     if pd.notna(rel5) and rel5<=-5:score+=5; reasons.append("stock-specific weakness exceeds the Nasdaq")
     # history
     if hs:
-        if hs["p20"]>=70:score+=12; reasons.append("strong historical +20% rebound hit-rate")
-        elif hs["p20"]>=50:score+=7; reasons.append("historical analogues are moderately favourable")
-        else:cautions.append("similar historical episodes have a weak +20% hit-rate")
-        if hs["rr"]==hs["rr"] and hs["rr"]>=2.5:score+=7; reasons.append("historical reward/risk is attractive")
-        if hs["meddown"]<-15:cautions.append("similar episodes often suffered substantial further downside")
+        if pd.notna(hs["p20"]) and hs["n1y"]>=5 and hs["p20"]>=70:
+            score+=12; reasons.append("completed historical cases often later rose at least 20%")
+        elif pd.notna(hs["p20"]) and hs["n1y"]>=5 and hs["p20"]>=50:
+            score+=7; reasons.append("completed historical cases are moderately favourable")
+        elif pd.notna(hs["p20"]) and hs["n1y"]>=5:
+            cautions.append("completed historical cases have a weaker +20% recovery rate")
+        if pd.notna(hs["rr"]) and hs["rr"]>=2.5:score+=7; reasons.append("historical reward/risk is attractive")
+        if pd.notna(hs["meddown"]) and hs["meddown"]<-15:cautions.append("completed similar episodes often suffered substantial further downside")
     # fundamentals
     if fund_label=="STRONG":score+=6; reasons.append("fundamental snapshot remains strong")
     elif fund_label=="DETERIORATING":score-=10; cautions.append("fundamental snapshot is deteriorating")
@@ -277,6 +288,59 @@ def score_explanation(score):
         return "STRONG OPPORTUNITY", "Several useful signals are lining up. This deserves serious investigation as a possible entry.", "INVESTIGATE BUY"
     return "EXCEPTIONAL SETUP", "This is one of the strongest combinations of sell-off, recovery evidence and historical support detected by the model.", "HIGHEST PRIORITY"
 
+def rsi_explanation(rsi, rsi_5d_ago=np.nan):
+    if rsi < 20:
+        label="EXTREMELY OVERSOLD"
+        meaning="The share has been under exceptionally heavy selling pressure. That can create opportunity, but it can also mean the fall is not finished."
+    elif rsi < 30:
+        label="IDEAL DIP-WATCH AREA"
+        meaning="The share is in the traditional oversold area. This is interesting for our dip strategy, especially if the price starts rising."
+    elif rsi < 40:
+        label="INTERESTING"
+        meaning="Momentum is still weak after the fall. This can be useful if the RSI and share price are beginning to rise together."
+    elif rsi < 60:
+        label="NEUTRAL"
+        meaning="Momentum is neither especially weak nor especially strong."
+    elif rsi < 70:
+        label="STRONG"
+        meaning="The share already has fairly strong upward momentum, so it is less like the early dip-buying setup we are hunting."
+    else:
+        label="VERY STRONG / POSSIBLY OVERBOUGHT"
+        meaning="The share has risen strongly. For our dip-buying strategy this is usually less attractive than a low RSI."
+    direction=""
+    if pd.notna(rsi_5d_ago):
+        if rsi_5d_ago < 35 and rsi > rsi_5d_ago + 3:
+            direction=f" RSI has risen from {rsi_5d_ago:.0f} five trading days ago, which is encouraging because selling momentum may be easing."
+        elif rsi < rsi_5d_ago - 3:
+            direction=f" RSI has fallen from {rsi_5d_ago:.0f} five trading days ago, so selling momentum is still worsening."
+    return label, meaning + direction
+
+def recent_levels(df, days=63):
+    recent=df.tail(days)
+    peak=float(recent["Close"].max())
+    low=float(recent["Close"].min())
+    return peak,low
+
+def entry_zone(df,f,matches):
+    price=float(df["Close"].iloc[-1])
+    cur=f.iloc[-1]
+    rsi=float(cur["RSI"])
+    hs=hist_summary(matches,price)
+    # A reference zone, not an instruction: near current/recent support when RSI is weak.
+    low63=float(df["Close"].tail(63).min())
+    ma20=float(df["Close"].tail(20).mean())
+    if rsi <= 35:
+        upper=min(price, ma20) if ma20 < price else price
+        lower=max(low63, upper*0.94)
+        note="This is an area to investigate, not an automatic buy range. It is based on recent support, current price and weak RSI."
+        return lower,upper,note
+    if cur["3M_DD"] <= -12:
+        upper=price*0.97
+        lower=max(low63,price*0.90)
+        note="RSI is not yet in our preferred dip-buying area, so the app would prefer either a cheaper price or clearer recovery evidence."
+        return lower,upper,note
+    return np.nan,np.nan,"No useful dip-entry zone is identified at the moment."
+
 # ---------- NEWS ----------
 def classify_news(news):
     text=" ".join((x["title"]+" "+x.get("summary","")).lower() for x in news[:8])
@@ -293,7 +357,7 @@ def classify_news(news):
     return cats[:3] if cats else ["UNCLEAR / MIXED"]
 
 # ---------- CHART ----------
-def mobile_chart(df,ticker,entry=None,target=None):
+def mobile_chart(df,ticker,entry=None):
     data=[]
     for idx,row in df.iterrows():
         data.append({"time":idx.strftime("%Y-%m-%d"),"value":round(float(row["Close"]),4)})
@@ -309,10 +373,14 @@ def mobile_chart(df,ticker,entry=None,target=None):
         ]
     markers_json=json.dumps(markers)
     price_lines=""
+    current=float(df["Close"].iloc[-1])
+    recent_peak=float(recent["Close"].max()) if not recent.empty else current
+    recent_low=float(recent["Close"].min()) if not recent.empty else current
+    price_lines += f"""series.createPriceLine({{price:{current},color:'#555',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'Current'}});"""
+    price_lines += f"""series.createPriceLine({{price:{recent_peak},color:'#777',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'Recent peak'}});"""
+    price_lines += f"""series.createPriceLine({{price:{recent_low},color:'#999',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'Recent low'}});"""
     if entry:
-        price_lines += f"""series.createPriceLine({{price:{float(entry)},color:'#555',lineWidth:2,lineStyle:2,axisLabelVisible:true,title:'Entry'}});"""
-    if target:
-        price_lines += f"""series.createPriceLine({{price:{float(target)},color:'#777',lineWidth:2,lineStyle:1,axisLabelVisible:true,title:'Target'}});"""
+        price_lines += f"""series.createPriceLine({{price:{float(entry)},color:'#444',lineWidth:2,lineStyle:1,axisLabelVisible:true,title:'My entry'}});"""
     chart_html=f"""
     <div style="font-family:Arial,sans-serif">
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
@@ -438,7 +506,7 @@ if stocks:
 
     st.subheader("Opportunity board")
     for t,x in ranked:
-        df=x["df"]; f=x["f"]; e=x["engine"]; hs=x["hs"]; cur=f.iloc[-1]; price=float(df["Close"].iloc[-1])
+        df=x["df"]; f=x["f"]; matches=x["matches"]; e=x["engine"]; hs=x["hs"]; cur=f.iloc[-1]; price=float(df["Close"].iloc[-1])
         with st.container(border=True):
             label, meaning, instinct = score_explanation(e["score"])
             st.markdown(f"### {t} · ${price:,.2f}")
@@ -510,22 +578,25 @@ for tab,t in zip(tabs,WATCHLIST):
         }),hide_index=True,use_container_width=True)
         st.caption("Tail percentile asks how unusual the move is versus this stock's own history. A very low figure on a decline means unusually severe weakness.")
 
-        # RSI explanation
-        if cur["RSI"]<30:rsi_text="oversold territory"
-        elif cur["RSI"]<40:rsi_text="weak momentum"
-        elif cur["RSI"]<60:rsi_text="roughly neutral momentum"
-        elif cur["RSI"]<70:rsi_text="strong momentum"
-        else:rsi_text="conventionally overbought territory"
-        st.markdown("### RSI explained")
-        st.write(f"RSI (Relative Strength Index) measures recent price momentum on a 0–100 scale. {t}'s RSI is {cur['RSI']:.0f}, which indicates {rsi_text}. Below 30 is conventionally called oversold and above 70 overbought, but RSI is not a buy/sell signal by itself.")
+        # RSI translated for the dip-buying strategy
+        rsi5=float(f["RSI"].iloc[-6]) if len(f)>=6 and pd.notna(f["RSI"].iloc[-6]) else np.nan
+        rsi_label,rsi_meaning=rsi_explanation(float(cur["RSI"]),rsi5)
+        st.markdown("### RSI — what it means for this strategy")
+        r1,r2=st.columns(2)
+        r1.metric("Today's RSI",f"{cur['RSI']:.0f}/100",rsi_label)
+        r2.metric("Ideal area to watch","20–35")
+        st.write("RSI measures how strongly the share price has recently been rising or falling. For this dip-buying strategy, lower readings are generally more interesting — but the best signal is often a low RSI that then starts rising while the share price also starts rising.")
+        st.write(f"What today's reading means: {rsi_meaning}")
+        st.caption("Below 30 is traditionally called oversold; above 70 is traditionally called overbought. RSI alone is never treated as a buy signal.")
 
         st.markdown("### Historical opportunity engine")
         if hs:
             h1,h2,h3,h4=st.columns(4)
             h1.metric("Similar episodes",hs["n"])
-            h2.metric("Later rose 20%+",f"{int(matches['Days +20%'].notna().sum())} of {len(matches)}")
-            h3.metric("Typical 6M return",f"{hs['med6']:+.1f}%")
-            h4.metric("Typical further fall",f"{abs(hs['meddown']):.1f}%")
+            completed1y_metric = matches[matches["Full 1Y history"]==True] if "Full 1Y history" in matches.columns else matches.iloc[0:0]
+            h2.metric("Later rose 20%+",f"{int(completed1y_metric['Days +20%'].notna().sum())} of {len(completed1y_metric)}" if len(completed1y_metric) else "Not enough history")
+            h3.metric("Typical 6M return",f"{hs['med6']:+.1f}%" if pd.notna(hs["med6"]) else "Not enough history")
+            h4.metric("Typical further fall",f"{abs(hs['meddown']):.1f}%" if pd.notna(hs["meddown"]) else "Not enough history")
             valid1 = matches["1M %"].dropna()
             valid3 = matches["3M %"].dropna()
             valid6 = matches["6M %"].dropna()
@@ -539,10 +610,15 @@ for tab,t in zip(tabs,WATCHLIST):
                 st.write(f"• 3 months later, the share price was higher in {up3} of {len(valid3)} comparable situations. The typical return was {hs['med3']:+.1f}%.")
             if len(valid6):
                 st.write(f"• 6 months later, the share price was higher in {up6} of {len(valid6)} comparable situations. The typical return was {hs['med6']:+.1f}%.")
-            hit20 = int(matches["Days +20%"].notna().sum())
-            st.write(f"• In {hit20} of the {len(matches)} comparable situations, the share price at some point rose at least 20% above the historical comparison price within the following year. This does not mean an investor necessarily made 20%, because the price may have fallen substantially first.")
-            st.write(f"• In these similar situations, the typical lowest point afterwards was another {abs(hs['meddown']):.1f}% below the comparison price.")
-            if hs["med6"] > 0:
+            completed1y = matches[matches["Full 1Y history"]==True] if "Full 1Y history" in matches.columns else matches.iloc[0:0]
+            hit20 = int(completed1y["Days +20%"].notna().sum()) if len(completed1y) else 0
+            if len(completed1y):
+                st.write(f"• In {hit20} of the {len(completed1y)} comparable situations with a full year of later price history, the share price at some point rose at least 20% above the historical comparison price. This does not mean an investor necessarily made 20%, because the price may have fallen substantially first.")
+            else:
+                st.write("• There are not enough comparable situations with a full year of later price history to give a reliable '+20%' count.")
+            if pd.notna(hs["meddown"]):
+                st.write(f"• Looking only at cases with a full 6 months of later price history, the typical lowest point afterwards was another {abs(hs['meddown']):.1f}% below the comparison price.")
+            if pd.notna(hs["med6"]) and hs["med6"] > 0:
                 conclusion = "Historically, buying at a similar stage often worked reasonably well, although further falls were still possible."
             else:
                 conclusion = "Historically, this exact stage was often too early to buy: the share frequently fell further and the typical 6-month return was still negative."
@@ -558,15 +634,44 @@ for tab,t in zip(tabs,WATCHLIST):
                 st.write("Each line shows how the share price moved around one of the most similar historical situations. The lines are rebased to the same starting value so their shapes can be compared; they are not actual share prices.")
                 analogue_chart(df,matches,t)
 
-        st.markdown("### Trade economics")
-        if hs:
-            target=hs["target"]; adverse=hs["adverse"]
-            q1,q2,q3,q4=st.columns(4)
-            q1.metric("Typical 6M price if history repeated",f"${target:,.2f}",f"{hs['target_pct']:+.1f}%")
-            q2.metric("Price after typical further fall",f"${adverse:,.2f}",f"{hs['meddown']:.1f}%")
-            q3.metric("Possible upside vs downside",f"{hs['rr']:.1f}:1" if hs['rr']==hs['rr'] else "N/A")
-            q4.metric("Historical cases that later rose 20%+",f"{int(matches['Days +20%'].notna().sum())}/{len(matches)}")
-            st.caption("These are scenario estimates derived from comparable historical episodes, not forecasts or guaranteed targets.")
+        st.markdown("### Price levels & possible opportunity")
+        peak3,low3=recent_levels(df,63)
+        peak_up=(peak3/price-1)*100
+        low_from=(price/low3-1)*100
+        p1,p2,p3=st.columns(3)
+        p1.metric("Current share price",f"${price:,.2f}")
+        p2.metric("Recent 3M high",f"${peak3:,.2f}",f"{peak_up:+.1f}% needed to get back there")
+        p3.metric("Recent 3M low",f"${low3:,.2f}",f"current price is {low_from:+.1f}% above it")
+        st.caption("These three prices are factual market levels, not forecasts.")
+
+        lower,upper,zone_note=entry_zone(df,f,matches)
+        st.markdown("#### Potential entry area")
+        if pd.notna(lower) and pd.notna(upper):
+            st.write(f"${lower:,.2f}–${upper:,.2f}")
+            st.write(zone_note)
+        else:
+            st.write("No attractive dip-entry area identified right now.")
+            st.write(zone_note)
+
+        st.markdown("#### Historical recovery estimate")
+        if hs and pd.notna(hs.get("target_pct",np.nan)):
+            st.write(f"If the typical 6-month outcome from the completed similar historical situations repeated, the share price would be about ${hs['target']:,.2f} — approximately {hs['target_pct']:+.1f}% from today's price.")
+            st.caption(f"This is calculated by this app from {hs['n6']} completed historical 6-month comparisons. It is not an analyst forecast or a Yahoo Finance price target.")
+        else:
+            completed = hs.get("n6",0) if hs else 0
+            st.write(f"No meaningful positive historical recovery estimate is shown. There are {completed} completed 6-month comparisons, and/or their typical outcome does not support a positive estimate.")
+            st.caption("The app deliberately does not turn the current price into a meaningless 'target' when historical evidence is weak.")
+
+        st.markdown("#### Analyst consensus — separate from our historical estimate")
+        analyst_target=info.get("targetMeanPrice")
+        analyst_n=info.get("numberOfAnalystOpinions")
+        if isinstance(analyst_target,(int,float)) and analyst_target>0:
+            analyst_up=(analyst_target/price-1)*100
+            st.write(f"Analyst mean price target: ${analyst_target:,.2f} ({analyst_up:+.1f}% versus today's price)"
+                     + (f", based on {analyst_n} analyst opinions." if isinstance(analyst_n,(int,float)) and analyst_n>0 else "."))
+            st.caption("This is external analyst-consensus data returned by yfinance/Yahoo Finance data, not a target calculated by this app.")
+        else:
+            st.write("Analyst consensus target is not currently available from the data feed.")
 
         st.markdown("### Market context")
         st.write(f"{t} 5D: {cur['5D']:+.1f}% · QQQ 5D: {qqq5:+.1f}% · SPY 5D: {spy5:+.1f}% · {t} versus QQQ: {e['rel5']:+.1f} percentage points.")
@@ -617,29 +722,28 @@ for tab,t in zip(tabs,WATCHLIST):
         st.markdown("### Main price chart")
         st.caption("Clean line chart by default. Pinch to zoom, swipe to pan, and tap/drag for the exact date and price.")
         entry_for_chart=entry_price if held==t and entry_price>0 else None
-        target_for_chart=hs.get("target") if hs else None
-        mobile_chart(df,t,entry_for_chart,target_for_chart)
+        mobile_chart(df,t,entry_for_chart)
 
         if held==t and entry_price>0:
             st.markdown("### My trade")
             ret=(price/entry_price-1)*100
             pnl=position_value*ret/100 if position_value>0 else 0
-            if hs and price>=hs["target"]*0.95: lifecycle="TAKE-PROFIT ZONE"
-            elif ret>=10:lifecycle="RECOVERY / HOLD"
+            if hs and pd.notna(hs.get("target",np.nan)) and price>=hs["target"]*0.95: lifecycle="HISTORICAL RECOVERY AREA"
+            elif ret>=10:lifecycle="RECOVERY / REVIEW"
             elif ret>=0:lifecycle="RECOVERY DEVELOPING"
             elif e["status"]=="DEEP SELLOFF":lifecycle="RISK REVIEW"
             else:lifecycle="ENTRY / WATCH"
             st.write(f"Lifecycle: {lifecycle}")
             st.write(f"Entry ${entry_price:,.2f} → current ${price:,.2f} · return {ret:+.1f}%"
                      + (f" · estimated P/L {pnl:+,.2f}" if position_value>0 else ""))
-            if hs and hs["target_pct"]>0:
+            if hs and pd.notna(hs.get("target_pct",np.nan)) and hs["target_pct"]>0:
                 expected_total=hs["target"]-entry_price
                 achieved=price-entry_price
                 pct_done=(achieved/expected_total*100) if expected_total>0 else np.nan
                 if pct_done==pct_done:
-                    st.write(f"Approximately {pct_done:.0f}% of the move from your entry to the current historical-median target has occurred.")
+                    st.write(f"Approximately {pct_done:.0f}% of the move from your entry to the current historical recovery estimate has occurred.")
 
-            if risk_budget>0 and hs and hs["meddown"]<0:
+            if risk_budget>0 and hs and pd.notna(hs.get("meddown",np.nan)) and hs["meddown"]<0:
                 risk_per_dollar=abs(hs["meddown"])/100
                 max_position=risk_budget/risk_per_dollar
                 st.write(f"Position-sizing reference: with a {risk_budget:,.0f} maximum loss and historical median adverse move of {abs(hs['meddown']):.1f}%, the corresponding position size would be about {max_position:,.0f}. This is a risk-budget calculation, not a recommendation.")
