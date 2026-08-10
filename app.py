@@ -578,6 +578,40 @@ def classify_news(news):
         if any(w in text for w in words):cats.append(label)
     return cats[:3] if cats else ["UNCLEAR / MIXED"]
 
+
+def period_return(df, days):
+    if df is None or df.empty or len(df) <= days:
+        return np.nan
+    return (float(df["Close"].iloc[-1]) / float(df["Close"].iloc[-1-days]) - 1) * 100
+
+def market_move_summary(stock_df, qqq_df, spy_df):
+    rows=[]
+    for label,days in [("1D",1),("5D",5),("1M",21),("3M",63)]:
+        s=period_return(stock_df,days)
+        q=period_return(qqq_df,days)
+        p=period_return(spy_df,days)
+        rows.append({"Period":label,"Stock":s,"Nasdaq-100 (QQQ)":q,"S&P 500 (SPY)":p,
+                     "vs Nasdaq":s-q if pd.notna(s) and pd.notna(q) else np.nan})
+    return pd.DataFrame(rows)
+
+def market_move_interpretation(rows, ticker):
+    if rows.empty:
+        return "Not enough data to compare the share with the wider market."
+    row5 = rows[rows["Period"]=="5D"].iloc[0] if not rows[rows["Period"]=="5D"].empty else rows.iloc[0]
+    s=row5["Stock"]; q=row5["Nasdaq-100 (QQQ)"]
+    if pd.isna(s) or pd.isna(q):
+        return "Not enough data to determine whether the move is mostly market-wide or company-specific."
+    diff=s-q
+    if abs(diff) <= 2:
+        return f"Most of {ticker}'s recent move appears broadly consistent with the wider technology market."
+    if diff <= -5:
+        return f"{ticker} has fallen much more than the Nasdaq-100, so a large part of the recent move appears company-specific. That deserves extra investigation before buying."
+    if diff < -2:
+        return f"{ticker} has been weaker than the Nasdaq-100, so the fall appears to be a mixture of a wider market move and company-specific weakness."
+    if diff >= 5:
+        return f"{ticker} has strongly outperformed the Nasdaq-100, so the recent move is more company-specific than market-wide."
+    return f"{ticker} has modestly outperformed the Nasdaq-100; the wider market still explains part of the move."
+
 # ---------- CHART ----------
 def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
     data=[]
@@ -732,6 +766,51 @@ risk_budget=st.sidebar.number_input("Maximum acceptable loss",min_value=0.0,valu
 st.title("🎯 Mega-Cap Sniper")
 st.caption("Find unusually attractive corrections and follow the trade from sell-off to recovery.")
 
+# ---------- VISUAL HIERARCHY ----------
+# Burgundy is reserved for navigation/section emphasis; green/red remain free for market signals.
+st.markdown("""
+<style>
+:root { --sniper-burgundy: #7A1F3D; --sniper-burgundy-soft: #F7EEF1; }
+.sniper-section-heading {
+    color: var(--sniper-burgundy);
+    font-size: 1.55rem;
+    font-weight: 750;
+    line-height: 1.2;
+    letter-spacing: .01em;
+    margin: 2.0rem 0 .9rem 0;
+    padding: 0 0 .42rem 0;
+    border-bottom: 3px solid var(--sniper-burgundy);
+}
+.sniper-ticker-heading {
+    color: var(--sniper-burgundy);
+    font-size: 1.45rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin: .15rem 0 .65rem 0;
+}
+/* Make stock tabs obvious and easy to spot/tap while scrolling on mobile. */
+.stTabs [data-baseweb=\"tab-list\"] { gap: .35rem; margin-top: .25rem; margin-bottom: .8rem; }
+.stTabs [data-baseweb=\"tab\"] {
+    height: 3rem;
+    padding: 0 .95rem;
+    font-size: 1.05rem;
+    font-weight: 750;
+    color: #303030;
+    border-radius: .55rem .55rem 0 0;
+}
+.stTabs [aria-selected=\"true\"] {
+    color: var(--sniper-burgundy) !important;
+    background: var(--sniper-burgundy-soft) !important;
+}
+.stTabs [data-baseweb=\"tab-highlight\"] { background-color: var(--sniper-burgundy) !important; height: 3px; }
+@media (max-width: 640px) {
+    .sniper-section-heading { font-size: 1.38rem; margin-top: 1.65rem; }
+    .sniper-ticker-heading { font-size: 1.32rem; }
+    .stTabs [data-baseweb=\"tab\"] { font-size: 1rem; padding: 0 .72rem; min-width: 3.7rem; }
+}
+</style>
+""", unsafe_allow_html=True)
+
 market_state, now_ny = us_market_status()
 now_uk = datetime.now(ZoneInfo("Europe/London"))
 latest_times=[x.get("intraday_ts") for x in stocks.values() if x.get("intraday_ts") is not None]
@@ -761,13 +840,13 @@ if stocks:
     else:
         st.info("NO COMPELLING DIP ENTRY TODAY — none of the five shares currently clears the stronger entry-quality threshold.")
 
-    st.subheader("Opportunity board")
+    st.markdown('<div class="sniper-section-heading">Opportunity board</div>', unsafe_allow_html=True)
     for t,x in ranked:
         df=x["df"]; f=x["f"]; matches=x["matches"]; e=x["engine"]; hs=x["hs"]; cur=f.iloc[-1]; price=float(df["Close"].iloc[-1])
         with st.container(border=True):
             snap=rebound_strategy_snapshot(df,matches,stake_gbp)
             label, meaning, instinct = score_explanation(snap["entry_score"])
-            st.markdown(f"### {t} · ${price:,.2f}")
+            st.markdown(f'<div class="sniper-ticker-heading">{t} · ${price:,.2f}</div>', unsafe_allow_html=True)
             if cur["3M_DD"] <= -12 and cur["5D"] > 2:
                 plain_state = "SHARE PRICE MAY BE STARTING TO RISE AGAIN"
             elif cur["5D"] <= -5:
@@ -791,7 +870,7 @@ if stocks:
             st.write(f"Strategy verdict: {snap['verdict']} · {snap['summary']}")
 
 st.divider()
-st.subheader("Deep analysis")
+st.markdown('<div class="sniper-section-heading">Deep analysis</div>', unsafe_allow_html=True)
 tabs=st.tabs(WATCHLIST)
 
 for tab,t in zip(tabs,WATCHLIST):
@@ -803,7 +882,7 @@ for tab,t in zip(tabs,WATCHLIST):
         cur=f.iloc[-1]; price=float(df["Close"].iloc[-1])
 
         snap=rebound_strategy_snapshot(df,matches,stake_gbp)
-        st.markdown(f"## {t} — ${price:,.2f}")
+        st.markdown(f'<div class="sniper-ticker-heading">{t} — ${price:,.2f}</div>', unsafe_allow_html=True)
         if cur["3M_DD"] <= -12 and cur["5D"] > 2:
             plain_state = "SHARE PRICE MAY BE STARTING TO RISE AGAIN"
             plain_explain = f"{t} is still {abs(cur['3M_DD']):.1f}% below its 3-month high, but its share price has risen {cur['5D']:.1f}% over the last 5 trading days. That may be an early sign that the recent fall is ending and the share price is beginning to move higher again."
@@ -830,6 +909,23 @@ for tab,t in zip(tabs,WATCHLIST):
         a.metric("Share price",f"${price:,.2f}",f"{cur['1D']:+.1f}% today")
         b.metric("Below 3M high",f"{cur['3M_DD']:.1f}%")
         c.metric("RSI",f"{cur['RSI']:.0f}")
+
+        st.markdown("### Market or company-specific move?")
+        market_rows=market_move_summary(df,qqq,spy)
+        st.write("Nasdaq-100 (QQQ) = a broad measure of large US technology and growth companies.")
+        st.write("S&P 500 (SPY) = a broad measure of the largest US companies overall.")
+        display_market = market_rows.rename(columns={"Stock":t})
+        st.dataframe(
+            display_market.style.format({
+                t:"{:+.1f}%",
+                "Nasdaq-100 (QQQ)":"{:+.1f}%",
+                "S&P 500 (SPY)":"{:+.1f}%",
+                "vs Nasdaq":"{:+.1f} pts"
+            }),
+            hide_index=True,
+            use_container_width=True
+        )
+        st.info(market_move_interpretation(market_rows,t))
 
         st.markdown("### Why the app thinks this")
         st.write(e["narrative"])
@@ -965,15 +1061,7 @@ for tab,t in zip(tabs,WATCHLIST):
             st.caption("This is external analyst-consensus data returned by yfinance/Yahoo Finance data, not a target calculated by this app.")
         else:
             st.write("Analyst consensus target is not currently available from the data feed.")
-
-        st.markdown("### Market context")
-        st.write(f"{t} 5D: {cur['5D']:+.1f}% · QQQ 5D: {qqq5:+.1f}% · SPY 5D: {spy5:+.1f}% · {t} versus QQQ: {e['rel5']:+.1f} percentage points.")
-        if e["rel5"]<-5:
-            st.write("Interpretation: the stock has materially underperformed the Nasdaq, suggesting the weakness is substantially stock-specific rather than merely a broad market move.")
-        elif e["rel5"]>5:
-            st.write("Interpretation: the stock has materially outperformed the Nasdaq over the same period.")
-        else:
-            st.write("Interpretation: much of the short-term movement is broadly consistent with the wider technology market.")
+        st.markdown("### Fundamentals & valuation snapshot")
 
         st.markdown("### Fundamentals & valuation snapshot")
         st.write(f"Fundamental health: {x['fund_label']}.")
