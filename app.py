@@ -6,8 +6,12 @@ import numpy as np
 import yfinance as yf
 import json, math, html
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
+from streamlit_autorefresh import st_autorefresh
 
 st.set_page_config(page_title="Mega-Cap Sniper", page_icon="🎯", layout="wide")
+
+st_autorefresh(interval=5 * 60 * 1000, limit=None, key="five_minute_refresh")
 
 WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL"]
 PERIODS = {"1D":1,"2D":2,"5D":5,"7D":7,"10D":10,"1M":21,"3M":63,"6M":126,"12M":252}
@@ -25,6 +29,40 @@ def load_price(ticker, years=10):
         df.columns = df.columns.get_level_values(0)
     cols=[c for c in ["Open","High","Low","Close","Volume"] if c in df.columns]
     return df[cols].dropna()
+
+@st.cache_data(ttl=120)
+def load_intraday(ticker):
+    try:
+        df = yf.download(
+            ticker, period="5d", interval="5m",
+            auto_adjust=True, progress=False, prepost=False, threads=False
+        )
+        if df.empty:
+            return None, None
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+        close = df["Close"].dropna()
+        if close.empty:
+            return None, None
+        px = float(close.iloc[-1])
+        ts = close.index[-1]
+        try:
+            if ts.tzinfo is None:
+                ts = ts.tz_localize("America/New_York")
+            else:
+                ts = ts.tz_convert("America/New_York")
+        except Exception:
+            pass
+        return px, ts
+    except Exception:
+        return None, None
+
+def us_market_status():
+    now_ny = datetime.now(ZoneInfo("America/New_York"))
+    weekday = now_ny.weekday() < 5
+    mins = now_ny.hour * 60 + now_ny.minute
+    regular = weekday and (9*60+30 <= mins < 16*60)
+    return ("OPEN" if regular else "CLOSED"), now_ny
 
 @st.cache_data(ttl=1800)
 def load_fundamentals(ticker):
@@ -662,6 +700,14 @@ stocks={}
 for t in WATCHLIST:
     df=load_price(t,10)
     if df.empty or len(df)<400:continue
+    intraday_price,intraday_ts=load_intraday(t)
+    if intraday_price is not None:
+        df=df.copy()
+        df.loc[df.index[-1],"Close"]=intraday_price
+        if "High" in df.columns:
+            df.loc[df.index[-1],"High"]=max(float(df.loc[df.index[-1],"High"]),intraday_price)
+        if "Low" in df.columns:
+            df.loc[df.index[-1],"Low"]=min(float(df.loc[df.index[-1],"Low"]),intraday_price)
     f=feature_frame(df)
     matches=historical_matches(df,f)
     info=load_fundamentals(t)
@@ -670,7 +716,7 @@ for t in WATCHLIST:
     engine=opportunity_engine(df,f,matches,qqq5,fund_label)
     hs=hist_summary(matches,current)
     stocks[t]={"df":df,"f":f,"matches":matches,"info":info,"fund_label":fund_label,
-               "fund_notes":fund_notes,"engine":engine,"hs":hs}
+               "fund_notes":fund_notes,"engine":engine,"hs":hs,"intraday_ts":intraday_ts}
 
 # ---------- SIDEBAR / POSITION TRACKER ----------
 st.sidebar.header("My rebound strategy")
@@ -685,6 +731,24 @@ risk_budget=st.sidebar.number_input("Maximum acceptable loss",min_value=0.0,valu
 # ---------- HOME ----------
 st.title("🎯 Mega-Cap Sniper")
 st.caption("Find unusually attractive corrections and follow the trade from sell-off to recovery.")
+
+market_state, now_ny = us_market_status()
+now_uk = datetime.now(ZoneInfo("Europe/London"))
+latest_times=[x.get("intraday_ts") for x in stocks.values() if x.get("intraday_ts") is not None]
+if latest_times:
+    try:
+        freshest=max(latest_times)
+        fresh_text=freshest.strftime("%d %b %Y, %H:%M ET")
+    except Exception:
+        fresh_text=now_ny.strftime("%d %b %Y, %H:%M ET")
+else:
+    fresh_text=now_ny.strftime("%d %b %Y, %H:%M ET")
+
+st.write(
+    f"Prices last refreshed: {now_uk.strftime('%d %b %Y, %H:%M UK time')} · "
+    f"Latest market-data point: {fresh_text} · US regular market: {market_state}"
+)
+st.caption("The page refreshes automatically every 5 minutes. Intraday prices use 5-minute Yahoo/yfinance data when available; they may be delayed. US market status is based on normal weekday trading hours and does not account for every exchange holiday.")
 st.info(f"CORE STRATEGY: Deploy about £{stake_gbp:,.0f} into an unusually attractive mega-cap dip. Aim to capture at least +10% (about £{stake_gbp*.10:,.0f} gross), with +20% (about £{stake_gbp*.20:,.0f} gross) as the preferred rebound objective.")
 
 if stocks:
