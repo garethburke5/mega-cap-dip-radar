@@ -9,25 +9,15 @@ from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 from streamlit_autorefresh import st_autorefresh
 
-st.set_page_config(page_title="Mega-Cap Sniper", page_icon="🎯", layout="wide")
+st.set_page_config(page_title="Share Sniper", page_icon="🎯", layout="wide")
 
 st_autorefresh(interval=5 * 60 * 1000, limit=None, key="five_minute_refresh")
 
-WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL","AVGO","NFLX","ASML","TSM","BARC.L","IAG.L","CRM"]
-COMPANY_NAMES = {
-    "TSLA":"Tesla",
-    "NVDA":"Nvidia",
-    "META":"Meta",
-    "AMZN":"Amazon",
-    "GOOGL":"Alphabet (Google)",
-    "AVGO":"Broadcom",
-    "NFLX":"Netflix",
-    "ASML":"ASML",
-    "TSM":"TSMC",
-    "BARC.L":"Barclays",
-    "IAG.L":"International Airlines Group",
-    "CRM":"Salesforce",
-}
+WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL","AVGO","BARC.L"]
+COMPANY_NAMES = {"TSLA":"Tesla","NVDA":"Nvidia","META":"Meta","AMZN":"Amazon","GOOGL":"Alphabet (Google)","AVGO":"Broadcom","BARC.L":"Barclays"}
+
+def display_price(ticker, price):
+    return f"{price:,.1f}p" if ticker.endswith(".L") else f"${price:,.2f}"
 
 PERIODS = {"1D":1,"2D":2,"5D":5,"7D":7,"10D":10,"1M":21,"3M":63,"6M":126,"12M":252}
 MATCH_FEATURES = ["1D","5D","10D","1M","3M_DD","6M_DD","RSI","DIST50","VOLRATIO"]
@@ -770,7 +760,7 @@ for t in WATCHLIST:
 # ---------- SIDEBAR / POSITION TRACKER ----------
 st.sidebar.header("My rebound strategy")
 stake_gbp=st.sidebar.number_input("Typical amount to deploy (£)",min_value=1000.0,value=20000.0,step=1000.0)
-st.sidebar.caption("Core objective: capture roughly 10–20% rebounds after unusually attractive falls in high-quality, liquid companies.")
+st.sidebar.caption("Core objective: capture roughly 10–20% rebounds after unusually attractive falls.")
 st.sidebar.header("My position (optional)")
 held=st.sidebar.selectbox("Stock",["None"]+WATCHLIST)
 entry_price=st.sidebar.number_input("Entry price ($)",min_value=0.0,value=0.0,step=1.0)
@@ -778,7 +768,7 @@ position_value=st.sidebar.number_input("Amount invested",min_value=0.0,value=0.0
 risk_budget=st.sidebar.number_input("Maximum acceptable loss",min_value=0.0,value=0.0,step=100.0)
 
 # ---------- HOME ----------
-st.title("🎯 Mega-Cap Sniper")
+st.title("🎯 Share Sniper")
 st.caption("Find unusually attractive corrections and follow the trade from sell-off to recovery.")
 
 # ---------- VISUAL HIERARCHY ----------
@@ -843,34 +833,27 @@ st.write(
     f"Latest market-data point: {fresh_text} · US regular market: {market_state}"
 )
 st.caption("The page refreshes automatically every 5 minutes. Intraday prices use 5-minute Yahoo/yfinance data when available; they may be delayed. US market status is based on normal weekday trading hours and does not account for every exchange holiday.")
-st.info(f"CORE STRATEGY: Deploy about £{stake_gbp:,.0f} into an unusually attractive dip in a high-quality, liquid company. Aim to capture at least +10% (about £{stake_gbp*.10:,.0f} gross), with +20% (about £{stake_gbp*.20:,.0f} gross) as the preferred rebound objective.")
+st.info(f"CORE STRATEGY: Deploy about £{stake_gbp:,.0f} into an unusually attractive dip in a large, established company. Aim to capture at least +10% (about £{stake_gbp*.10:,.0f} gross), with +20% (about £{stake_gbp*.20:,.0f} gross) as the preferred rebound objective.")
 
 if stocks:
     ranked=sorted(stocks.items(), key=lambda kv: rebound_strategy_snapshot(kv[1]["df"],kv[1]["matches"],stake_gbp)["score"], reverse=True)
-
-    st.markdown('<div class="sniper-section-heading">Today\'s opportunities</div>', unsafe_allow_html=True)
-    st.caption("Start here. These are the shares that deserve your attention first today, ranked by how attractive the current buying price looks for the 10–20% rebound strategy.")
-
-    actionable=[]
+    st.markdown('<div class="sniper-section-heading">Today\'s Sniper Opportunities</div>', unsafe_allow_html=True)
+    st.caption("Start here. Shares are ranked by how attractive the current buying price looks for our 10–20% rebound strategy. A high rank is a prompt to investigate, not an instruction to buy.")
+    daily=[]
     for t,x in ranked:
         snap=rebound_strategy_snapshot(x["df"],x["matches"],stake_gbp)
-        if snap["entry_score"] >= 48:
-            actionable.append((t,x,snap))
-
-    if actionable:
-        for rank,(t,x,snap) in enumerate(actionable[:5], start=1):
-            price=float(x["df"]["Close"].iloc[-1])
-            cur=x["f"].iloc[-1]
-            company=COMPANY_NAMES.get(t,t)
-            with st.container(border=True):
-                st.markdown(f'<div class="sniper-ticker-heading">#{rank} · {company} ({t}) · ${price:,.2f}</div>', unsafe_allow_html=True)
-                st.markdown(f"**{snap['verdict']} · Buying opportunity {snap['entry_score']}/100**")
-                st.write(snap["summary"])
-                st.write(snap["entry_explain"])
-                st.write(f"Recent move: {cur['1D']:+.1f}% today · {cur['5D']:+.1f}% over 5 trading days · {cur['1M']:+.1f}% over 1 month · {cur['3M_DD']:.1f}% from the 3-month high.")
-                st.write(f"Your £{stake_gbp:,.0f} objective: +10% ≈ £{snap['gain10']:,.0f} gross · +20% ≈ £{snap['gain20']:,.0f} gross.")
-    else:
-        st.info("NO STRONG BUYING OPPORTUNITY TODAY — none of the shares currently reaches the app's minimum 48/100 buying-opportunity threshold. The best action may simply be to wait.")
+        daily.append((t,x,snap))
+    strong=[row for row in daily if row[2]["entry_score"] >= 63]
+    if not strong:
+        st.info("NO COMPELLING ENTRY TODAY — none of the shares currently clears the stronger buying-opportunity threshold. Waiting is a valid result.")
+    for pos,(t,x,snap) in enumerate(daily[:5], start=1):
+        price=float(x["df"]["Close"].iloc[-1])
+        company=COMPANY_NAMES.get(t,t)
+        with st.container(border=True):
+            st.markdown(f"### #{pos} · {company} ({t}) · {display_price(t,price)}")
+            st.write(f"Buying opportunity today: {snap['entry_score']}/100 — {snap['verdict']}.")
+            st.write(snap["entry_explain"])
+            st.write(f"£{stake_gbp:,.0f} objective: +10% ≈ £{snap['gain10']:,.0f} gross · +20% ≈ £{snap['gain20']:,.0f} gross.")
 
     st.markdown('<div class="sniper-section-heading">Opportunity board</div>', unsafe_allow_html=True)
     for t,x in ranked:
@@ -878,7 +861,7 @@ if stocks:
         with st.container(border=True):
             snap=rebound_strategy_snapshot(df,matches,stake_gbp)
             label, meaning, instinct = score_explanation(snap["entry_score"])
-            st.markdown(f'<div class="sniper-ticker-heading">{t} · ${price:,.2f}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="sniper-ticker-heading">{t} · {display_price(t,price)}</div>', unsafe_allow_html=True)
             if cur["3M_DD"] <= -12 and cur["5D"] > 2:
                 plain_state = "SHARE PRICE MAY BE STARTING TO RISE AGAIN"
             elif cur["5D"] <= -5:
@@ -903,7 +886,6 @@ if stocks:
 
 st.divider()
 st.markdown('<div class="sniper-section-heading">Deep analysis</div>', unsafe_allow_html=True)
-st.caption("Choose a share below for full analysis. Swipe the ticker row sideways on mobile to see all names.")
 tabs=st.tabs(WATCHLIST)
 
 for tab,t in zip(tabs,WATCHLIST):
