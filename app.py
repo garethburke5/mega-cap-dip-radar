@@ -13,8 +13,30 @@ st.set_page_config(page_title="Share Sniper", page_icon="🎯", layout="wide")
 
 st_autorefresh(interval=5 * 60 * 1000, limit=None, key="five_minute_refresh")
 
-WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL","AVGO","BARC.L"]
-COMPANY_NAMES = {"TSLA":"Tesla","NVDA":"Nvidia","META":"Meta","AMZN":"Amazon","GOOGL":"Alphabet (Google)","AVGO":"Broadcom","BARC.L":"Barclays"}
+WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL","AVGO","BARC.L","QCOM","BA"]
+COMPANY_NAMES = {
+    "TSLA":"Tesla",
+    "NVDA":"Nvidia",
+    "META":"Meta",
+    "AMZN":"Amazon",
+    "GOOGL":"Alphabet (Google)",
+    "AVGO":"Broadcom",
+    "BARC.L":"Barclays",
+    "QCOM":"Qualcomm",
+    "BA":"Boeing",
+}
+
+SNIPER_PROFILES = {
+    "TSLA":"Core wave share — frequent large swings. Entry discipline still matters.",
+    "NVDA":"Core wave share — repeated large corrections and rebounds.",
+    "META":"Core wave share — meaningful sentiment-driven falls and recoveries.",
+    "AMZN":"Core wave share — regular enough corrections to suit the rebound strategy.",
+    "GOOGL":"Core wave share — somewhat calmer, but still produces meaningful corrections.",
+    "AVGO":"High-volatility candidate — keep, but require stronger evidence that the fall has stabilised because false bottoms can occur.",
+    "BARC.L":"UK blue-chip wave share — banking and macro moves can create meaningful corrections and rebounds.",
+    "QCOM":"Occasional deep-dip candidate — most interesting after a genuinely large fall. Around $140–$150 is a particularly interesting area to investigate if the business remains sound.",
+    "BA":"Occasional deep-dip candidate — only interesting after a substantial collapse. Company-specific risk is higher, so always check why the share has fallen before buying.",
+}
 
 def display_price(ticker, price):
     return f"{price:,.1f}p" if ticker.endswith(".L") else f"${price:,.2f}"
@@ -769,7 +791,7 @@ risk_budget=st.sidebar.number_input("Maximum acceptable loss",min_value=0.0,valu
 
 # ---------- HOME ----------
 st.title("🎯 Share Sniper")
-st.caption("Find unusually attractive corrections and follow the trade from sell-off to recovery.")
+st.caption("Find large, established shares with meaningful corrections and target the rebound — without forcing a trade every day.")
 
 # ---------- VISUAL HIERARCHY ----------
 # Burgundy is reserved for navigation/section emphasis; green/red remain free for market signals.
@@ -838,7 +860,7 @@ st.info(f"CORE STRATEGY: Deploy about £{stake_gbp:,.0f} into an unusually attra
 if stocks:
     ranked=sorted(stocks.items(), key=lambda kv: rebound_strategy_snapshot(kv[1]["df"],kv[1]["matches"],stake_gbp)["score"], reverse=True)
     st.markdown('<div class="sniper-section-heading">Today\'s Sniper Opportunities</div>', unsafe_allow_html=True)
-    st.caption("Start here. Shares are ranked by how attractive the current buying price looks for our 10–20% rebound strategy. A high rank is a prompt to investigate, not an instruction to buy.")
+    st.caption("Start here. Shares are ranked by how attractive the current buying price looks for our 10–20% rebound strategy. Core wave shares and occasional deep-dip shares are both included; a high rank is a prompt to investigate, not an instruction to buy.")
     daily=[]
     for t,x in ranked:
         snap=rebound_strategy_snapshot(x["df"],x["matches"],stake_gbp)
@@ -852,6 +874,7 @@ if stocks:
         with st.container(border=True):
             st.markdown(f"### #{pos} · {company} ({t}) · {display_price(t,price)}")
             st.write(f"Buying opportunity today: {snap['entry_score']}/100 — {snap['verdict']}.")
+            st.caption(SNIPER_PROFILES.get(t,""))
             st.write(snap["entry_explain"])
             st.write(f"£{stake_gbp:,.0f} objective: +10% ≈ £{snap['gain10']:,.0f} gross · +20% ≈ £{snap['gain20']:,.0f} gross.")
 
@@ -871,6 +894,7 @@ if stocks:
             else:
                 plain_state = "NO MAJOR BUYING OPPORTUNITY DETECTED"
             st.markdown(f"**{plain_state}**")
+            st.caption(SNIPER_PROFILES.get(t,""))
             st.write(f"Buying opportunity today: {snap['entry_score']}/100 — {snap['verdict']}.")
             st.write(f"Size of recent dip: {snap['dip_quality']}/100. {snap['summary']}")
             st.write(snap["entry_explain"])
@@ -897,7 +921,7 @@ for tab,t in zip(tabs,WATCHLIST):
         cur=f.iloc[-1]; price=float(df["Close"].iloc[-1])
 
         snap=rebound_strategy_snapshot(df,matches,stake_gbp)
-        st.markdown(f'<div class="sniper-ticker-heading">{t} — ${price:,.2f}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="sniper-ticker-heading">{COMPANY_NAMES.get(t,t)} ({t}) — {display_price(t,price)}</div>', unsafe_allow_html=True)
         if cur["3M_DD"] <= -12 and cur["5D"] > 2:
             plain_state = "SHARE PRICE MAY BE STARTING TO RISE AGAIN"
             plain_explain = f"{t} is still {abs(cur['3M_DD']):.1f}% below its 3-month high, but its share price has risen {cur['5D']:.1f}% over the last 5 trading days. That may be an early sign that the recent fall is ending and the share price is beginning to move higher again."
@@ -912,10 +936,22 @@ for tab,t in zip(tabs,WATCHLIST):
             plain_explain = "The current price pattern does not show the combination of a major fall and an emerging recovery that this tool is designed to find."
         st.markdown(f"### {plain_state}")
         st.write(plain_explain)
+        st.info("Sniper profile: " + SNIPER_PROFILES.get(t,"This share is monitored for meaningful dip-and-rebound opportunities."))
         st.markdown(f"### Buying opportunity today: {snap['entry_score']}/100 — {snap['verdict']}")
         st.write(snap["summary"])
         st.write(snap["entry_explain"])
         st.write(f"Your instinct: {snap['instinct']}.")
+        if t=="QCOM":
+            if price <= 155:
+                st.success("QUALCOMM DEEP-DIP AREA: the price is in/near the $140–$150 area we identified as especially worth investigating. This is still not an automatic buy.")
+            elif price <= 165:
+                st.info("QUALCOMM WATCH AREA: getting closer to the deep-dip zone. A cheaper price around $140–$150 would be more interesting for this strategy.")
+            else:
+                st.caption("Qualcomm is an occasional deep-dip share for us. We are more interested after a much larger fall, especially around the $140–$150 area.")
+        if t=="BA":
+            st.warning("BOEING SPECIAL RULE: a large fall can create opportunity, but Boeing has more company-specific operational/regulatory risk than the other names. Check the reason for any collapse before considering an entry.")
+        if t=="AVGO":
+            st.warning("BROADCOM SPECIAL RULE: false bottoms can occur. Prefer stronger evidence that the fall has stabilised before treating a large drop as an entry.")
         d1,d2=st.columns(2)
         d1.metric("Size of recent dip",f"{snap['dip_quality']}/100")
         d2.metric("Buying opportunity today",f"{snap['entry_score']}/100")
