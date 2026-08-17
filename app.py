@@ -149,12 +149,29 @@ def feature_frame(df):
     f=pd.DataFrame(index=df.index)
     for k,d in PERIODS.items():
         f[k]=c.pct_change(d)*100
+
+    # Standard rolling drawdowns for mature shares.
     f["3M_DD"]=(c/c.rolling(63).max()-1)*100
     f["6M_DD"]=(c/c.rolling(126).max()-1)*100
     f["12M_DD"]=(c/c.rolling(252).max()-1)*100
+
+    # New listings do not yet have 63/126/252 trading days.
+    # Use the available public-history peak so they still receive full analysis.
+    running_high=c.cummax()
+    public_dd=(c/running_high-1)*100
+    if len(c) < 63:
+        f["3M_DD"]=public_dd
+    if len(c) < 126:
+        f["6M_DD"]=public_dd
+    if len(c) < 252:
+        f["12M_DD"]=public_dd
+
     f["RSI"]=calc_rsi(c)
-    f["DIST50"]=(c/c.rolling(50).mean()-1)*100
-    f["VOLRATIO"]=df["Volume"]/df["Volume"].rolling(20).mean()
+
+    # Use all available days until 50 trading days exist.
+    ma50=c.rolling(50, min_periods=min(10,len(c))).mean()
+    f["DIST50"]=(c/ma50-1)*100
+    f["VOLRATIO"]=df["Volume"]/df["Volume"].rolling(20,min_periods=min(5,len(c))).mean()
     return f
 
 def percentile_rank(series,value,lower_is_extreme=True):
@@ -641,6 +658,31 @@ def market_move_interpretation(rows, ticker):
         return f"{ticker} has strongly outperformed the Nasdaq-100, so the recent move is more company-specific than market-wide."
     return f"{ticker} has modestly outperformed the Nasdaq-100; the wider market still explains part of the move."
 
+def new_listing_snapshot(df, ipo_price=None):
+    if df is None or df.empty:
+        return {}
+    c=df["Close"]
+    current=float(c.iloc[-1])
+    high=float(c.max())
+    low=float(c.min())
+    high_date=c.idxmax()
+    low_date=c.idxmin()
+    out={
+        "current":current,
+        "high":high,
+        "low":low,
+        "from_high":(current/high-1)*100 if high else np.nan,
+        "from_low":(current/low-1)*100 if low else np.nan,
+        "high_date":high_date,
+        "low_date":low_date,
+        "sessions":len(c),
+        "first_date":c.index[0],
+    }
+    if ipo_price:
+        out["ipo_price"]=ipo_price
+        out["from_ipo"]=(current/ipo_price-1)*100
+    return out
+
 # ---------- CHART ----------
 def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
     data=[]
@@ -762,7 +804,12 @@ spy5=(float(spy["Close"].iloc[-1])/float(spy["Close"].iloc[-6])-1)*100 if len(sp
 stocks={}
 for t in WATCHLIST:
     df=load_price(t,10)
-    if df.empty or len(df)<400:continue
+    # New listings such as SpaceX must not be discarded simply because they
+    # do not yet have years of price history. Twenty sessions is enough for
+    # the live dip/rebound engine; historical analogue analysis remains empty
+    # until sufficient history accumulates.
+    if df.empty or len(df)<20:
+        continue
     intraday_price,intraday_ts=load_intraday(t)
     if intraday_price is not None:
         df=df.copy()
@@ -939,6 +986,27 @@ for tab,t in zip(tabs,WATCHLIST):
         st.markdown(f"### {plain_state}")
         st.write(plain_explain)
         st.info("Sniper profile: " + SNIPER_PROFILES.get(t,"This share is monitored for meaningful dip-and-rebound opportunities."))
+
+        if t=="SPCX":
+            spx=new_listing_snapshot(df,135.0)
+            if spx:
+                st.markdown("### SpaceX analysis summary")
+                c1,c2,c3,c4=st.columns(4)
+                c1.metric("Current price",display_price(t,spx["current"]))
+                c2.metric("Since $135 IPO",f'{spx["from_ipo"]:+.1f}%')
+                c3.metric("From public-market high",f'{spx["from_high"]:+.1f}%')
+                c4.metric("Rebound from public-market low",f'{spx["from_low"]:+.1f}%')
+                st.write(
+                    f"SpaceX has only {spx['sessions']} trading sessions of public history, so the app uses its entire "
+                    f"post-IPO trading range as the medium-term reference rather than pretending it has 3, 6 or 12 months of history. "
+                    f"Its public-market high is {display_price(t,spx['high'])} and its public-market low is {display_price(t,spx['low'])}."
+                )
+                st.write(
+                    "What matters today: the app gives SpaceX the same Buying Opportunity Today score, RSI, recent-price analysis, "
+                    "market-relative comparison, £20,000 rebound targets, chart, fundamentals and news review as every other share. "
+                    "The only part that is deliberately unavailable is the multi-year historical-analogue evidence, because that history does not yet exist."
+                )
+
         st.markdown(f"### Buying opportunity today: {snap['entry_score']}/100 — {snap['verdict']}")
         st.write(snap["summary"])
         st.write(snap["entry_explain"])
@@ -951,12 +1019,11 @@ for tab,t in zip(tabs,WATCHLIST):
             else:
                 st.caption("Qualcomm is an occasional deep-dip share for us. We are more interested after a much larger fall, especially around the $140–$150 area.")
         if t=="SPCX":
-            st.warning("SPACEX — FULL ANALYSIS, EXTRA CAUTION: score SpaceX with the same buying-opportunity, dip, RSI, market-relative, chart, news and fundamentals framework as every other share. Because it only listed recently, historical-match evidence is naturally weaker and must not be mistaken for low potential.")
+            st.warning("SPACEX — FULL SNIPER TREATMENT: SpaceX is scored and analysed like every other share. The app only omits the multi-year analogue statistics that cannot yet exist. Short public history is a limitation on historical evidence, not a reason to suppress the opportunity analysis.")
             ipo_price=135.0
             ipo_move=(price/ipo_price-1)*100
             st.write(f"IPO reference: $135.00 · current price is {ipo_move:+.1f}% versus the IPO price.")
-            st.write("Extra SpaceX intelligence to consider: post-IPO high/low and rebound size, share-unlock/lock-up supply pressure, earnings and cash-investment narrative, Starlink/launch/AI developments, and whether today's move is company-specific or part of the wider growth/tech market.")
-            st.write("Sniper interpretation: a sharp fall can be highly interesting, but do not penalise SpaceX simply because it lacks five years of historical analogues. Conversely, do not chase a large rebound merely because the upside story is exciting.")
+            st.write("Extra SpaceX intelligence: post-IPO high/low and rebound size, share-unlock/lock-up supply pressure, results, Starlink/launch execution, AI/compute investment, financing/capital expenditure, valuation and whether today's move is company-specific or part of the wider growth/tech market.")
         if t=="BA":
             st.warning("BOEING SPECIAL RULE: a large fall can create opportunity, but Boeing has more company-specific operational/regulatory risk than the other names. Check the reason for any collapse before considering an entry.")
         if t=="AVGO":
