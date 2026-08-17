@@ -13,7 +13,7 @@ st.set_page_config(page_title="Share Sniper", page_icon="🎯", layout="wide")
 
 st_autorefresh(interval=5 * 60 * 1000, limit=None, key="five_minute_refresh")
 
-WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL","AVGO","BARC.L","QCOM","BA"]
+WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL","AVGO","BARC.L","QCOM","BA","SPCX"]
 COMPANY_NAMES = {
     "TSLA":"Tesla",
     "NVDA":"Nvidia",
@@ -24,6 +24,7 @@ COMPANY_NAMES = {
     "BARC.L":"Barclays",
     "QCOM":"Qualcomm",
     "BA":"Boeing",
+    "SPCX":"SpaceX",
 }
 
 SNIPER_PROFILES = {
@@ -36,6 +37,7 @@ SNIPER_PROFILES = {
     "BARC.L":"UK blue-chip wave share — banking and macro moves can create meaningful corrections and rebounds.",
     "QCOM":"Occasional deep-dip candidate — most interesting after a genuinely large fall. Around $140–$150 is a particularly interesting area to investigate if the business remains sound.",
     "BA":"Occasional deep-dip candidate — only interesting after a substantial collapse. Company-specific risk is higher, so always check why the share has fallen before buying.",
+    "SPCX":"Special situation / new listing — high rebound potential but limited trading history. Do not chase sharp rebounds; favour meaningful pullbacks.",
 }
 
 def display_price(ticker, price):
@@ -948,6 +950,8 @@ for tab,t in zip(tabs,WATCHLIST):
                 st.info("QUALCOMM WATCH AREA: getting closer to the deep-dip zone. A cheaper price around $140–$150 would be more interesting for this strategy.")
             else:
                 st.caption("Qualcomm is an occasional deep-dip share for us. We are more interested after a much larger fall, especially around the $140–$150 area.")
+        if t=="SPCX":
+            st.warning("SPACEX SPECIAL RULE: this is a new listing with limited history. Treat it as a special-situation rebound share, not a proven Sniper. Avoid chasing sharp rebounds; wait for a meaningful pullback.")
         if t=="BA":
             st.warning("BOEING SPECIAL RULE: a large fall can create opportunity, but Boeing has more company-specific operational/regulatory risk than the other names. Check the reason for any collapse before considering an entry.")
         if t=="AVGO":
