@@ -37,7 +37,7 @@ SNIPER_PROFILES = {
     "BARC.L":"UK blue-chip wave share — banking and macro moves can create meaningful corrections and rebounds.",
     "QCOM":"Occasional deep-dip candidate — most interesting after a genuinely large fall. Around $140–$150 is a particularly interesting area to investigate if the business remains sound.",
     "BA":"Occasional deep-dip candidate — only interesting after a substantial collapse. Company-specific risk is higher, so always check why the share has fallen before buying.",
-    "SPCX":"Special situation / new listing — high rebound potential but limited trading history. Do not chase sharp rebounds; favour meaningful pullbacks.",
+    "SPCX":"Full Sniper analysis + new-listing intelligence — potentially exceptional rebound amplitude. Use the same price, RSI, dip, entry, market, news and fundamental analysis as every other share, plus extra IPO/unlock/event context because the trading history is short.",
 }
 
 def display_price(ticker, price):
@@ -951,7 +951,12 @@ for tab,t in zip(tabs,WATCHLIST):
             else:
                 st.caption("Qualcomm is an occasional deep-dip share for us. We are more interested after a much larger fall, especially around the $140–$150 area.")
         if t=="SPCX":
-            st.warning("SPACEX SPECIAL RULE: this is a new listing with limited history. Treat it as a special-situation rebound share, not a proven Sniper. Avoid chasing sharp rebounds; wait for a meaningful pullback.")
+            st.warning("SPACEX — FULL ANALYSIS, EXTRA CAUTION: score SpaceX with the same buying-opportunity, dip, RSI, market-relative, chart, news and fundamentals framework as every other share. Because it only listed recently, historical-match evidence is naturally weaker and must not be mistaken for low potential.")
+            ipo_price=135.0
+            ipo_move=(price/ipo_price-1)*100
+            st.write(f"IPO reference: $135.00 · current price is {ipo_move:+.1f}% versus the IPO price.")
+            st.write("Extra SpaceX intelligence to consider: post-IPO high/low and rebound size, share-unlock/lock-up supply pressure, earnings and cash-investment narrative, Starlink/launch/AI developments, and whether today's move is company-specific or part of the wider growth/tech market.")
+            st.write("Sniper interpretation: a sharp fall can be highly interesting, but do not penalise SpaceX simply because it lacks five years of historical analogues. Conversely, do not chase a large rebound merely because the upside story is exciting.")
         if t=="BA":
             st.warning("BOEING SPECIAL RULE: a large fall can create opportunity, but Boeing has more company-specific operational/regulatory risk than the other names. Check the reason for any collapse before considering an entry.")
         if t=="AVGO":
