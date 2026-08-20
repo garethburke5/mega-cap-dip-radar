@@ -753,7 +753,10 @@ def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
         document.getElementById('readout').innerHTML='<b>{ticker}</b> &nbsp; '+p.time+' &nbsp; $'+d.value.toFixed(2);
       }});
       new ResizeObserver(e=>{{chart.applyOptions({{width:e[0].contentRect.width}})}}).observe(el);
-      rng(132);
+      // Default to the 1-year view. If a newly listed share has less than
+      // one year of public history (e.g. SpaceX), this naturally shows all
+      // available history.
+      rng(264);
     </script>
     """
     components.html(chart_html,height=505,scrolling=False)
