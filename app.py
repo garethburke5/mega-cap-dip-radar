@@ -971,6 +971,13 @@ for tab,t in zip(tabs,WATCHLIST):
 
         snap=rebound_strategy_snapshot(df,matches,stake_gbp)
         st.markdown(f'<div class="sniper-ticker-heading">{COMPANY_NAMES.get(t,t)} ({t}) — {display_price(t,price)}</div>', unsafe_allow_html=True)
+
+        st.markdown("### Main price chart")
+        st.caption("Pinch to zoom and swipe to pan. The +10% and +20% lines are your rebound objectives from today’s price — not analyst forecasts.")
+        entry_for_chart=entry_price if held==t and entry_price>0 else None
+        strategy_snap=rebound_strategy_snapshot(df,matches,stake_gbp)
+        mobile_chart(df,t,entry_for_chart,strategy_snap["target10"],strategy_snap["target20"])
+
         if cur["3M_DD"] <= -12 and cur["5D"] > 2:
             plain_state = "SHARE PRICE MAY BE STARTING TO RISE AGAIN"
             plain_explain = f"{t} is still {abs(cur['3M_DD']):.1f}% below its 3-month high, but its share price has risen {cur['5D']:.1f}% over the last 5 trading days. That may be an early sign that the recent fall is ending and the share price is beginning to move higher again."
@@ -1226,12 +1233,6 @@ for tab,t in zip(tabs,WATCHLIST):
         else:
             st.write("No recent headline feed was available from the current market-data source.")
         st.caption("Headline classification is a screening aid. The app does not assume that a headline proves the cause of a price move.")
-
-        st.markdown("### Main price chart")
-        st.caption("Pinch to zoom and swipe to pan. The +10% and +20% lines are your rebound objectives from today’s price — not analyst forecasts.")
-        entry_for_chart=entry_price if held==t and entry_price>0 else None
-        strategy_snap=rebound_strategy_snapshot(df,matches,stake_gbp)
-        mobile_chart(df,t,entry_for_chart,strategy_snap["target10"],strategy_snap["target20"])
 
         if held==t and entry_price>0:
             st.markdown("### My trade")
