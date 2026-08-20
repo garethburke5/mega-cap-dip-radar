@@ -715,9 +715,9 @@ def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
     chart_html=f"""
     <div style="font-family:Arial,sans-serif">
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-        <button onclick="calendarRange(31)">1M</button><button onclick="calendarRange(92)">3M</button>
-        <button onclick="calendarRange(183)">6M</button><button class="active-range" onclick="calendarRange(365)">1Y</button>
-        <button onclick="calendarRange(730)">2Y</button><button onclick="calendarRange(1826)">5Y</button>
+        <button onclick="showRange(31)">1M</button><button onclick="showRange(92)">3M</button>
+        <button onclick="showRange(183)">6M</button><button class="active-range" onclick="showRange(365)">1Y</button>
+        <button onclick="showRange(730)">2Y</button><button onclick="showRange(1826)">5Y</button>
         <button onclick="fit()">MAX</button>
       </div>
       <div id="readout" style="height:24px;font-size:14px"><b>{ticker}</b></div>
@@ -730,7 +730,8 @@ def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
     </style>
     <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
     <script>
-      const data={payload};
+      const allData={payload};
+      const allMarkers={markers_json};
       const el=document.getElementById('chart');
       const chart=LightweightCharts.createChart(el,{{
         width:el.clientWidth,height:430,
@@ -743,29 +744,41 @@ def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
         handleScale:{{axisPressedMouseMove:true,mouseWheel:true,pinch:true}}
       }});
       const series=chart.addLineSeries({{lineWidth:2,priceLineVisible:true}});
-      series.setData(data);
-      series.setMarkers({markers_json});
       {price_lines}
-      function calendarRange(days){{
-        if(!data.length)return;
-        const last=new Date(data[data.length-1].time+'T00:00:00Z');
-        const firstAvailable=new Date(data[0].time+'T00:00:00Z');
-        const fromDate=new Date(last);
-        fromDate.setUTCDate(fromDate.getUTCDate()-days);
-        const effectiveFrom=fromDate<firstAvailable?firstAvailable:fromDate;
-        const iso=d=>d.toISOString().slice(0,10);
-        chart.timeScale().setVisibleRange({{from:iso(effectiveFrom),to:data[data.length-1].time}});
+
+      function subsetByDays(days){{
+        if(!allData.length)return [];
+        const last=new Date(allData[allData.length-1].time+'T00:00:00Z');
+        const cutoff=new Date(last);
+        cutoff.setUTCDate(cutoff.getUTCDate()-days);
+        return allData.filter(d=>new Date(d.time+'T00:00:00Z')>=cutoff);
       }}
-      function fit(){{chart.timeScale().fitContent()}}
+
+      function showRange(days){{
+        const selected = days===null ? allData : subsetByDays(days);
+        series.setData(selected);
+        if(selected.length){{
+          const firstTime=selected[0].time;
+          const lastTime=selected[selected.length-1].time;
+          const selectedMarkers=allMarkers.filter(m=>m.time>=firstTime && m.time<=lastTime);
+          series.setMarkers(selectedMarkers);
+        }} else {{
+          series.setMarkers([]);
+        }}
+        chart.timeScale().fitContent();
+      }}
+
+      function fit(){{showRange(null)}}
       chart.subscribeCrosshairMove(p=>{{
         if(!p.time)return;
         const d=p.seriesData.get(series); if(!d)return;
         document.getElementById('readout').innerHTML='<b>{ticker}</b> &nbsp; '+p.time+' &nbsp; $'+d.value.toFixed(2);
       }});
       new ResizeObserver(e=>{{chart.applyOptions({{width:e[0].contentRect.width}})}}).observe(el);
-      // Default to a true 365-calendar-day view. Delay until the chart
-      // completes its first layout so the initial full-history fit cannot win.
-      requestAnimationFrame(()=>requestAnimationFrame(()=>calendarRange(365)));
+      // HARD DEFAULT: the chart is initially populated with only the last
+      // 365 calendar days. Wider history is not loaded into the visible series
+      // until the user deliberately selects 2Y, 5Y or MAX.
+      showRange(365);
     </script>
     """
     components.html(chart_html,height=505,scrolling=False)
