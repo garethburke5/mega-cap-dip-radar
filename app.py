@@ -715,9 +715,9 @@ def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
     chart_html=f"""
     <div style="font-family:Arial,sans-serif">
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-        <button onclick="rng(22)">1M</button><button onclick="rng(66)">3M</button>
-        <button onclick="rng(132)">6M</button><button onclick="rng(264)">1Y</button>
-        <button onclick="rng(528)">2Y</button><button onclick="rng(1320)">5Y</button>
+        <button onclick="calendarRange(31)">1M</button><button onclick="calendarRange(92)">3M</button>
+        <button onclick="calendarRange(183)">6M</button><button class="active-range" onclick="calendarRange(365)">1Y</button>
+        <button onclick="calendarRange(730)">2Y</button><button onclick="calendarRange(1826)">5Y</button>
         <button onclick="fit()">MAX</button>
       </div>
       <div id="readout" style="height:24px;font-size:14px"><b>{ticker}</b></div>
@@ -726,6 +726,7 @@ def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
     <style>
       button{{border:1px solid #ccc;background:white;border-radius:8px;padding:8px 13px;font-size:14px}}
       button:active{{background:#eee}}
+      button.active-range{{background:#eee;font-weight:700}}
     </style>
     <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
     <script>
@@ -745,7 +746,16 @@ def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
       series.setData(data);
       series.setMarkers({markers_json});
       {price_lines}
-      function rng(n){{const L=data.length;chart.timeScale().setVisibleLogicalRange({{from:Math.max(0,L-n)-1,to:L+2}})}}
+      function calendarRange(days){{
+        if(!data.length)return;
+        const last=new Date(data[data.length-1].time+'T00:00:00Z');
+        const firstAvailable=new Date(data[0].time+'T00:00:00Z');
+        const fromDate=new Date(last);
+        fromDate.setUTCDate(fromDate.getUTCDate()-days);
+        const effectiveFrom=fromDate<firstAvailable?firstAvailable:fromDate;
+        const iso=d=>d.toISOString().slice(0,10);
+        chart.timeScale().setVisibleRange({{from:iso(effectiveFrom),to:data[data.length-1].time}});
+      }}
       function fit(){{chart.timeScale().fitContent()}}
       chart.subscribeCrosshairMove(p=>{{
         if(!p.time)return;
@@ -753,10 +763,9 @@ def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
         document.getElementById('readout').innerHTML='<b>{ticker}</b> &nbsp; '+p.time+' &nbsp; $'+d.value.toFixed(2);
       }});
       new ResizeObserver(e=>{{chart.applyOptions({{width:e[0].contentRect.width}})}}).observe(el);
-      // Default to the 1-year view. If a newly listed share has less than
-      // one year of public history (e.g. SpaceX), this naturally shows all
-      // available history.
-      rng(264);
+      // Default to a true 365-calendar-day view. Delay until the chart
+      // completes its first layout so the initial full-history fit cannot win.
+      requestAnimationFrame(()=>requestAnimationFrame(()=>calendarRange(365)));
     </script>
     """
     components.html(chart_html,height=505,scrolling=False)
