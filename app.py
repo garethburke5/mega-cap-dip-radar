@@ -715,9 +715,9 @@ def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
     chart_html=f"""
     <div style="font-family:Arial,sans-serif">
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-        <button onclick="showRange(31)">1M</button><button onclick="showRange(92)">3M</button>
-        <button onclick="showRange(183)">6M</button><button class="active-range" onclick="showRange(365)">1Y</button>
-        <button onclick="showRange(730)">2Y</button><button onclick="showRange(1826)">5Y</button>
+        <button onclick="rng(22)">1M</button><button onclick="rng(66)">3M</button>
+        <button onclick="rng(132)">6M</button><button onclick="rng(264)">1Y</button>
+        <button onclick="rng(528)">2Y</button><button onclick="rng(1320)">5Y</button>
         <button onclick="fit()">MAX</button>
       </div>
       <div id="readout" style="height:24px;font-size:14px"><b>{ticker}</b></div>
@@ -726,12 +726,10 @@ def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
     <style>
       button{{border:1px solid #ccc;background:white;border-radius:8px;padding:8px 13px;font-size:14px}}
       button:active{{background:#eee}}
-      button.active-range{{background:#eee;font-weight:700}}
     </style>
     <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
     <script>
-      const allData={payload};
-      const allMarkers={markers_json};
+      const data={payload};
       const el=document.getElementById('chart');
       const chart=LightweightCharts.createChart(el,{{
         width:el.clientWidth,height:430,
@@ -744,41 +742,18 @@ def mobile_chart(df,ticker,entry=None,strategy10=None,strategy20=None):
         handleScale:{{axisPressedMouseMove:true,mouseWheel:true,pinch:true}}
       }});
       const series=chart.addLineSeries({{lineWidth:2,priceLineVisible:true}});
+      series.setData(data);
+      series.setMarkers({markers_json});
       {price_lines}
-
-      function subsetByDays(days){{
-        if(!allData.length)return [];
-        const last=new Date(allData[allData.length-1].time+'T00:00:00Z');
-        const cutoff=new Date(last);
-        cutoff.setUTCDate(cutoff.getUTCDate()-days);
-        return allData.filter(d=>new Date(d.time+'T00:00:00Z')>=cutoff);
-      }}
-
-      function showRange(days){{
-        const selected = days===null ? allData : subsetByDays(days);
-        series.setData(selected);
-        if(selected.length){{
-          const firstTime=selected[0].time;
-          const lastTime=selected[selected.length-1].time;
-          const selectedMarkers=allMarkers.filter(m=>m.time>=firstTime && m.time<=lastTime);
-          series.setMarkers(selectedMarkers);
-        }} else {{
-          series.setMarkers([]);
-        }}
-        chart.timeScale().fitContent();
-      }}
-
-      function fit(){{showRange(null)}}
+      function rng(n){{const L=data.length;chart.timeScale().setVisibleLogicalRange({{from:Math.max(0,L-n)-1,to:L+2}})}}
+      function fit(){{chart.timeScale().fitContent()}}
       chart.subscribeCrosshairMove(p=>{{
         if(!p.time)return;
         const d=p.seriesData.get(series); if(!d)return;
         document.getElementById('readout').innerHTML='<b>{ticker}</b> &nbsp; '+p.time+' &nbsp; $'+d.value.toFixed(2);
       }});
       new ResizeObserver(e=>{{chart.applyOptions({{width:e[0].contentRect.width}})}}).observe(el);
-      // HARD DEFAULT: the chart is initially populated with only the last
-      // 365 calendar days. Wider history is not loaded into the visible series
-      // until the user deliberately selects 2Y, 5Y or MAX.
-      showRange(365);
+      rng(132);
     </script>
     """
     components.html(chart_html,height=505,scrolling=False)
@@ -862,6 +837,54 @@ held=st.sidebar.selectbox("Stock",["None"]+WATCHLIST)
 entry_price=st.sidebar.number_input("Entry price ($)",min_value=0.0,value=0.0,step=1.0)
 position_value=st.sidebar.number_input("Amount invested",min_value=0.0,value=0.0,step=500.0)
 risk_budget=st.sidebar.number_input("Maximum acceptable loss",min_value=0.0,value=0.0,step=100.0)
+
+
+# ---------- ROCK-BOTTOM WATCHLIST ----------
+ROCK_BOTTOM = {
+    "ARM": {
+        "name": "Arm Holdings",
+        "watch_below": 160.0,
+        "entry_low": 120.0,
+        "entry_high": 140.0,
+        "action_price": 140.0,
+        "comment": "Only interesting near its old lower trading base; a fall from a recent spike alone does not make it cheap."
+    },
+    "MSTR": {
+        "name": "Strategy (MicroStrategy)",
+        "watch_below": 130.0,
+        "entry_low": 80.0,
+        "entry_high": 100.0,
+        "action_price": 100.0,
+        "comment": "High-risk, Bitcoin-dependent rebound trade. Check Bitcoin and Strategy-specific news before acting."
+    },
+}
+
+def rock_bottom_snapshot(ticker, cfg):
+    df = load_price(ticker, 1)
+    if df.empty: return None
+    intraday_price, _ = load_intraday(ticker)
+    price = float(intraday_price) if intraday_price is not None else float(df["Close"].iloc[-1])
+    c = df["Close"].astype(float)
+    chg5 = (price/float(c.iloc[-6])-1)*100 if len(c)>=6 else 0.0
+    chg20 = (price/float(c.iloc[-21])-1)*100 if len(c)>=21 else chg5
+    if chg5 <= -3: direction = "FALLING TOWARD TARGET"
+    elif chg5 >= 3: direction = "MOVING AWAY / REBOUNDING"
+    elif chg20 <= -5: direction = "DRIFTING LOWER"
+    elif chg20 >= 5: direction = "TRENDING HIGHER"
+    else: direction = "SIDEWAYS / STABILISING"
+    if cfg["entry_low"] <= price <= cfg["entry_high"]: status = "AT SNIPER ENTRY ZONE"
+    elif price < cfg["entry_low"]: status = "BELOW ENTRY ZONE — INVESTIGATE WHY"
+    elif price <= cfg["watch_below"]: status = "WATCH CLOSELY"
+    else: status = "IGNORE FOR NOW"
+    distance=(price/cfg["action_price"]-1)*100
+    return {"ticker":ticker,"name":cfg["name"],"price":price,"direction":direction,
+            "status":status,"distance":distance,"cfg":cfg}
+
+rock_bottom_rows=[]
+for _ticker,_cfg in ROCK_BOTTOM.items():
+    _rb=rock_bottom_snapshot(_ticker,_cfg)
+    if _rb: rock_bottom_rows.append(_rb)
+
 
 # ---------- HOME ----------
 st.title("🎯 Share Sniper")
@@ -983,6 +1006,23 @@ if stocks:
             st.write(f"Strategy verdict: {snap['verdict']} · {snap['summary']}")
 
 st.divider()
+
+st.markdown('<div class="sniper-section-heading">Rock-bottom watchlist</div>', unsafe_allow_html=True)
+st.caption("Shares we deliberately ignore at ordinary prices. They only become interesting when they approach unusually cheap pre-set Sniper zones.")
+for rb in rock_bottom_rows:
+    cfg=rb["cfg"]
+    distance_text=(f"{abs(rb['distance']):.1f}% below ${cfg['action_price']:.0f}"
+                   if rb["distance"]<0 else f"{rb['distance']:.1f}% above ${cfg['action_price']:.0f}")
+    st.markdown(
+        f"""<div style="border:1px solid #e2e2e2;border-radius:12px;padding:12px 14px;margin:8px 0 12px 0;">
+        <div style="font-size:1.18rem;font-weight:750;">{rb['name']} ({rb['ticker']}) — ${rb['price']:,.2f}</div>
+        <div style="margin-top:5px;"><b>Sniper entry zone:</b> ${cfg['entry_low']:.0f}–${cfg['entry_high']:.0f}
+        &nbsp; · &nbsp; <b>Action price:</b> ≤${cfg['action_price']:.0f}
+        &nbsp; · &nbsp; <b>Distance:</b> {distance_text}</div>
+        <div style="margin-top:5px;"><b>Direction:</b> {rb['direction']} &nbsp; · &nbsp; <b>Status:</b> {rb['status']}</div>
+        <div style="margin-top:5px;color:#555;">{cfg['comment']}</div></div>""",
+        unsafe_allow_html=True)
+
 st.markdown('<div class="sniper-section-heading">Deep analysis</div>', unsafe_allow_html=True)
 tabs=st.tabs(WATCHLIST)
 
