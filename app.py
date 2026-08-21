@@ -853,8 +853,8 @@ ROCK_BOTTOM = {
         "name": "Strategy (MicroStrategy)",
         "watch_below": 130.0,
         "entry_low": 80.0,
-        "entry_high": 100.0,
-        "action_price": 100.0,
+        "entry_high": 90.0,
+        "action_price": 90.0,
         "comment": "High-risk, Bitcoin-dependent rebound trade. Check Bitcoin and Strategy-specific news before acting."
     },
 }
