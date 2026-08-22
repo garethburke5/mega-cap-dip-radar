@@ -55,6 +55,20 @@ SNIPER_PROFILES = {
 def display_price(ticker, price):
     return f"{price:,.1f}p" if ticker.endswith(".L") else f"${price:,.2f}"
 
+def human_large_number(value, currency="$"):
+    try:
+        v=float(value)
+    except Exception:
+        return str(value)
+    av=abs(v)
+    if av >= 1_000_000_000_000:
+        return f"{currency}{v/1_000_000_000_000:,.2f} trillion"
+    if av >= 1_000_000_000:
+        return f"{currency}{v/1_000_000_000:,.1f} billion"
+    if av >= 1_000_000:
+        return f"{currency}{v/1_000_000:,.1f} million"
+    return f"{currency}{v:,.0f}"
+
 PERIODS = {"1D":1,"2D":2,"5D":5,"7D":7,"10D":10,"1M":21,"3M":63,"6M":126,"12M":252}
 MATCH_FEATURES = ["1D","5D","10D","1M","3M_DD","6M_DD","RSI","DIST50","VOLRATIO"]
 
@@ -1231,15 +1245,14 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
 
         k1,k2,k3,k4=st.columns(4)
         k1.metric("Dip quality", f"{snap['dip_quality']}/100")
-        k2.metric("From 3M high", f"{from_high:.1f}%")
+        k2.metric("From 3-month high", f"{from_high:.1f}%")
         k3.metric("RSI", rsi_text)
-        k4.metric("5-day direction", f"{five_day:+.1f}%")
+        k4.metric("Movement over past 5 days", f"{five_day:+.1f}%")
 
         st.caption(
-            "RSI (Relative Strength Index) is a 0–100 measure of recent price momentum. "
-            "Below 30 usually means the share has been heavily sold (oversold); above 70 means "
-            "it has been heavily bought (overbought). For Sniper, a low RSI is interesting, "
-            "especially if the share price and RSI begin turning upward."
+            "RSI = recent price momentum on a 0–100 scale. For Sniper, lower is generally better: "
+            "below 30 means heavily sold/oversold and can signal a better rebound setup. "
+            "Very low RSI is not an automatic buy — we still want the fall to stabilise."
         )
 
         # 3) WHAT'S DRIVING THE MOVE?
@@ -1298,8 +1311,13 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
             h1.metric("Similar episodes", str(n))
             h2.metric("Later +10%", f"{hit10}/{n1y}" if n1y else "n/a")
             h3.metric("Later +20%", f"{hit20}/{n1y}" if n1y else "n/a")
-            h4.metric("Typical further fall", f"{meddown:.1f}%" if pd.notna(meddown) else "n/a")
+            h4.metric("Typical extra fall after entry", f"{meddown:.1f}%" if pd.notna(meddown) else "n/a")
 
+            if pd.notna(meddown):
+                st.caption(
+                    f"Typical extra fall after entry means: in similar past setups, the share often fell "
+                    f"about {abs(meddown):.1f}% further from the historical comparison price before reaching its later low."
+                )
             if pd.notna(med6):
                 st.caption(f"Median 6-month result across completed comparable episodes: {med6:+.1f}%.")
 
@@ -1315,10 +1333,19 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
                 st.write("There are historical matches, but too few have a full year of later price history to make the +10%/+20% recovery rate robust.")
 
             with st.expander("Show historical examples"):
+                st.caption(
+                    "Similarity runs from 0 to 1. A score of 1 would mean the historical setup matched today's "
+                    "measured price pattern almost perfectly; 0 means very different. Higher is more comparable."
+                )
                 show_cols=[c for c in ["Date","Similarity","1M %","3M %","6M %","Best 6M %","Further downside %","Days +10%","Days +20%"] if c in matches.columns]
                 st.dataframe(matches[show_cols],use_container_width=True,hide_index=True)
 
             with st.expander("Show historical comparison chart"):
+                st.caption(
+                    "How to read this chart: each line is rebased to 100 at the start so you can compare shape rather than price. "
+                    "The current share path is compared with past setups that looked similar. If the historical lines tended to rise "
+                    "after the comparison point, that supports a rebound case; if they diverge widely, the historical evidence is weaker."
+                )
                 analogue_chart(df,matches,t)
         else:
             if t=="SPCX":
@@ -1354,10 +1381,12 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
         analyst_target=info.get("targetMeanPrice")
         recommendation=info.get("recommendationKey")
 
-        f1,f2,f3=st.columns(3)
+        market_cap=info.get("marketCap")
+        f1,f2,f3,f4=st.columns(4)
         f1.metric("Fundamental view",fund_label if fund_label else "n/a")
         f2.metric("P/E",f"{float(pe):.1f}x" if isinstance(pe,(int,float)) and pd.notna(pe) else "n/a")
-        f3.metric("Analyst mean target",display_price(t,float(analyst_target)) if isinstance(analyst_target,(int,float)) and pd.notna(analyst_target) else "n/a")
+        f3.metric("Market cap",human_large_number(market_cap) if isinstance(market_cap,(int,float)) and pd.notna(market_cap) else "n/a")
+        f4.metric("Analyst mean target",display_price(t,float(analyst_target)) if isinstance(analyst_target,(int,float)) and pd.notna(analyst_target) else "n/a")
 
         if fund_notes:
             st.caption(" · ".join(str(x) for x in fund_notes[:4]))
@@ -1380,8 +1409,23 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
             ]
             for label_name,key in fields:
                 val=info.get(key)
-                if val is not None:
-                    detail_rows.append({"Metric":label_name,"Value":val})
+                if val is None:
+                    continue
+                if key=="marketCap":
+                    shown=human_large_number(val)
+                elif key in {"revenueGrowth","earningsGrowth","profitMargins"} and isinstance(val,(int,float)):
+                    shown=f"{float(val)*100:+.1f}%"
+                elif key=="freeCashflow":
+                    shown=human_large_number(val)
+                elif key in {"trailingPE","forwardPE","priceToSalesTrailing12Months"} and isinstance(val,(int,float)):
+                    shown=f"{float(val):,.1f}x"
+                elif key=="targetMeanPrice" and isinstance(val,(int,float)):
+                    shown=display_price(t,float(val))
+                elif isinstance(val,(int,float)):
+                    shown=f"{val:,.0f}" if float(val).is_integer() else f"{float(val):,.2f}"
+                else:
+                    shown=str(val)
+                detail_rows.append({"Metric":label_name,"Value":shown})
             if detail_rows:
                 st.dataframe(detail_rows,use_container_width=True,hide_index=True)
             else:
