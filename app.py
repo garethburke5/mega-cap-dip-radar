@@ -895,6 +895,13 @@ ROCK_BOTTOM = {
     },
 }
 
+def rock_bottom_signal(price, cfg):
+    if price <= cfg["entry_high"]:
+        return "GREEN", "READY OPPORTUNITY", "#198754", "#EAF7EF"
+    if price <= cfg["watch_below"]:
+        return "AMBER", "ON THE WAY", "#B26A00", "#FFF4D6"
+    return "RED", "NOWHERE NEAR TARGET", "#B42318", "#FDECEC"
+
 def rock_bottom_snapshot(ticker, cfg):
     df = load_price(ticker, 1)
     if df.empty: return None
@@ -913,8 +920,10 @@ def rock_bottom_snapshot(ticker, cfg):
     elif price <= cfg["watch_below"]: status = "WATCH CLOSELY"
     else: status = "IGNORE FOR NOW"
     distance=(price/cfg["action_price"]-1)*100
+    signal, signal_text, signal_colour, signal_bg = rock_bottom_signal(price, cfg)
     return {"ticker":ticker,"name":cfg["name"],"price":price,"direction":direction,
-            "status":status,"distance":distance,"cfg":cfg}
+            "status":status,"distance":distance,"cfg":cfg,
+            "signal":signal,"signal_text":signal_text,"signal_colour":signal_colour,"signal_bg":signal_bg}
 
 rock_bottom_rows=[]
 for _ticker,_cfg in ROCK_BOTTOM.items():
@@ -1050,8 +1059,11 @@ for rb in rock_bottom_rows:
     distance_text=(f"{abs(rb['distance']):.1f}% below ${cfg['action_price']:.0f}"
                    if rb["distance"]<0 else f"{rb['distance']:.1f}% above ${cfg['action_price']:.0f}")
     st.markdown(
-        f"""<div style="border:1px solid #e2e2e2;border-radius:12px;padding:12px 14px;margin:8px 0 12px 0;">
-        <div style="font-size:1.18rem;font-weight:750;">{rb['name']} ({rb['ticker']}) — ${rb['price']:,.2f}</div>
+        f"""<div style="border-left:10px solid {rb['signal_colour']};border-top:1px solid #e2e2e2;border-right:1px solid #e2e2e2;border-bottom:1px solid #e2e2e2;background:{rb['signal_bg']};border-radius:12px;padding:12px 14px;margin:8px 0 12px 0;">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;">
+          <div style="font-size:1.18rem;font-weight:750;">{rb['name']} ({rb['ticker']}) — ${rb['price']:,.2f}</div>
+          <div style="font-weight:800;color:{rb['signal_colour']};">{rb['signal']} · {rb['signal_text']}</div>
+        </div>
         <div style="margin-top:5px;"><b>Sniper entry zone:</b> ${cfg['entry_low']:.0f}–${cfg['entry_high']:.0f}
         &nbsp; · &nbsp; <b>Action price:</b> ≤${cfg['action_price']:.0f}
         &nbsp; · &nbsp; <b>Distance:</b> {distance_text}</div>
@@ -1071,7 +1083,12 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
         cur=f.iloc[-1]; price=float(df["Close"].iloc[-1])
 
         snap=rebound_strategy_snapshot(df,matches,stake_gbp)
-        st.markdown(f'<div class="sniper-ticker-heading">{COMPANY_NAMES.get(t,t)} ({t}) — {display_price(t,price)}</div>', unsafe_allow_html=True)
+        if t in ROCK_BOTTOM:
+            rb_cfg=ROCK_BOTTOM[t]
+            deep_target=f" (target ${rb_cfg['entry_low']:.0f}–${rb_cfg['entry_high']:.0f})"
+        else:
+            deep_target=""
+        st.markdown(f'<div class="sniper-ticker-heading">{COMPANY_NAMES.get(t,t)} ({t}) — {display_price(t,price)}{deep_target}</div>', unsafe_allow_html=True)
 
         st.markdown("### Main price chart")
         st.caption("Pinch to zoom and swipe to pan. The +10% and +20% lines are your rebound objectives from today’s price — not analyst forecasts.")
