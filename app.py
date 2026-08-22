@@ -851,6 +851,33 @@ position_value=st.sidebar.number_input("Amount invested",min_value=0.0,value=0.0
 risk_budget=st.sidebar.number_input("Maximum acceptable loss",min_value=0.0,value=0.0,step=100.0)
 
 
+
+# ---------- UNIFIED SNIPER TRAFFIC LIGHT ----------
+def sniper_badge(signal, label, colour, bg):
+    return (f'<span style="display:inline-block;padding:4px 9px;border-radius:999px;'
+            f'font-weight:800;color:{colour};background:{bg};border:1px solid {colour};'
+            f'font-size:0.86rem;">{signal} · {label}</span>')
+
+def core_sniper_signal(snap):
+    # Use the existing Buying Opportunity Today score. Green means investigate now,
+    # not "buy blindly"; unusually severe dips get the explicit fundamentals warning.
+    score=float(snap.get("entry_score", snap.get("score",0)) or 0)
+    if score >= 63:
+        return "GREEN","CHECK FUNDAMENTALS","#198754","#EAF7EF"
+    if score >= 45:
+        return "AMBER","APPROACHING","#B26A00","#FFF4D6"
+    return "RED","WAIT","#B42318","#FDECEC"
+
+def unified_sniper_signal(ticker, price, snap=None):
+    if ticker in ROCK_BOTTOM:
+        cfg=ROCK_BOTTOM[ticker]
+        if price <= cfg["entry_high"]:
+            return "GREEN","CHECK FUNDAMENTALS","#198754","#EAF7EF"
+        if price <= cfg["watch_below"]:
+            return "AMBER","APPROACHING","#B26A00","#FFF4D6"
+        return "RED","WAIT","#B42318","#FDECEC"
+    return core_sniper_signal(snap or {})
+
 # ---------- ROCK-BOTTOM WATCHLIST ----------
 ROCK_BOTTOM = {
     "ARM": {
@@ -1014,7 +1041,9 @@ if stocks:
         price=float(x["df"]["Close"].iloc[-1])
         company=COMPANY_NAMES.get(t,t)
         with st.container(border=True):
+            _sig,_sl,_sc,_sbg=unified_sniper_signal(t,price,snap)
             st.markdown(f"### #{pos} · {company} ({t}) · {display_price(t,price)}")
+            st.markdown(sniper_badge(_sig,_sl,_sc,_sbg), unsafe_allow_html=True)
             st.write(f"Buying opportunity today: {snap['entry_score']}/100 — {snap['verdict']}.")
             st.caption(SNIPER_PROFILES.get(t,""))
             st.write(snap["entry_explain"])
@@ -1026,7 +1055,8 @@ if stocks:
         with st.container(border=True):
             snap=rebound_strategy_snapshot(df,matches,stake_gbp)
             label, meaning, instinct = score_explanation(snap["entry_score"])
-            st.markdown(f'<div class="sniper-ticker-heading">{t} · {display_price(t,price)}</div>', unsafe_allow_html=True)
+            _sig,_sl,_sc,_sbg=unified_sniper_signal(t,price,snap)
+            st.markdown(f'<div class="sniper-ticker-heading">{t} · {display_price(t,price)} &nbsp; {sniper_badge(_sig,_sl,_sc,_sbg)}</div>', unsafe_allow_html=True)
             if cur["3M_DD"] <= -12 and cur["5D"] > 2:
                 plain_state = "SHARE PRICE MAY BE STARTING TO RISE AGAIN"
             elif cur["5D"] <= -5:
@@ -1088,7 +1118,12 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
             deep_target=f" (target ${rb_cfg['entry_low']:.0f}–${rb_cfg['entry_high']:.0f})"
         else:
             deep_target=""
-        st.markdown(f'<div class="sniper-ticker-heading">{COMPANY_NAMES.get(t,t)} ({t}) — {display_price(t,price)}{deep_target}</div>', unsafe_allow_html=True)
+        _deep_snap=rebound_strategy_snapshot(df,d["matches"],stake_gbp)
+        _sig,_sl,_sc,_sbg=unified_sniper_signal(t,price,_deep_snap)
+        st.markdown(
+            f'<div class="sniper-ticker-heading">{COMPANY_NAMES.get(t,t)} ({t}) — '
+            f'{display_price(t,price)}{deep_target} &nbsp; {sniper_badge(_sig,_sl,_sc,_sbg)}</div>',
+            unsafe_allow_html=True)
 
         st.markdown("### Main price chart")
         st.caption("Pinch to zoom and swipe to pan. The +10% and +20% lines are your rebound objectives from today’s price — not analyst forecasts.")
