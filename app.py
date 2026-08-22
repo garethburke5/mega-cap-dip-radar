@@ -1158,22 +1158,29 @@ st.markdown('<div class="sniper-section-heading">Deep analysis</div>', unsafe_al
 st.caption("Pick a share for the full Sniper view. The chart comes first; the sections below explain whether the current price is genuinely interesting and why.")
 
 tabs=st.tabs(ANALYSIS_UNIVERSE)
+
 for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
     with tab:
         if t not in stocks:
             st.warning("Price data is temporarily unavailable for this share.")
             continue
 
+        # Use only the data objects already built successfully for every ticker.
         d=stocks[t]
         df=d["df"]
-        matches=d["matches"]
+        matches=d["matches"]              # pandas DataFrame, never treat as a boolean
+        info=d["info"]                    # fundamentals dict
+        fund_label=d["fund_label"]        # already-calculated assessment string
+        fund_notes=d["fund_notes"]        # already-calculated notes list
+        hs=d["hs"]                        # already-calculated historical summary dict
         price=float(df["Close"].iloc[-1])
+        c=df["Close"].astype(float)
 
-        # Calculate the core Sniper snapshot ONCE and reuse it throughout this share.
+        # Calculate once and reuse.
         snap=rebound_strategy_snapshot(df,matches,stake_gbp)
-        label, meaning, instinct=score_explanation(snap["entry_score"])
+        _,score_meaning,_=score_explanation(snap["entry_score"])
 
-        # Header: current price + target + traffic light.
+        # Header
         sig,sig_label,sig_colour,sig_bg,zone=all_share_signal(t,price,df)
         target=target_label(t,zone)
         target_suffix=f" (target {target})" if target else ""
@@ -1184,47 +1191,38 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
             unsafe_allow_html=True
         )
 
-        # Main chart stays immediately below the share heading.
+        # MAIN PRICE CHART
         st.markdown("### Main price chart")
-        mobile_chart(df,t)
+        entry_for_chart=entry_price if held==t and entry_price>0 else None
+        mobile_chart(df,t,entry_for_chart,snap["target10"],snap["target20"])
 
-        # 1. ONE verdict only.
+        # 1) ONE VERDICT
         st.markdown("### Sniper verdict")
         st.markdown(f"**Buying opportunity: {snap['entry_score']}/100 — {snap['verdict']}**")
-        verdict_bits=[]
+
+        verdict_parts=[]
         if zone:
             lo,hi=zone
             if price > hi:
                 gap=(price/hi-1)*100
-                verdict_bits.append(f"The current price is {gap:.1f}% above the top of our Sniper target zone ({target}).")
+                verdict_parts.append(f"The current price is {gap:.1f}% above the top of our Sniper target zone ({target}).")
             elif price >= lo:
-                verdict_bits.append(f"The share is inside our Sniper target zone ({target}).")
+                verdict_parts.append(f"The share is inside our Sniper target zone ({target}).")
             else:
-                verdict_bits.append(f"The share is below our Sniper target zone ({target}), so the reason for the fall needs checking carefully.")
-        if snap.get("recent_dip") is not None:
-            verdict_bits.append(f"The recent dip is {snap['recent_dip']:.1f}%.")
-        verdict_bits.append(meaning)
-        st.write(" ".join(verdict_bits))
+                verdict_parts.append(f"The share is below our Sniper target zone ({target}), so check carefully why it has fallen this far.")
+        verdict_parts.append(snap["summary"])
+        if snap["entry_explain"]:
+            verdict_parts.append(snap["entry_explain"])
+        st.write(" ".join(verdict_parts))
 
-        # 2. Key signals — RSI explained the FIRST and ONLY time it is surfaced as a section.
+        # 2) KEY SIGNALS — RSI explained here and nowhere else.
         st.markdown("### Key signals")
-        recent_high=float(df["Close"].tail(min(66,len(df))).max()) if not df.empty else price
+        recent_high=float(c.tail(min(63,len(c))).max())
         from_high=(price/recent_high-1)*100 if recent_high else 0.0
-        c=df["Close"].astype(float)
-        five_day=(price/float(c.iloc[-6])-1)*100 if len(c)>=6 else 0.0
+        five_day=snap["r5"] if pd.notna(snap["r5"]) else 0.0
+        rsi_value=snap["rsi"]
 
-        rsi_value=snap.get("rsi")
-        if rsi_value is None:
-            # Use the app's RSI helper if snapshot does not expose it.
-            try:
-                _r=calc_rsi(c)
-                rsi_value=float(_r.iloc[-1]) if hasattr(_r,"iloc") else float(_r)
-            except Exception:
-                rsi_value=None
-
-        if rsi_value is None:
-            rsi_text="Unavailable"
-        elif rsi_value < 30:
+        if rsi_value < 30:
             rsi_text=f"{rsi_value:.0f} — oversold"
         elif rsi_value > 70:
             rsi_text=f"{rsi_value:.0f} — overbought"
@@ -1232,125 +1230,159 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
             rsi_text=f"{rsi_value:.0f} — neutral"
 
         k1,k2,k3,k4=st.columns(4)
-        k1.metric("Recent dip", f"{snap.get('recent_dip',0):.1f}%")
+        k1.metric("Dip quality", f"{snap['dip_quality']}/100")
         k2.metric("From 3M high", f"{from_high:.1f}%")
         k3.metric("RSI", rsi_text)
         k4.metric("5-day direction", f"{five_day:+.1f}%")
-        st.caption("RSI (Relative Strength Index) measures recent price momentum from 0–100. Below 30 usually means heavily sold/oversold; above 70 means heavily bought/overbought. For Sniper, a low RSI can be interesting, especially if it starts turning upward.")
 
-        # 3. What's driving it? Combine market-relative movement + catalysts/news.
+        st.caption(
+            "RSI (Relative Strength Index) is a 0–100 measure of recent price momentum. "
+            "Below 30 usually means the share has been heavily sold (oversold); above 70 means "
+            "it has been heavily bought (overbought). For Sniper, a low RSI is interesting, "
+            "especially if the share price and RSI begin turning upward."
+        )
+
+        # 3) WHAT'S DRIVING THE MOVE?
         st.markdown("### What's driving the move?")
-        try:
-            _qqq=load_price("QQQ", years=1)
-            _spy=load_price("SPY", years=1)
-            _moves=market_move_summary(df,_qqq,_spy)
-            _interp=market_move_interpretation(_moves,t)
-            if _interp:
-                st.write(_interp)
-        except Exception:
-            pass
+        move_rows=market_move_summary(df,qqq,spy)
+        st.write(market_move_interpretation(move_rows,t))
 
-        try:
-            _news=load_news(t)
-            _classified=classify_news(_news) if _news else []
-            if _classified:
-                for item in _classified[:5]:
-                    if isinstance(item, dict):
-                        _title=item.get("title") or item.get("headline") or str(item)
-                        st.write(f"• {_title}")
-                    else:
-                        st.write(f"• {item}")
-            else:
-                st.caption("No significant recent catalyst headlines were returned.")
-        except Exception:
-            st.caption("Recent catalyst headlines are temporarily unavailable.")
+        # Compact market comparison
+        row5=move_rows[move_rows["Period"]=="5D"]
+        if not row5.empty:
+            r=row5.iloc[0]
+            m1,m2,m3=st.columns(3)
+            m1.metric(f"{t} · 5D", f"{r['Stock']:+.1f}%" if pd.notna(r["Stock"]) else "n/a")
+            m2.metric("Nasdaq-100 (QQQ) · 5D", f"{r['Nasdaq-100 (QQQ)']:+.1f}%" if pd.notna(r["Nasdaq-100 (QQQ)"]) else "n/a")
+            m3.metric("S&P 500 (SPY) · 5D", f"{r['S&P 500 (SPY)']:+.1f}%" if pd.notna(r["S&P 500 (SPY)"]) else "n/a")
 
-        # Special-situation context belongs here, not in a separate giant section.
+        news=load_news(t)
+        categories=classify_news(news) if news else []
+        if categories:
+            st.caption("Recent news themes: " + " · ".join(categories))
+        if news:
+            for item in news[:3]:
+                title=item.get("title","")
+                publisher=item.get("publisher","")
+                if title:
+                    suffix=f" — {publisher}" if publisher else ""
+                    st.write(f"• {title}{suffix}")
+        else:
+            st.caption("No recent headlines were returned.")
+
+        # Special-situation warning appears in the relevant section only.
         if t=="MSTR":
-            st.info("Special situation: Strategy is heavily influenced by Bitcoin. A low MSTR price is not enough on its own — check what Bitcoin is doing and why MSTR has fallen.")
+            st.info("Special situation: Strategy is heavily influenced by Bitcoin. Check Bitcoin and the reason for MSTR's fall before treating a low price as an opportunity.")
         elif t=="RKLB":
-            st.info("Special situation: Rocket Lab carries higher execution risk than the mega-cap names. Check Neutron, launch and company-specific developments before acting.")
+            st.info("Special situation: Rocket Lab has higher execution risk than the mega-cap names. Check Neutron, launches and company-specific developments before acting.")
         elif t=="SPCX":
-            st.info("Special situation: SpaceX has a shorter public trading history, so IPO/unlock/event effects deserve extra weight alongside the normal Sniper analysis.")
+            st.info("Special situation: SpaceX has a short public trading history. IPO/unlock/event effects deserve extra weight.")
         elif t=="BA":
-            st.info("Special situation: Boeing can move sharply on operational, regulatory and aircraft-safety developments. Check the cause of any large fall before treating it as a rebound opportunity.")
+            st.info("Special situation: Boeing can move sharply on operational, regulatory and aircraft-safety developments. Check the cause of any major fall.")
 
-        # 4. Historical evidence — summary first; detail hidden.
+        # 4) HISTORICAL SNIPER EVIDENCE — DataFrame-safe throughout.
         st.markdown("### Historical Sniper evidence")
-        if matches:
+
+        if matches is not None and not matches.empty:
             n=len(matches)
-            hit10=sum(1 for m in matches if float(m.get("max_gain",0) or 0) >= 10)
-            hit20=sum(1 for m in matches if float(m.get("max_gain",0) or 0) >= 20)
-            further=[float(m.get("further_fall",0) or 0) for m in matches if m.get("further_fall") is not None]
-            sixm=[float(m.get("return_6m",0) or 0) for m in matches if m.get("return_6m") is not None]
-            typical_fall=(sum(further)/len(further)) if further else None
-            typical_6m=(sum(sixm)/len(sixm)) if sixm else None
+
+            full1y=matches[matches["Full 1Y history"]==True] if "Full 1Y history" in matches.columns else pd.DataFrame()
+            n1y=len(full1y)
+            hit10=int(full1y["Days +10%"].notna().sum()) if n1y and "Days +10%" in full1y.columns else 0
+            hit20=int(full1y["Days +20%"].notna().sum()) if n1y and "Days +20%" in full1y.columns else 0
+
+            meddown=matches["Further downside %"].dropna().median() if "Further downside %" in matches.columns else np.nan
+            med6=matches["6M %"].dropna().median() if "6M %" in matches.columns else np.nan
 
             h1,h2,h3,h4=st.columns(4)
             h1.metric("Similar episodes", str(n))
-            h2.metric("Later +10%", f"{hit10}/{n}")
-            h3.metric("Later +20%", f"{hit20}/{n}")
-            h4.metric("Typical further fall", f"{typical_fall:.1f}%" if typical_fall is not None else "n/a")
-            if typical_6m is not None:
-                st.caption(f"Typical 6-month result across comparable episodes: {typical_6m:+.1f}%.")
+            h2.metric("Later +10%", f"{hit10}/{n1y}" if n1y else "n/a")
+            h3.metric("Later +20%", f"{hit20}/{n1y}" if n1y else "n/a")
+            h4.metric("Typical further fall", f"{meddown:.1f}%" if pd.notna(meddown) else "n/a")
 
-            if hit10/n >= .7:
-                st.write("Historically, comparable setups have often produced a meaningful rebound, although the share may still fall further before recovering.")
-            elif hit10/n >= .4:
-                st.write("Historical outcomes are mixed. The setup has produced rebounds before, but the evidence is not strong enough to rely on without the current price/news context.")
+            if pd.notna(med6):
+                st.caption(f"Median 6-month result across completed comparable episodes: {med6:+.1f}%.")
+
+            if n1y >= 5:
+                rate10=hit10/n1y
+                if rate10 >= .70:
+                    st.write("Comparable completed setups have often produced a +10% rebound, although further downside before recovery remains possible.")
+                elif rate10 >= .40:
+                    st.write("Historical outcomes are mixed: rebounds have occurred, but the evidence is not strong enough to rely on without today's price and news context.")
+                else:
+                    st.write("Comparable completed setups have not produced a consistently strong +10% rebound.")
             else:
-                st.write("Comparable historical setups have not produced a consistently strong rebound. Price alone is not enough here.")
+                st.write("There are historical matches, but too few have a full year of later price history to make the +10%/+20% recovery rate robust.")
 
             with st.expander("Show historical examples"):
-                try:
-                    render_historical_examples(matches,t)
-                except Exception:
-                    st.dataframe(matches, use_container_width=True)
+                show_cols=[c for c in ["Date","Similarity","1M %","3M %","6M %","Best 6M %","Further downside %","Days +10%","Days +20%"] if c in matches.columns]
+                st.dataframe(matches[show_cols],use_container_width=True,hide_index=True)
 
             with st.expander("Show historical comparison chart"):
-                try:
-                    analogue_chart(df,matches,t)
-                except Exception:
-                    st.caption("Historical comparison chart is unavailable for this share.")
+                analogue_chart(df,matches,t)
         else:
-            st.write("There are not enough comparable historical episodes to make the historical evidence meaningful.")
+            if t=="SPCX":
+                st.write("SpaceX is too newly listed for meaningful multi-year historical analogues. Its live price, momentum, market comparison, news and fundamentals are still analysed normally.")
+            else:
+                st.write("There are not enough comparable historical episodes to make this section meaningful yet.")
 
-        # 5. Price levels + £20k scenario together.
+        # 5) PRICE LEVELS + £20K — no repeated score.
         st.markdown("### Price levels & £20k scenario")
         p1,p2,p3,p4=st.columns(4)
-        p1.metric("Current", display_price(t,price))
-        p2.metric("Sniper target", target if target else "n/a")
-        if zone:
-            entry_reference=zone[1]
-            if t.endswith(".L"):
-                p3.metric("+10% from target", f"{entry_reference*1.10:,.0f}p")
-                p4.metric("+20% from target", f"{entry_reference*1.20:,.0f}p")
-            else:
-                p3.metric("+10% from target", f"${entry_reference*1.10:,.2f}")
-                p4.metric("+20% from target", f"${entry_reference*1.20:,.2f}")
-        else:
-            p3.metric("+10%", "n/a")
-            p4.metric("+20%", "n/a")
-        st.caption(f"On a £{stake_gbp:,.0f} position: +10% ≈ £{stake_gbp*.10:,.0f} gross; +20% ≈ £{stake_gbp*.20:,.0f} gross.")
+        p1.metric("Current",display_price(t,price))
+        p2.metric("Sniper target",target if target else "n/a")
 
-        # 6. Fundamentals & analyst view — ONE section only.
+        if zone:
+            entry_ref=float(zone[1])
+            p3.metric("+10% from target",display_price(t,entry_ref*1.10))
+            p4.metric("+20% from target",display_price(t,entry_ref*1.20))
+        else:
+            p3.metric("+10% from target","n/a")
+            p4.metric("+20% from target","n/a")
+
+        st.caption(
+            f"On a £{stake_gbp:,.0f} position: +10% ≈ £{stake_gbp*.10:,.0f} gross; "
+            f"+20% ≈ £{stake_gbp*.20:,.0f} gross."
+        )
+
+        # 6) FUNDAMENTALS & ANALYST VIEW — use the fields already loaded for this ticker.
         st.markdown("### Fundamentals & analyst view")
-        try:
-            _info=load_fundamentals(t)
-            _assessment=fundamental_assessment(_info,price) if _info else {}
-            if _info:
-                _health=_assessment.get("label") or _assessment.get("health") or "Available"
-                _pe=_info.get("trailingPE") or _info.get("forwardPE")
-                _target=_info.get("targetMeanPrice")
-                f1,f2,f3=st.columns(3)
-                f1.metric("Fundamental view", str(_health))
-                f2.metric("P/E", f"{float(_pe):.1f}x" if _pe else "n/a")
-                f3.metric("Analyst mean target", display_price(t,float(_target)) if _target else "n/a")
-                with st.expander("Show fundamental details"):
-                    _keys=["marketCap","trailingPE","forwardPE","priceToSalesTrailing12Months","revenueGrowth","earningsGrowth","profitMargins","targetMeanPrice","recommendationKey"]
-                    _rows={k:_info.get(k) for k in _keys if _info.get(k) is not None}
-                    st.dataframe([_rows],use_container_width=True)
+
+        pe=info.get("trailingPE")
+        if pe is None:
+            pe=info.get("forwardPE")
+        analyst_target=info.get("targetMeanPrice")
+        recommendation=info.get("recommendationKey")
+
+        f1,f2,f3=st.columns(3)
+        f1.metric("Fundamental view",fund_label if fund_label else "n/a")
+        f2.metric("P/E",f"{float(pe):.1f}x" if isinstance(pe,(int,float)) and pd.notna(pe) else "n/a")
+        f3.metric("Analyst mean target",display_price(t,float(analyst_target)) if isinstance(analyst_target,(int,float)) and pd.notna(analyst_target) else "n/a")
+
+        if fund_notes:
+            st.caption(" · ".join(str(x) for x in fund_notes[:4]))
+        if recommendation:
+            st.caption(f"Yahoo analyst recommendation label: {str(recommendation).upper()}.")
+
+        with st.expander("Show fundamental details"):
+            detail_rows=[]
+            fields=[
+                ("Market cap","marketCap"),
+                ("Trailing P/E","trailingPE"),
+                ("Forward P/E","forwardPE"),
+                ("Price / sales","priceToSalesTrailing12Months"),
+                ("Revenue growth","revenueGrowth"),
+                ("Earnings growth","earningsGrowth"),
+                ("Profit margin","profitMargins"),
+                ("Free cash flow","freeCashflow"),
+                ("Analyst mean target","targetMeanPrice"),
+                ("Analyst opinions","numberOfAnalystOpinions"),
+            ]
+            for label_name,key in fields:
+                val=info.get(key)
+                if val is not None:
+                    detail_rows.append({"Metric":label_name,"Value":val})
+            if detail_rows:
+                st.dataframe(detail_rows,use_container_width=True,hide_index=True)
             else:
-                st.write("Fundamental data is currently unavailable.")
-        except Exception:
-            st.write("Fundamental data is currently unavailable.")
+                st.write("Detailed fundamental data is currently unavailable.")
