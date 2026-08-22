@@ -1066,89 +1066,93 @@ st.write(
     f"Latest market-data point: {fresh_text} · US regular market: {market_state}"
 )
 st.caption("The page refreshes automatically every 5 minutes. Intraday prices use 5-minute Yahoo/yfinance data when available; they may be delayed. US market status is based on normal weekday trading hours and does not account for every exchange holiday.")
-st.info(f"CORE STRATEGY: Deploy about £{stake_gbp:,.0f} into an unusually attractive dip in a large, established company. Aim to capture at least +10% (about £{stake_gbp*.10:,.0f} gross), with +20% (about £{stake_gbp*.20:,.0f} gross) as the preferred rebound objective.")
+st.caption(f"Strategy: deploy about £{stake_gbp:,.0f} only when the price is genuinely attractive; target roughly +10% to +20% rebound.")
+
 
 if stocks:
-    ranked=sorted([(t,stocks[t]) for t in CORE_WATCHLIST if t in stocks], key=lambda kv: rebound_strategy_snapshot(kv[1]["df"],kv[1]["matches"],stake_gbp)["score"], reverse=True)
-    st.markdown('<div class="sniper-section-heading">Today\'s Sniper Opportunities</div>', unsafe_allow_html=True)
-    st.caption("Start here. Shares are ranked by how attractive the current buying price looks for our 10–20% rebound strategy. Core wave shares and occasional deep-dip shares are both included; a high rank is a prompt to investigate, not an instruction to buy.")
-    daily=[]
-    for t,x in ranked:
-        snap=rebound_strategy_snapshot(x["df"],x["matches"],stake_gbp)
-        daily.append((t,x,snap))
-    strong=[row for row in daily if row[2]["entry_score"] >= 63]
-    if not strong:
-        st.info("NO COMPELLING ENTRY TODAY — none of the shares currently clears the stronger buying-opportunity threshold. Waiting is a valid result.")
-    for pos,(t,x,snap) in enumerate(daily[:5], start=1):
-        price=float(x["df"]["Close"].iloc[-1])
-        company=COMPANY_NAMES.get(t,t)
-        with st.container(border=True):
-            _sig,_sl,_sc,_sbg,_zone=all_share_signal(t,price,x["df"])
-            _target=target_label(t,_zone)
-            st.markdown(f"### #{pos} · {company} ({t}) · {display_price(t,price)}" + (f" · target {_target}" if _target else ""))
-            st.markdown(sniper_badge(_sig,_sl,_sc,_sbg), unsafe_allow_html=True)
-            st.write(f"Buying opportunity today: {snap['entry_score']}/100 — {snap['verdict']}.")
-            st.caption(SNIPER_PROFILES.get(t,""))
-            st.write(snap["entry_explain"])
-            st.write(f"£{stake_gbp:,.0f} objective: +10% ≈ £{snap['gain10']:,.0f} gross · +20% ≈ £{snap['gain20']:,.0f} gross.")
+    ranked = []
+    for t in CORE_WATCHLIST:
+        if t not in stocks:
+            continue
+        x = stocks[t]
+        price = float(x["df"]["Close"].iloc[-1])
+        snap = rebound_strategy_snapshot(x["df"], x["matches"], stake_gbp)
+        sig, sig_label, sig_colour, sig_bg, zone = all_share_signal(t, price, x["df"])
+        target = target_label(t, zone)
+        rank_order = {"GREEN": 0, "AMBER": 1, "RED": 2}.get(sig, 3)
+        zone_hi = zone[1] if zone else None
+        distance = ((price / zone_hi) - 1) * 100 if zone_hi else None
+        ranked.append({
+            "ticker": t,
+            "company": COMPANY_NAMES.get(t, t),
+            "price": price,
+            "signal": sig,
+            "signal_label": sig_label,
+            "signal_colour": sig_colour,
+            "signal_bg": sig_bg,
+            "target": target,
+            "distance": distance,
+            "entry_score": snap["entry_score"],
+            "verdict": snap["verdict"],
+        })
 
-st.markdown('<div class="sniper-section-heading">Rock-bottom watchlist</div>', unsafe_allow_html=True)
-st.caption("Shares we deliberately ignore at ordinary prices. They only become interesting when they approach unusually cheap pre-set Sniper zones.")
-for rb in rock_bottom_rows:
-    cfg=rb["cfg"]
-    distance_text=(f"{abs(rb['distance']):.1f}% below ${cfg['action_price']:.0f}"
-                   if rb["distance"]<0 else f"{rb['distance']:.1f}% above ${cfg['action_price']:.0f}")
-    st.markdown(
-        f"""<div style="border-left:10px solid {rb['signal_colour']};border-top:1px solid #e2e2e2;border-right:1px solid #e2e2e2;border-bottom:1px solid #e2e2e2;background:{rb['signal_bg']};border-radius:12px;padding:12px 14px;margin:8px 0 12px 0;">
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;">
-          <div style="font-size:1.18rem;font-weight:750;">{rb['name']} ({rb['ticker']}) — ${rb['price']:,.2f}</div>
-          <div style="font-weight:800;color:{rb['signal_colour']};">{rb['signal']} · {rb['signal_text']}</div>
-        </div>
-        <div style="margin-top:5px;"><b>Sniper entry zone:</b> ${cfg['entry_low']:.0f}–${cfg['entry_high']:.0f}
-        &nbsp; · &nbsp; <b>Action price:</b> ≤${cfg['action_price']:.0f}
-        &nbsp; · &nbsp; <b>Distance:</b> {distance_text}</div>
-        <div style="margin-top:5px;"><b>Direction:</b> {rb['direction']} &nbsp; · &nbsp; <b>Status:</b> {rb['status']}</div>
-        <div style="margin-top:5px;color:#555;">{cfg['comment']}</div></div>""",
-        unsafe_allow_html=True)
+    ranked = sorted(
+        ranked,
+        key=lambda r: ({"GREEN": 0, "AMBER": 1, "RED": 2}.get(r["signal"], 3),
+                       abs(r["distance"]) if r["distance"] is not None else 999)
+    )
 
+    st.markdown('<div class="sniper-section-heading">Today</div>', unsafe_allow_html=True)
+    st.caption("Start here. Green deserves attention now, amber is approaching, red is not worth your time yet. Open Deep Analysis for the full reasoning.")
 
-    st.markdown('<div class="sniper-section-heading">Opportunity board</div>', unsafe_allow_html=True)
-    for t,x in ranked:
-        df=x["df"]; f=x["f"]; matches=x["matches"]; e=x["engine"]; hs=x["hs"]; cur=f.iloc[-1]; price=float(df["Close"].iloc[-1])
-        with st.container(border=True):
-            snap=rebound_strategy_snapshot(df,matches,stake_gbp)
-            label, meaning, instinct = score_explanation(snap["entry_score"])
-            _sig,_sl,_sc,_sbg,_zone=all_share_signal(t,price,df)
-            _target=target_label(t,_zone)
-            st.markdown(
-                f'<div class="sniper-ticker-heading">{t} · {display_price(t,price)}'
-                f'{(" (target "+_target+")") if _target else ""} &nbsp; '
-                f'{sniper_badge(_sig,_sl,_sc,_sbg)}</div>',
-                unsafe_allow_html=True)
-            if cur["3M_DD"] <= -12 and cur["5D"] > 2:
-                plain_state = "SHARE PRICE MAY BE STARTING TO RISE AGAIN"
-            elif cur["5D"] <= -5:
-                plain_state = "SHARE PRICE IS STILL FALLING"
-            elif cur["3M_DD"] <= -12:
-                plain_state = "SHARE PRICE REMAINS WELL BELOW ITS RECENT HIGH"
+    for row in ranked:
+        dist_text = ""
+        if row["distance"] is not None:
+            if row["distance"] > 0:
+                dist_text = f"{row['distance']:.1f}% above target"
             else:
-                plain_state = "NO MAJOR BUYING OPPORTUNITY DETECTED"
-            st.markdown(f"**{plain_state}**")
-            st.caption(SNIPER_PROFILES.get(t,""))
-            st.write(f"Buying opportunity today: {snap['entry_score']}/100 — {snap['verdict']}.")
-            st.write(f"Size of recent dip: {snap['dip_quality']}/100. {snap['summary']}")
-            st.write(snap["entry_explain"])
-            st.write(f"Today: {cur['1D']:+.1f}% · Last 5 trading days: {cur['5D']:+.1f}% · Last month: {cur['1M']:+.1f}% · From 3-month high: {cur['3M_DD']:.1f}%")
-            if hs:
-                n = hs["n"]
-                up3 = int((matches["3M %"] > 0).sum())
-                valid3 = int(matches["3M %"].notna().sum())
-                st.write(f"History: Tesla's share price was higher 3 months later in {up3} of {valid3} similar situations." if t=="TSLA" else f"History: {t}'s share price was higher 3 months later in {up3} of {valid3} similar situations.")
-            st.write("What this means for you: WAIT — SEE IF THE PRICE FALLS FURTHER." if 48 <= snap["entry_score"] < 63 else f"What this means for you: {snap['instinct']}.")
-            st.write(f"£{stake_gbp:,.0f} rebound view: +10% = about £{snap['gain10']:,.0f} gross; +20% = about £{snap['gain20']:,.0f} gross.")
-            st.write(f"Strategy verdict: {snap['verdict']} · {snap['summary']}")
+                dist_text = f"{abs(row['distance']):.1f}% inside/below target"
+        target_text = f"Target {row['target']}" if row["target"] else "Target unavailable"
+        st.markdown(
+            f"""<div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr);
+                        gap:10px;align-items:center;border-left:8px solid {row['signal_colour']};
+                        background:{row['signal_bg']};border-radius:10px;padding:10px 12px;margin:7px 0;">
+                <div><b>{row['company']} ({row['ticker']})</b><br>
+                     <span style="font-size:1.05rem;">{display_price(row['ticker'],row['price'])}</span></div>
+                <div><b>{row['signal']} · {row['signal_label']}</b><br>
+                     <span style="font-size:.9rem;">{target_text}</span></div>
+                <div><span style="font-size:.92rem;">{dist_text}</span><br>
+                     <span style="font-size:.86rem;color:#555;">Score {row['entry_score']}/100</span></div>
+            </div>""",
+            unsafe_allow_html=True,
+        )
 
-st.divider()
+
+
+st.markdown('<div class="sniper-section-heading">Rock-bottom watch</div>', unsafe_allow_html=True)
+st.caption("Special situations we only want at unusually low prices.")
+
+for rb in rock_bottom_rows:
+    cfg = rb["cfg"]
+    distance_text = (
+        f"{abs(rb['distance']):.1f}% below action price"
+        if rb["distance"] < 0
+        else f"{rb['distance']:.1f}% above action price"
+    )
+    st.markdown(
+        f"""<div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr);
+                    gap:10px;align-items:center;border-left:8px solid {rb['signal_colour']};
+                    background:{rb['signal_bg']};border-radius:10px;padding:10px 12px;margin:7px 0;">
+            <div><b>{rb['name']} ({rb['ticker']})</b><br>
+                 <span style="font-size:1.05rem;">${rb['price']:,.2f}</span></div>
+            <div><b>{rb['signal']} · {rb['signal_text']}</b><br>
+                 <span style="font-size:.9rem;">Entry ${cfg['entry_low']:.0f}–${cfg['entry_high']:.0f}</span></div>
+            <div><span style="font-size:.92rem;">{distance_text}</span><br>
+                 <span style="font-size:.86rem;color:#555;">{rb['direction']}</span></div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
 
 st.markdown('<div class="sniper-section-heading">Deep analysis</div>', unsafe_allow_html=True)
 tabs=st.tabs(ANALYSIS_UNIVERSE)
@@ -1191,7 +1195,6 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
             plain_explain = "The current price pattern does not show the combination of a major fall and an emerging recovery that this tool is designed to find."
         st.markdown(f"### {plain_state}")
         st.write(plain_explain)
-        st.info("Sniper profile: " + SNIPER_PROFILES.get(t,"This share is monitored for meaningful dip-and-rebound opportunities."))
 
         if t in ROCK_BOTTOM:
             rb_cfg=ROCK_BOTTOM[t]
@@ -1235,7 +1238,6 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
         st.markdown(f"### Buying opportunity today: {snap['entry_score']}/100 — {snap['verdict']}")
         st.write(snap["summary"])
         st.write(snap["entry_explain"])
-        st.write(f"Your instinct: {snap['instinct']}.")
         if t=="QCOM":
             if price <= 155:
                 st.success("QUALCOMM DEEP-DIP AREA: the price is in/near the $140–$150 area we identified as especially worth investigating. This is still not an automatic buy.")
