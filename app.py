@@ -13,7 +13,9 @@ st.set_page_config(page_title="Share Sniper", page_icon="🎯", layout="wide")
 
 st_autorefresh(interval=5 * 60 * 1000, limit=None, key="five_minute_refresh")
 
-WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL","AVGO","BARC.L","QCOM","BA","SPCX","SOFI","PLTR"]
+CORE_WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL","AVGO","BARC.L","QCOM","BA","SPCX"]
+ROCK_BOTTOM_TICKERS = ["ARM","MSTR","RKLB","SOFI","PLTR"]
+ANALYSIS_UNIVERSE = CORE_WATCHLIST + ROCK_BOTTOM_TICKERS
 COMPANY_NAMES = {
     "TSLA":"Tesla",
     "NVDA":"Nvidia",
@@ -26,7 +28,10 @@ COMPANY_NAMES = {
     "BA":"Boeing",
     "SPCX":"SpaceX",
     "SOFI":"SoFi Technologies",
-    "PLTR":"Palantir",
+    "PLTR":"Palantir Technologies",
+    "ARM":"Arm Holdings",
+    "MSTR":"Strategy (MicroStrategy)",
+    "RKLB":"Rocket Lab",
 }
 
 SNIPER_PROFILES = {
@@ -40,6 +45,11 @@ SNIPER_PROFILES = {
     "QCOM":"Occasional deep-dip candidate — most interesting after a genuinely large fall. Around $140–$150 is a particularly interesting area to investigate if the business remains sound.",
     "BA":"Occasional deep-dip candidate — only interesting after a substantial collapse. Company-specific risk is higher, so always check why the share has fallen before buying.",
     "SPCX":"Full Sniper analysis + new-listing intelligence — potentially exceptional rebound amplitude. Use the same price, RSI, dip, entry, market, news and fundamental analysis as every other share, plus extra IPO/unlock/event context because the trading history is short.",
+    "ARM":"Rock-bottom candidate — fully analyse and chart it, but price discipline matters. Actionable at $140 or below; preferred zone $120–$140.",
+    "MSTR":"Rock-bottom / high-risk candidate — fully analyse and chart it, but it is Bitcoin-dependent. Preferred zone $80–$90.",
+    "RKLB":"Rock-bottom / higher-risk space candidate — fully analyse and chart it despite not being a mega-cap. Preferred zone $38–$45.",
+    "SOFI":"Rock-bottom / higher-volatility fintech candidate — fully analyse and chart it. Preferred zone $13–$15.",
+    "PLTR":"Rock-bottom / valuation-sensitive AI candidate — fully analyse and chart it. Preferred zone $100–$120.",
 }
 
 def display_price(ticker, price):
@@ -804,7 +814,7 @@ spy5=(float(spy["Close"].iloc[-1])/float(spy["Close"].iloc[-6])-1)*100 if len(sp
 
 # ---------- BUILD STOCK DATA ----------
 stocks={}
-for t in WATCHLIST:
+for t in ANALYSIS_UNIVERSE:
     df=load_price(t,10)
     # New listings such as SpaceX must not be discarded simply because they
     # do not yet have years of price history. Twenty sessions is enough for
@@ -835,7 +845,7 @@ st.sidebar.header("My rebound strategy")
 stake_gbp=st.sidebar.number_input("Typical amount to deploy (£)",min_value=1000.0,value=20000.0,step=1000.0)
 st.sidebar.caption("Core objective: capture roughly 10–20% rebounds after unusually attractive falls.")
 st.sidebar.header("My position (optional)")
-held=st.sidebar.selectbox("Stock",["None"]+WATCHLIST)
+held=st.sidebar.selectbox("Stock",["None"]+ANALYSIS_UNIVERSE)
 entry_price=st.sidebar.number_input("Entry price ($)",min_value=0.0,value=0.0,step=1.0)
 position_value=st.sidebar.number_input("Amount invested",min_value=0.0,value=0.0,step=500.0)
 risk_budget=st.sidebar.number_input("Maximum acceptable loss",min_value=0.0,value=0.0,step=100.0)
@@ -981,7 +991,7 @@ st.caption("The page refreshes automatically every 5 minutes. Intraday prices us
 st.info(f"CORE STRATEGY: Deploy about £{stake_gbp:,.0f} into an unusually attractive dip in a large, established company. Aim to capture at least +10% (about £{stake_gbp*.10:,.0f} gross), with +20% (about £{stake_gbp*.20:,.0f} gross) as the preferred rebound objective.")
 
 if stocks:
-    ranked=sorted(stocks.items(), key=lambda kv: rebound_strategy_snapshot(kv[1]["df"],kv[1]["matches"],stake_gbp)["score"], reverse=True)
+    ranked=sorted([(t,stocks[t]) for t in CORE_WATCHLIST if t in stocks], key=lambda kv: rebound_strategy_snapshot(kv[1]["df"],kv[1]["matches"],stake_gbp)["score"], reverse=True)
     st.markdown('<div class="sniper-section-heading">Today\'s Sniper Opportunities</div>', unsafe_allow_html=True)
     st.caption("Start here. Shares are ranked by how attractive the current buying price looks for our 10–20% rebound strategy. Core wave shares and occasional deep-dip shares are both included; a high rank is a prompt to investigate, not an instruction to buy.")
     daily=[]
@@ -1050,9 +1060,9 @@ for rb in rock_bottom_rows:
         unsafe_allow_html=True)
 
 st.markdown('<div class="sniper-section-heading">Deep analysis</div>', unsafe_allow_html=True)
-tabs=st.tabs(WATCHLIST)
+tabs=st.tabs(ANALYSIS_UNIVERSE)
 
-for tab,t in zip(tabs,WATCHLIST):
+for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
     if t not in stocks:continue
     x=stocks[t]
     with tab:
@@ -1084,6 +1094,25 @@ for tab,t in zip(tabs,WATCHLIST):
         st.markdown(f"### {plain_state}")
         st.write(plain_explain)
         st.info("Sniper profile: " + SNIPER_PROFILES.get(t,"This share is monitored for meaningful dip-and-rebound opportunities."))
+
+        if t in ROCK_BOTTOM:
+            rb_cfg=ROCK_BOTTOM[t]
+            rb_distance=(price/rb_cfg["action_price"]-1)*100
+            if rb_cfg["entry_low"] <= price <= rb_cfg["entry_high"]:
+                rb_state="AT ROCK-BOTTOM SNIPER ENTRY ZONE"
+            elif price < rb_cfg["entry_low"]:
+                rb_state="BELOW OUR ENTRY ZONE — CHECK WHY IT HAS FALLEN THIS FAR"
+            elif price <= rb_cfg["watch_below"]:
+                rb_state="APPROACHING ROCK-BOTTOM TERRITORY"
+            else:
+                rb_state="CURRENTLY ABOVE OUR ROCK-BOTTOM BUY AREA"
+            st.markdown(f"### Rock-bottom price discipline: {rb_state}")
+            st.write(
+                f"Our Sniper entry zone for {COMPANY_NAMES.get(t,t)} is "
+                f"${rb_cfg['entry_low']:.0f}–${rb_cfg['entry_high']:.0f}; "
+                f"action threshold ≤${rb_cfg['action_price']:.0f}. "
+                f"Current price is {rb_distance:+.1f}% versus that action threshold."
+            )
 
         if t=="SPCX":
             spx=new_listing_snapshot(df,135.0)
