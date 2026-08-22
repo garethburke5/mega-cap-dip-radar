@@ -1186,7 +1186,7 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
 
         # Main chart stays immediately below the share heading.
         st.markdown("### Main price chart")
-        render_tv_like_chart(df,t)
+        mobile_chart(df,t)
 
         # 1. ONE verdict only.
         st.markdown("### Sniper verdict")
@@ -1217,7 +1217,7 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
         if rsi_value is None:
             # Use the app's RSI helper if snapshot does not expose it.
             try:
-                _r=compute_rsi(c)
+                _r=calc_rsi(c)
                 rsi_value=float(_r.iloc[-1]) if hasattr(_r,"iloc") else float(_r)
             except Exception:
                 rsi_value=None
@@ -1241,23 +1241,29 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
         # 3. What's driving it? Combine market-relative movement + catalysts/news.
         st.markdown("### What's driving the move?")
         try:
-            market_text=market_relative_explanation(t,df)
-            if market_text:
-                st.write(market_text)
+            _qqq=load_price("QQQ", years=1)
+            _spy=load_price("SPY", years=1)
+            _moves=market_move_summary(df,_qqq,_spy)
+            _interp=market_move_interpretation(_moves,t)
+            if _interp:
+                st.write(_interp)
         except Exception:
             pass
 
-        # Keep the app's catalyst/news intelligence but avoid a second generic explanation block.
         try:
-            render_catalyst_scan(t)
-        except Exception:
-            try:
-                catalysts=catalyst_scan(t)
-                if catalysts:
-                    for item in catalysts[:5]:
+            _news=load_news(t)
+            _classified=classify_news(_news) if _news else []
+            if _classified:
+                for item in _classified[:5]:
+                    if isinstance(item, dict):
+                        _title=item.get("title") or item.get("headline") or str(item)
+                        st.write(f"• {_title}")
+                    else:
                         st.write(f"• {item}")
-            except Exception:
-                st.caption("No additional catalyst scan is available right now.")
+            else:
+                st.caption("No significant recent catalyst headlines were returned.")
+        except Exception:
+            st.caption("Recent catalyst headlines are temporarily unavailable.")
 
         # Special-situation context belongs here, not in a separate giant section.
         if t=="MSTR":
@@ -1303,7 +1309,7 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
 
             with st.expander("Show historical comparison chart"):
                 try:
-                    render_historical_analogue_chart(df,matches,t)
+                    analogue_chart(df,matches,t)
                 except Exception:
                     st.caption("Historical comparison chart is unavailable for this share.")
         else:
@@ -1330,27 +1336,21 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
         # 6. Fundamentals & analyst view — ONE section only.
         st.markdown("### Fundamentals & analyst view")
         try:
-            f=fundamentals_snapshot(t)
-            if f:
-                health=f.get("health","")
-                valuation=f.get("valuation","")
-                analyst=f.get("analyst_target")
-                cols=st.columns(3)
-                cols[0].metric("Fundamental health", str(health) if health else "n/a")
-                cols[1].metric("Valuation", str(valuation) if valuation else "n/a")
-                if analyst is not None:
-                    cols[2].metric("Analyst mean target", display_price(t,float(analyst)))
-                else:
-                    cols[2].metric("Analyst mean target","n/a")
-                # Keep the useful underlying numbers compactly if the function provides them.
-                useful={k:v for k,v in f.items() if k not in {"health","valuation","analyst_target"} and v not in (None,"")}
-                if useful:
-                    with st.expander("Show fundamental details"):
-                        st.dataframe([useful], use_container_width=True)
+            _info=load_fundamentals(t)
+            _assessment=fundamental_assessment(_info,price) if _info else {}
+            if _info:
+                _health=_assessment.get("label") or _assessment.get("health") or "Available"
+                _pe=_info.get("trailingPE") or _info.get("forwardPE")
+                _target=_info.get("targetMeanPrice")
+                f1,f2,f3=st.columns(3)
+                f1.metric("Fundamental view", str(_health))
+                f2.metric("P/E", f"{float(_pe):.1f}x" if _pe else "n/a")
+                f3.metric("Analyst mean target", display_price(t,float(_target)) if _target else "n/a")
+                with st.expander("Show fundamental details"):
+                    _keys=["marketCap","trailingPE","forwardPE","priceToSalesTrailing12Months","revenueGrowth","earningsGrowth","profitMargins","targetMeanPrice","recommendationKey"]
+                    _rows={k:_info.get(k) for k in _keys if _info.get(k) is not None}
+                    st.dataframe([_rows],use_container_width=True)
             else:
                 st.write("Fundamental data is currently unavailable.")
         except Exception:
-            try:
-                render_fundamentals(t)
-            except Exception:
-                st.write("Fundamental data is currently unavailable.")
+            st.write("Fundamental data is currently unavailable.")
