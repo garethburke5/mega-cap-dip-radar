@@ -13,7 +13,7 @@ st.set_page_config(page_title="Share Sniper", page_icon="🎯", layout="wide")
 
 st_autorefresh(interval=5 * 60 * 1000, limit=None, key="five_minute_refresh")
 
-WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL","AVGO","BARC.L","QCOM","BA","SPCX"]
+WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL","AVGO","BARC.L","QCOM","BA","SPCX","SOFI","PLTR"]
 COMPANY_NAMES = {
     "TSLA":"Tesla",
     "NVDA":"Nvidia",
@@ -25,6 +25,8 @@ COMPANY_NAMES = {
     "QCOM":"Qualcomm",
     "BA":"Boeing",
     "SPCX":"SpaceX",
+    "SOFI":"SoFi Technologies",
+    "PLTR":"Palantir",
 }
 
 SNIPER_PROFILES = {
@@ -856,6 +858,30 @@ ROCK_BOTTOM = {
         "entry_high": 90.0,
         "action_price": 90.0,
         "comment": "High-risk, Bitcoin-dependent rebound trade. Check Bitcoin and Strategy-specific news before acting."
+    },
+    "RKLB": {
+        "name": "Rocket Lab",
+        "watch_below": 50.0,
+        "entry_low": 38.0,
+        "entry_high": 45.0,
+        "action_price": 45.0,
+        "comment": "Higher-risk space special situation, not a mega-cap. Only consider at a deep discount; check Neutron, launch and company-specific news before acting."
+    },
+    "SOFI": {
+        "name": "SoFi Technologies",
+        "watch_below": 16.0,
+        "entry_low": 13.0,
+        "entry_high": 15.0,
+        "action_price": 15.0,
+        "comment": "Higher-volatility fintech, not a mega-cap. Keep it fully graphed and analysed, but only consider buying at a genuinely depressed price."
+    },
+    "PLTR": {
+        "name": "Palantir Technologies",
+        "watch_below": 140.0,
+        "entry_low": 100.0,
+        "entry_high": 120.0,
+        "action_price": 120.0,
+        "comment": "Strong AI/data business with valuation risk. Keep it fully graphed and analysed; only consider buying after a major price reset."
     },
 }
 
