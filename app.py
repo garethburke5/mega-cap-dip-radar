@@ -852,31 +852,73 @@ risk_budget=st.sidebar.number_input("Maximum acceptable loss",min_value=0.0,valu
 
 
 
-# ---------- UNIFIED SNIPER TRAFFIC LIGHT ----------
-def sniper_badge(signal, label, colour, bg):
-    return (f'<span style="display:inline-block;padding:4px 9px;border-radius:999px;'
-            f'font-weight:800;color:{colour};background:{bg};border:1px solid {colour};'
-            f'font-size:0.86rem;">{signal} · {label}</span>')
+# ---------- SNIPER TARGETS + TRAFFIC LIGHTS ----------
+# Manually agreed Sniper zones where we have explicitly discussed them.
+CORE_MANUAL_TARGETS = {
+    "TSLA": (300.0, 310.0),
+    "META": (520.0, 540.0),
+    "QCOM": (140.0, 150.0),
+    "BA": (150.0, 170.0),
+    "SPCX": (110.0, 120.0),
+}
 
-def core_sniper_signal(snap):
-    # Use the existing Buying Opportunity Today score. Green means investigate now,
-    # not "buy blindly"; unusually severe dips get the explicit fundamentals warning.
-    score=float(snap.get("entry_score", snap.get("score",0)) or 0)
-    if score >= 63:
-        return "GREEN","CHECK FUNDAMENTALS","#198754","#EAF7EF"
-    if score >= 45:
-        return "AMBER","APPROACHING","#B26A00","#FFF4D6"
-    return "RED","WAIT","#B42318","#FDECEC"
+def derived_core_target_zone(df):
+    """
+    For core shares without an explicitly agreed target, use the lower part of
+    the stock's OWN trailing-1Y daily-close distribution. This avoids the old
+    mistake of calling a share cheap merely because it is far below a spike.
+    """
+    if df is None or df.empty:
+        return None
+    c=df["Close"].dropna().tail(252)
+    if len(c)<20:
+        c=df["Close"].dropna()
+    if c.empty:
+        return None
+    lo=float(c.quantile(0.10))
+    hi=float(c.quantile(0.20))
+    if lo>hi: lo,hi=hi,lo
+    return lo,hi
 
-def unified_sniper_signal(ticker, price, snap=None):
+def sniper_target_zone(ticker, df=None):
     if ticker in ROCK_BOTTOM:
         cfg=ROCK_BOTTOM[ticker]
-        if price <= cfg["entry_high"]:
-            return "GREEN","CHECK FUNDAMENTALS","#198754","#EAF7EF"
-        if price <= cfg["watch_below"]:
-            return "AMBER","APPROACHING","#B26A00","#FFF4D6"
-        return "RED","WAIT","#B42318","#FDECEC"
-    return core_sniper_signal(snap or {})
+        return float(cfg["entry_low"]), float(cfg["entry_high"])
+    if ticker in CORE_MANUAL_TARGETS:
+        return CORE_MANUAL_TARGETS[ticker]
+    return derived_core_target_zone(df)
+
+def target_label(ticker, zone):
+    if not zone:
+        return ""
+    lo,hi=zone
+    if ticker.endswith(".L"):
+        return f"{lo:,.0f}–{hi:,.0f}p"
+    return f"${lo:,.0f}–${hi:,.0f}"
+
+def all_share_signal(ticker, price, df=None):
+    """
+    Price comes FIRST.
+    GREEN only when the live price has actually reached the Sniper target zone.
+    AMBER means close enough to watch carefully (within ~8% above the zone).
+    RED means price still needs a more meaningful fall.
+    """
+    zone=sniper_target_zone(ticker,df)
+    if not zone:
+        return "RED","WAIT","#B42318","#FDECEC",zone
+    lo,hi=zone
+    if price <= hi:
+        return "GREEN","CHECK FUNDAMENTALS","#198754","#EAF7EF",zone
+    if price <= hi*1.08:
+        return "AMBER","APPROACHING","#B26A00","#FFF4D6",zone
+    return "RED","WAIT — PRICE TOO HIGH","#B42318","#FDECEC",zone
+
+def sniper_badge(signal,label,colour,bg):
+    return (
+        f'<span style="display:inline-block;padding:4px 9px;border-radius:999px;'
+        f'font-weight:800;color:{colour};background:{bg};border:1px solid {colour};'
+        f'font-size:0.86rem;">{signal} · {label}</span>'
+    )
 
 # ---------- ROCK-BOTTOM WATCHLIST ----------
 ROCK_BOTTOM = {
@@ -924,9 +966,9 @@ ROCK_BOTTOM = {
 
 def rock_bottom_signal(price, cfg):
     if price <= cfg["entry_high"]:
-        return "GREEN", "READY OPPORTUNITY", "#198754", "#EAF7EF"
+        return "GREEN", "CHECK FUNDAMENTALS", "#198754", "#EAF7EF"
     if price <= cfg["watch_below"]:
-        return "AMBER", "ON THE WAY", "#B26A00", "#FFF4D6"
+        return "AMBER", "APPROACHING", "#B26A00", "#FFF4D6"
     return "RED", "NOWHERE NEAR TARGET", "#B42318", "#FDECEC"
 
 def rock_bottom_snapshot(ticker, cfg):
@@ -1041,13 +1083,34 @@ if stocks:
         price=float(x["df"]["Close"].iloc[-1])
         company=COMPANY_NAMES.get(t,t)
         with st.container(border=True):
-            _sig,_sl,_sc,_sbg=unified_sniper_signal(t,price,snap)
-            st.markdown(f"### #{pos} · {company} ({t}) · {display_price(t,price)}")
+            _sig,_sl,_sc,_sbg,_zone=all_share_signal(t,price,x["df"])
+            _target=target_label(t,_zone)
+            st.markdown(f"### #{pos} · {company} ({t}) · {display_price(t,price)}" + (f" · target {_target}" if _target else ""))
             st.markdown(sniper_badge(_sig,_sl,_sc,_sbg), unsafe_allow_html=True)
             st.write(f"Buying opportunity today: {snap['entry_score']}/100 — {snap['verdict']}.")
             st.caption(SNIPER_PROFILES.get(t,""))
             st.write(snap["entry_explain"])
             st.write(f"£{stake_gbp:,.0f} objective: +10% ≈ £{snap['gain10']:,.0f} gross · +20% ≈ £{snap['gain20']:,.0f} gross.")
+
+st.markdown('<div class="sniper-section-heading">Rock-bottom watchlist</div>', unsafe_allow_html=True)
+st.caption("Shares we deliberately ignore at ordinary prices. They only become interesting when they approach unusually cheap pre-set Sniper zones.")
+for rb in rock_bottom_rows:
+    cfg=rb["cfg"]
+    distance_text=(f"{abs(rb['distance']):.1f}% below ${cfg['action_price']:.0f}"
+                   if rb["distance"]<0 else f"{rb['distance']:.1f}% above ${cfg['action_price']:.0f}")
+    st.markdown(
+        f"""<div style="border-left:10px solid {rb['signal_colour']};border-top:1px solid #e2e2e2;border-right:1px solid #e2e2e2;border-bottom:1px solid #e2e2e2;background:{rb['signal_bg']};border-radius:12px;padding:12px 14px;margin:8px 0 12px 0;">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;">
+          <div style="font-size:1.18rem;font-weight:750;">{rb['name']} ({rb['ticker']}) — ${rb['price']:,.2f}</div>
+          <div style="font-weight:800;color:{rb['signal_colour']};">{rb['signal']} · {rb['signal_text']}</div>
+        </div>
+        <div style="margin-top:5px;"><b>Sniper entry zone:</b> ${cfg['entry_low']:.0f}–${cfg['entry_high']:.0f}
+        &nbsp; · &nbsp; <b>Action price:</b> ≤${cfg['action_price']:.0f}
+        &nbsp; · &nbsp; <b>Distance:</b> {distance_text}</div>
+        <div style="margin-top:5px;"><b>Direction:</b> {rb['direction']} &nbsp; · &nbsp; <b>Status:</b> {rb['status']}</div>
+        <div style="margin-top:5px;color:#555;">{cfg['comment']}</div></div>""",
+        unsafe_allow_html=True)
+
 
     st.markdown('<div class="sniper-section-heading">Opportunity board</div>', unsafe_allow_html=True)
     for t,x in ranked:
@@ -1055,8 +1118,13 @@ if stocks:
         with st.container(border=True):
             snap=rebound_strategy_snapshot(df,matches,stake_gbp)
             label, meaning, instinct = score_explanation(snap["entry_score"])
-            _sig,_sl,_sc,_sbg=unified_sniper_signal(t,price,snap)
-            st.markdown(f'<div class="sniper-ticker-heading">{t} · {display_price(t,price)} &nbsp; {sniper_badge(_sig,_sl,_sc,_sbg)}</div>', unsafe_allow_html=True)
+            _sig,_sl,_sc,_sbg,_zone=all_share_signal(t,price,df)
+            _target=target_label(t,_zone)
+            st.markdown(
+                f'<div class="sniper-ticker-heading">{t} · {display_price(t,price)}'
+                f'{(" (target "+_target+")") if _target else ""} &nbsp; '
+                f'{sniper_badge(_sig,_sl,_sc,_sbg)}</div>',
+                unsafe_allow_html=True)
             if cur["3M_DD"] <= -12 and cur["5D"] > 2:
                 plain_state = "SHARE PRICE MAY BE STARTING TO RISE AGAIN"
             elif cur["5D"] <= -5:
@@ -1082,25 +1150,6 @@ if stocks:
 
 st.divider()
 
-st.markdown('<div class="sniper-section-heading">Rock-bottom watchlist</div>', unsafe_allow_html=True)
-st.caption("Shares we deliberately ignore at ordinary prices. They only become interesting when they approach unusually cheap pre-set Sniper zones.")
-for rb in rock_bottom_rows:
-    cfg=rb["cfg"]
-    distance_text=(f"{abs(rb['distance']):.1f}% below ${cfg['action_price']:.0f}"
-                   if rb["distance"]<0 else f"{rb['distance']:.1f}% above ${cfg['action_price']:.0f}")
-    st.markdown(
-        f"""<div style="border-left:10px solid {rb['signal_colour']};border-top:1px solid #e2e2e2;border-right:1px solid #e2e2e2;border-bottom:1px solid #e2e2e2;background:{rb['signal_bg']};border-radius:12px;padding:12px 14px;margin:8px 0 12px 0;">
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;">
-          <div style="font-size:1.18rem;font-weight:750;">{rb['name']} ({rb['ticker']}) — ${rb['price']:,.2f}</div>
-          <div style="font-weight:800;color:{rb['signal_colour']};">{rb['signal']} · {rb['signal_text']}</div>
-        </div>
-        <div style="margin-top:5px;"><b>Sniper entry zone:</b> ${cfg['entry_low']:.0f}–${cfg['entry_high']:.0f}
-        &nbsp; · &nbsp; <b>Action price:</b> ≤${cfg['action_price']:.0f}
-        &nbsp; · &nbsp; <b>Distance:</b> {distance_text}</div>
-        <div style="margin-top:5px;"><b>Direction:</b> {rb['direction']} &nbsp; · &nbsp; <b>Status:</b> {rb['status']}</div>
-        <div style="margin-top:5px;color:#555;">{cfg['comment']}</div></div>""",
-        unsafe_allow_html=True)
-
 st.markdown('<div class="sniper-section-heading">Deep analysis</div>', unsafe_allow_html=True)
 tabs=st.tabs(ANALYSIS_UNIVERSE)
 
@@ -1113,16 +1162,13 @@ for tab,t in zip(tabs,ANALYSIS_UNIVERSE):
         cur=f.iloc[-1]; price=float(df["Close"].iloc[-1])
 
         snap=rebound_strategy_snapshot(df,matches,stake_gbp)
-        if t in ROCK_BOTTOM:
-            rb_cfg=ROCK_BOTTOM[t]
-            deep_target=f" (target ${rb_cfg['entry_low']:.0f}–${rb_cfg['entry_high']:.0f})"
-        else:
-            deep_target=""
-        _deep_snap=rebound_strategy_snapshot(df,d["matches"],stake_gbp)
-        _sig,_sl,_sc,_sbg=unified_sniper_signal(t,price,_deep_snap)
+        _sig,_sl,_sc,_sbg,_zone=all_share_signal(t,price,df)
+        _target=target_label(t,_zone)
+        deep_target=f" (target {_target})" if _target else ""
         st.markdown(
             f'<div class="sniper-ticker-heading">{COMPANY_NAMES.get(t,t)} ({t}) — '
-            f'{display_price(t,price)}{deep_target} &nbsp; {sniper_badge(_sig,_sl,_sc,_sbg)}</div>',
+            f'{display_price(t,price)}{deep_target} &nbsp; '
+            f'{sniper_badge(_sig,_sl,_sc,_sbg)}</div>',
             unsafe_allow_html=True)
 
         st.markdown("### Main price chart")
