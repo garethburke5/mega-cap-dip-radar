@@ -13,7 +13,7 @@ st.set_page_config(page_title="Share Sniper", page_icon="🎯", layout="wide")
 
 st_autorefresh(interval=5 * 60 * 1000, limit=None, key="five_minute_refresh")
 
-CORE_WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL","AVGO","BARC.L","QCOM","BA","SPCX"]
+CORE_WATCHLIST = ["TSLA","NVDA","META","AMZN","GOOGL","AVGO","BARC.L","QCOM","BA","SPCX","DKS"]
 ROCK_BOTTOM_TICKERS = ["ARM","MSTR","RKLB","SOFI","PLTR"]
 ANALYSIS_UNIVERSE = CORE_WATCHLIST + ROCK_BOTTOM_TICKERS
 COMPANY_NAMES = {
@@ -27,6 +27,7 @@ COMPANY_NAMES = {
     "QCOM":"Qualcomm",
     "BA":"Boeing",
     "SPCX":"SpaceX",
+    "DKS":"DICK'S Sporting Goods",
     "SOFI":"SoFi Technologies",
     "PLTR":"Palantir Technologies",
     "ARM":"Arm Holdings",
@@ -45,6 +46,7 @@ SNIPER_PROFILES = {
     "QCOM":"Occasional deep-dip candidate — most interesting after a genuinely large fall. Around $140–$150 is a particularly interesting area to investigate if the business remains sound.",
     "BA":"Occasional deep-dip candidate — only interesting after a substantial collapse. Company-specific risk is higher, so always check why the share has fallen before buying.",
     "SPCX":"Full Sniper analysis + new-listing intelligence — potentially exceptional rebound amplitude. Use the same price, RSI, dip, entry, market, news and fundamental analysis as every other share, plus extra IPO/unlock/event context because the trading history is short.",
+    "DKS":"Special-event rebound candidate after the Foot Locker-driven sell-off. Do not chase the bounce: only actionable at $125 or below, and check that the post-crash floor/fundamentals are holding before buying.",
     "ARM":"Rock-bottom candidate — fully analyse and chart it, but price discipline matters. Actionable at $140 or below; preferred zone $120–$140.",
     "MSTR":"Rock-bottom / high-risk candidate — fully analyse and chart it, but it is Bitcoin-dependent. Preferred zone $80–$90.",
     "RKLB":"Rock-bottom / higher-risk space candidate — fully analyse and chart it despite not being a mega-cap. Preferred zone $38–$45.",
@@ -874,6 +876,7 @@ CORE_MANUAL_TARGETS = {
     "QCOM": (140.0, 150.0),
     "BA": (150.0, 170.0),
     "SPCX": (110.0, 120.0),
+    "DKS": (120.0, 125.0),
 }
 
 def derived_core_target_zone(df):
