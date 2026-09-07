@@ -1,0 +1,48 @@
+name: Auction History Free Runner
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/auction-history-free-runner.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run-isolated-auction-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout isolated auction-history runner branch
+        uses: actions/checkout@v4
+        with:
+          ref: auction-history-runner
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install crawler dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 playwright
+          python -m playwright install chromium
+
+      - name: Discover Allsop historical commercial auctions
+        run: python auction_history_runner/discover_allsop.py
+
+      - name: Publish discovery and telemetry to isolated branch
+        if: always()
+        run: |
+          git config user.name 'Auction History Free Runner'
+          git config user.email 'actions@users.noreply.github.com'
+          git add auction_history_output/allsop_discovery.json auction_history_output/progress.json || true
+          if ! git diff --cached --quiet; then
+            git commit -m 'Write Allsop historical discovery telemetry'
+            git push origin HEAD:auction-history-runner
+          fi
