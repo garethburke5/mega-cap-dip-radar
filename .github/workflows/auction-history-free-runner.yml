@@ -14,7 +14,7 @@ permissions:
 jobs:
   run-isolated-auction-history:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - name: Checkout isolated auction-history runner branch
         uses: actions/checkout@v4
@@ -30,7 +30,8 @@ jobs:
       - name: Install crawler dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4
+          pip install requests beautifulsoup4 playwright
+          python -m playwright install chromium
 
       - name: Refresh Allsop historical auction discovery
         run: python auction_history_runner/discover_allsop.py
@@ -46,5 +47,6 @@ jobs:
           git add auction_history_output/allsop_discovery.json auction_history_output/progress.json auction_history_output/allsop_lots.json || true
           if ! git diff --cached --quiet; then
             git commit -m 'Backfill Allsop public auction history'
+            git pull --rebase origin auction-history-runner
             git push origin HEAD:auction-history-runner
           fi
