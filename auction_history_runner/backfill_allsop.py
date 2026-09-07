@@ -47,8 +47,21 @@ def request_html(url):
     return r.text
 
 
-def lot_links(results_url):
-    html = request_html(results_url)
+def browser_html(url):
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page(
+            user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131 Safari/537.36"
+        )
+        page.goto(url, wait_until="networkidle", timeout=60000)
+        page.wait_for_timeout(1200)
+        html = page.content()
+        browser.close()
+        return html
+
+
+def extract_lot_links(html):
     soup = BeautifulSoup(html, "html.parser")
     found = []
     for a in soup.find_all("a", href=True):
@@ -59,6 +72,13 @@ def lot_links(results_url):
         if href not in found:
             found.append(href)
     return found
+
+
+def lot_links(results_url):
+    links = extract_lot_links(request_html(results_url))
+    if links:
+        return links, "requests"
+    return extract_lot_links(browser_html(results_url)), "playwright"
 
 
 def status_from(text):
@@ -211,9 +231,9 @@ def main(batch_size=2):
     for auction in selected:
         auction_id = auction.get("auction_id")
         try:
-            links = lot_links(auction["results_url"])
+            links, discovery_method = lot_links(auction["results_url"])
             if not links:
-                raise RuntimeError("No lot-overview links found on results page")
+                raise RuntimeError("No lot-overview links found after requests and browser rendering")
             rows = []
             with ThreadPoolExecutor(max_workers=8) as pool:
                 futs = {pool.submit(hydrate, url, auction): url for url in links}
@@ -237,6 +257,7 @@ def main(batch_size=2):
             state["completed_auction_ids"] = sorted(completed)
             state["auctions_completed"] = len(completed)
             state["lots_captured"] = len(existing)
+            state["last_result_page_method"] = discovery_method
             state["earliest_month_reached"] = min(
                 [a.get("month") for a in auctions if a.get("auction_id") in completed and a.get("month")],
                 default=None,
@@ -259,7 +280,7 @@ def main(batch_size=2):
             save(PROGRESS, progress)
 
     remaining = [a for a in auctions if a.get("auction_id") not in completed]
-    state["status"] = "CAUGHT UP" if not remaining else ("DEGRADED" if state.get("failures") and not selected else "RUNNING")
+    state["status"] = "CAUGHT UP" if not remaining else "RUNNING"
     state["remaining_auctions"] = len(remaining)
     state["last_run_completed"] = now_iso()
     progress["updated_at"] = now_iso()
