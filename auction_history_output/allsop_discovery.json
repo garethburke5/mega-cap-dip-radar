@@ -1,0 +1,779 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-07T12:10:46.072459+00:00",
+  "source": "Allsop Commercial",
+  "index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/",
+  "status": "DISCOVERED",
+  "auctions_discovered": 100,
+  "earliest_month": "2012-02",
+  "latest_month": "2026-07",
+  "attempts": [
+    {
+      "ok": true,
+      "method": "requests",
+      "status": 200,
+      "bytes": 293733,
+      "final_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    }
+  ],
+  "diagnostics": {
+    "headings": [
+      "All Past Auction Results",
+      "",
+      "View lots from our all of our previous auctions.",
+      "Commercial Auctions",
+      "Residential Auctions",
+      "Commercial Auctions",
+      "Residential Auctions",
+      "Allsop - Bringing property & people together for 120 years",
+      "Commercial Services",
+      "Residential Services",
+      "Popular Locations"
+    ],
+    "auction_id_link_count": 200,
+    "sample_auction_links": [
+      "https://www.allsop.co.uk/property-search?auction_id=771b1f0e-119b-11f1-82cb-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=eb91d024-f848-11f0-a7b9-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=d8f13938-f220-11f0-a09f-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=ac5a0860-c47f-11f0-836b-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=9511c0da-b589-11f0-b0f6-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=4c5d617a-7117-11f0-bb92-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=bc13087c-7116-11f0-93f5-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=df9b4068-1b97-11f0-b562-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=94fe29b6-fdcf-11ef-8592-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=b36c11d8-e952-11ef-9cb9-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=01b61362-e952-11ef-b1ea-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=82e225de-8188-11ef-8bc5-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=8d13763a-8187-11ef-b09d-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=da20d4c2-8182-11ef-9134-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=98b19ec8-5bbb-11ef-abc6-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=2a91abcc-2eed-11ef-a9a1-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=0ff53c2a-0643-11ef-9463-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=9110822a-8f91-11ee-84fe-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=1c6fb908-8f8d-11ee-91bf-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=9a3cb186-5d26-11ee-9f5c-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=0ebbc79c-402e-11ee-a83f-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=e0a8afe2-c354-11ed-b2e8-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=5673efd4-c355-11ed-846c-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=11c7f804-c354-11ed-bb43-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=0a9e99c4-69a5-11ed-b2a0-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=fc2df3b8-69a3-11ed-b23b-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=41f14052-b752-11ed-b2cd-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=70233bd0-1327-11ed-9f65-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=0ac48e10-1327-11ed-a16f-0242ac110002&view=table",
+      "https://www.allsop.co.uk/property-search?auction_id=9e991022-4c51-11ec-befa-0242ac110002&view=table"
+    ],
+    "section_trace": [
+      "ENTER COMMERCIAL: Commercial Auctions",
+      "ENTER COMMERCIAL: Commercial Auctions",
+      "LEAVE COMMERCIAL: Residential Auctions",
+      "ENTER COMMERCIAL: Commercial Auctions",
+      "LEAVE COMMERCIAL: Residential Auctions",
+      "ENTER COMMERCIAL: Commercial Auctions",
+      "ENTER COMMERCIAL: Commercial Auctions",
+      "LEAVE COMMERCIAL: Residential Auctions"
+    ]
+  },
+  "auctions": [
+    {
+      "auction_id": "771b1f0e-119b-11f1-82cb-0242ac110002",
+      "label": "July 2026",
+      "month": "2026-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=771b1f0e-119b-11f1-82cb-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "eb91d024-f848-11f0-a7b9-0242ac110002",
+      "label": "June 2026",
+      "month": "2026-06",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=eb91d024-f848-11f0-a7b9-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "d8f13938-f220-11f0-a09f-0242ac110002",
+      "label": "May 2026",
+      "month": "2026-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=d8f13938-f220-11f0-a09f-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "ac5a0860-c47f-11f0-836b-0242ac110002",
+      "label": "March 2026",
+      "month": "2026-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=ac5a0860-c47f-11f0-836b-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9511c0da-b589-11f0-b0f6-0242ac110002",
+      "label": "February 2026",
+      "month": "2026-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9511c0da-b589-11f0-b0f6-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "4c5d617a-7117-11f0-bb92-0242ac110002",
+      "label": "December 2025",
+      "month": "2025-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=4c5d617a-7117-11f0-bb92-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "bc13087c-7116-11f0-93f5-0242ac110002",
+      "label": "November 2025",
+      "month": "2025-11",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=bc13087c-7116-11f0-93f5-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "df9b4068-1b97-11f0-b562-0242ac110002",
+      "label": "September 2025",
+      "month": "2025-09",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=df9b4068-1b97-11f0-b562-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "94fe29b6-fdcf-11ef-8592-0242ac110002",
+      "label": "July 2025",
+      "month": "2025-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=94fe29b6-fdcf-11ef-8592-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "b36c11d8-e952-11ef-9cb9-0242ac110002",
+      "label": "June 2025",
+      "month": "2025-06",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=b36c11d8-e952-11ef-9cb9-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "01b61362-e952-11ef-b1ea-0242ac110002",
+      "label": "April 2025",
+      "month": "2025-04",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=01b61362-e952-11ef-b1ea-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "82e225de-8188-11ef-8bc5-0242ac110002",
+      "label": "March 2025",
+      "month": "2025-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=82e225de-8188-11ef-8bc5-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "8d13763a-8187-11ef-b09d-0242ac110002",
+      "label": "February 2025",
+      "month": "2025-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=8d13763a-8187-11ef-b09d-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "da20d4c2-8182-11ef-9134-0242ac110002",
+      "label": "December 2024",
+      "month": "2024-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=da20d4c2-8182-11ef-9134-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "98b19ec8-5bbb-11ef-abc6-0242ac110002",
+      "label": "November 2024",
+      "month": "2024-11",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=98b19ec8-5bbb-11ef-abc6-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "2a91abcc-2eed-11ef-a9a1-0242ac110002",
+      "label": "September 2024",
+      "month": "2024-09",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=2a91abcc-2eed-11ef-a9a1-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "0ff53c2a-0643-11ef-9463-0242ac110002",
+      "label": "July 2024",
+      "month": "2024-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=0ff53c2a-0643-11ef-9463-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9110822a-8f91-11ee-84fe-0242ac110002",
+      "label": "June 2024",
+      "month": "2024-06",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9110822a-8f91-11ee-84fe-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "1c6fb908-8f8d-11ee-91bf-0242ac110002",
+      "label": "May 2024",
+      "month": "2024-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=1c6fb908-8f8d-11ee-91bf-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9a3cb186-5d26-11ee-9f5c-0242ac110002",
+      "label": "March 2024",
+      "month": "2024-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9a3cb186-5d26-11ee-9f5c-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "0ebbc79c-402e-11ee-a83f-0242ac110002",
+      "label": "February 2024",
+      "month": "2024-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=0ebbc79c-402e-11ee-a83f-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "e0a8afe2-c354-11ed-b2e8-0242ac110002",
+      "label": "December 2023",
+      "month": "2023-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=e0a8afe2-c354-11ed-b2e8-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "5673efd4-c355-11ed-846c-0242ac110002",
+      "label": "October 2023",
+      "month": "2023-10",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=5673efd4-c355-11ed-846c-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "11c7f804-c354-11ed-bb43-0242ac110002",
+      "label": "September 2023",
+      "month": "2023-09",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=11c7f804-c354-11ed-bb43-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "0a9e99c4-69a5-11ed-b2a0-0242ac110002",
+      "label": "July 2023",
+      "month": "2023-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=0a9e99c4-69a5-11ed-b2a0-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "fc2df3b8-69a3-11ed-b23b-0242ac110002",
+      "label": "May 2023",
+      "month": "2023-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=fc2df3b8-69a3-11ed-b23b-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "41f14052-b752-11ed-b2cd-0242ac110002",
+      "label": "April 2023",
+      "month": "2023-04",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=41f14052-b752-11ed-b2cd-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "70233bd0-1327-11ed-9f65-0242ac110002",
+      "label": "March 2023",
+      "month": "2023-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=70233bd0-1327-11ed-9f65-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "0ac48e10-1327-11ed-a16f-0242ac110002",
+      "label": "February 2023",
+      "month": "2023-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=0ac48e10-1327-11ed-a16f-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9e991022-4c51-11ec-befa-0242ac110002",
+      "label": "December 2022",
+      "month": "2022-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9e991022-4c51-11ec-befa-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "36441856-4c50-11ec-9b26-0242ac110002",
+      "label": "November 2022",
+      "month": "2022-11",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=36441856-4c50-11ec-9b26-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "d275f042-4c4f-11ec-8a0f-0242ac110002",
+      "label": "September 2022",
+      "month": "2022-09",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=d275f042-4c4f-11ec-8a0f-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9379b13a-4c4f-11ec-b9bc-0242ac110002",
+      "label": "July 2022",
+      "month": "2022-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9379b13a-4c4f-11ec-b9bc-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "109fb0fc-4c4f-11ec-843d-0242ac110002",
+      "label": "May 2022",
+      "month": "2022-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=109fb0fc-4c4f-11ec-843d-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "96b7d129-4880-ec11-8168-005056a414c9",
+      "label": "March 2022",
+      "month": "2022-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=96b7d129-4880-ec11-8168-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "f5af66e0-04bc-11ec-95fd-0242ac110002",
+      "label": "February 2022",
+      "month": "2022-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=f5af66e0-04bc-11ec-95fd-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "b678e4f4-2e5e-11eb-8f4c-0242ac110002",
+      "label": "December 2021",
+      "month": "2021-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=b678e4f4-2e5e-11eb-8f4c-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "85962144-2e5e-11eb-8610-0242ac110002",
+      "label": "November 2021",
+      "month": "2021-11",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=85962144-2e5e-11eb-8610-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "5cbf8486-2e5e-11eb-b4cf-0242ac110002",
+      "label": "September 2021",
+      "month": "2021-09",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=5cbf8486-2e5e-11eb-b4cf-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "25098cbc-2e5e-11eb-b7e3-0242ac110002",
+      "label": "July 2021",
+      "month": "2021-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=25098cbc-2e5e-11eb-b7e3-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "d466b76c-2e5d-11eb-8a1f-0242ac110002",
+      "label": "June 2021",
+      "month": "2021-06",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=d466b76c-2e5d-11eb-8a1f-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "88b75cc4-e6da-11ea-a604-0242ac110002",
+      "label": "May 2021",
+      "month": "2021-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=88b75cc4-e6da-11ea-a604-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "604e1f02-e6da-11ea-8e80-0242ac110002",
+      "label": "March 2021",
+      "month": "2021-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=604e1f02-e6da-11ea-8e80-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "d2411cce-e77d-11ea-8f2e-0242ac110002",
+      "label": "February 2021",
+      "month": "2021-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=d2411cce-e77d-11ea-8f2e-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "8b6e0cc0-0237-11ea-aae7-0242ac110002",
+      "label": "December 2020",
+      "month": "2020-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=8b6e0cc0-0237-11ea-aae7-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "f2b851de-0236-11ea-b146-0242ac110002",
+      "label": "November 2020",
+      "month": "2020-11",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=f2b851de-0236-11ea-b146-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "15283980-a734-11ea-b2ed-0242ac110002",
+      "label": "September 2020",
+      "month": "2020-09",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=15283980-a734-11ea-b2ed-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "925f6c28-0236-11ea-96c3-0242ac110002",
+      "label": "July 2020",
+      "month": "2020-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=925f6c28-0236-11ea-96c3-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9c711fce-80ce-11ea-9d52-0242ac110002",
+      "label": "June 2020",
+      "month": "2020-06",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9c711fce-80ce-11ea-9d52-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "52745b0a-0236-11ea-ad5a-0242ac110002",
+      "label": "May 2020",
+      "month": "2020-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=52745b0a-0236-11ea-ad5a-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "149357fa-0236-11ea-9b59-0242ac110002",
+      "label": "March 2020",
+      "month": "2020-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=149357fa-0236-11ea-9b59-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "c5db960e-0235-11ea-b4f9-0242ac110002",
+      "label": "February 2020",
+      "month": "2020-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=c5db960e-0235-11ea-b4f9-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "cd2bdb50-60f8-11e9-abf2-0242ac110002",
+      "label": "December 2019",
+      "month": "2019-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=cd2bdb50-60f8-11e9-abf2-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "78d79e86-60f8-11e9-affb-0242ac110002",
+      "label": "October 2019",
+      "month": "2019-10",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=78d79e86-60f8-11e9-affb-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "22cb27b0-60f8-11e9-9bea-0242ac110002",
+      "label": "July 2019",
+      "month": "2019-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=22cb27b0-60f8-11e9-9bea-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "01f20ae4-50a5-11e9-9af9-0242ac110002",
+      "label": "May 2019",
+      "month": "2019-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=01f20ae4-50a5-11e9-9af9-0242ac110002&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "b9130a83-131b-e911-811d-005056a414c9",
+      "label": "March 2019",
+      "month": "2019-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=b9130a83-131b-e911-811d-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "3dd143d1-71f9-e811-811b-005056a414c9",
+      "label": "February 2019",
+      "month": "2019-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=3dd143d1-71f9-e811-811b-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "3e24f6db-b3d2-e811-8118-005056a414c9",
+      "label": "December 2018",
+      "month": "2018-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=3e24f6db-b3d2-e811-8118-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "a33c724a-9286-e811-8110-005056a414c9",
+      "label": "October 2018",
+      "month": "2018-10",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=a33c724a-9286-e811-8110-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "37db70e3-e059-e811-810d-005056a414c9",
+      "label": "July 2018",
+      "month": "2018-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=37db70e3-e059-e811-810d-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "3a38f21d-f50f-e811-8107-005056a414c9",
+      "label": "May 2018",
+      "month": "2018-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=3a38f21d-f50f-e811-8107-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "125dffa9-eb00-e811-8105-005056a414c9",
+      "label": "March 2018",
+      "month": "2018-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=125dffa9-eb00-e811-8105-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "851aa14c-24d5-e711-8102-005056a414c9",
+      "label": "February 2018",
+      "month": "2018-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=851aa14c-24d5-e711-8102-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "cd346276-6699-e711-80ff-005056a414c9",
+      "label": "December 2017",
+      "month": "2017-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=cd346276-6699-e711-80ff-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "1eb759bc-9f6b-e711-80fc-005056a414c9",
+      "label": "October 2017",
+      "month": "2017-10",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=1eb759bc-9f6b-e711-80fc-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "46246f41-3c3a-e711-80f9-005056a414c9",
+      "label": "July 2017",
+      "month": "2017-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=46246f41-3c3a-e711-80f9-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "c397dee7-9b13-e711-80f4-005056a414c9",
+      "label": "May 2017",
+      "month": "2017-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=c397dee7-9b13-e711-80f4-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "c52134af-08dc-e611-80f1-005056a414c9",
+      "label": "March 2017",
+      "month": "2017-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=c52134af-08dc-e611-80f1-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "a046f423-9ac0-e611-80ef-005056a414c9",
+      "label": "February 2017",
+      "month": "2017-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=a046f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9e46f423-9ac0-e611-80ef-005056a414c9",
+      "label": "December 2016",
+      "month": "2016-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9e46f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9c46f423-9ac0-e611-80ef-005056a414c9",
+      "label": "October 2016",
+      "month": "2016-10",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9c46f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9946f423-9ac0-e611-80ef-005056a414c9",
+      "label": "July 2016",
+      "month": "2016-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9946f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9746f423-9ac0-e611-80ef-005056a414c9",
+      "label": "May 2016",
+      "month": "2016-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9746f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9646f423-9ac0-e611-80ef-005056a414c9",
+      "label": "March 2016",
+      "month": "2016-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9646f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9346f423-9ac0-e611-80ef-005056a414c9",
+      "label": "February 2016",
+      "month": "2016-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9346f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "9146f423-9ac0-e611-80ef-005056a414c9",
+      "label": "December 2015",
+      "month": "2015-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=9146f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "8f46f423-9ac0-e611-80ef-005056a414c9",
+      "label": "October 2015",
+      "month": "2015-10",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=8f46f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "8c46f423-9ac0-e611-80ef-005056a414c9",
+      "label": "July 2015",
+      "month": "2015-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=8c46f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "8a46f423-9ac0-e611-80ef-005056a414c9",
+      "label": "May 2015",
+      "month": "2015-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=8a46f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "8846f423-9ac0-e611-80ef-005056a414c9",
+      "label": "March 2015",
+      "month": "2015-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=8846f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "8646f423-9ac0-e611-80ef-005056a414c9",
+      "label": "February 2015",
+      "month": "2015-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=8646f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "8446f423-9ac0-e611-80ef-005056a414c9",
+      "label": "December 2014",
+      "month": "2014-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=8446f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "8146f423-9ac0-e611-80ef-005056a414c9",
+      "label": "October 2014",
+      "month": "2014-10",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=8146f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "8046f423-9ac0-e611-80ef-005056a414c9",
+      "label": "July 2014",
+      "month": "2014-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=8046f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "7c46f423-9ac0-e611-80ef-005056a414c9",
+      "label": "May 2014",
+      "month": "2014-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=7c46f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "7a46f423-9ac0-e611-80ef-005056a414c9",
+      "label": "March 2014",
+      "month": "2014-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=7a46f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "7946f423-9ac0-e611-80ef-005056a414c9",
+      "label": "February 2014",
+      "month": "2014-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=7946f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "7746f423-9ac0-e611-80ef-005056a414c9",
+      "label": "December 2013",
+      "month": "2013-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=7746f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "7546f423-9ac0-e611-80ef-005056a414c9",
+      "label": "October 2013",
+      "month": "2013-10",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=7546f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "7146f423-9ac0-e611-80ef-005056a414c9",
+      "label": "July 2013",
+      "month": "2013-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=7146f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "6e46f423-9ac0-e611-80ef-005056a414c9",
+      "label": "May 2013",
+      "month": "2013-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=6e46f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "6946f423-9ac0-e611-80ef-005056a414c9",
+      "label": "March 2013",
+      "month": "2013-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=6946f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "6846f423-9ac0-e611-80ef-005056a414c9",
+      "label": "February 2013",
+      "month": "2013-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=6846f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "6646f423-9ac0-e611-80ef-005056a414c9",
+      "label": "December 2012",
+      "month": "2012-12",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=6646f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "6246f423-9ac0-e611-80ef-005056a414c9",
+      "label": "October 2012",
+      "month": "2012-10",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=6246f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "5f46f423-9ac0-e611-80ef-005056a414c9",
+      "label": "July 2012",
+      "month": "2012-07",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=5f46f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "5c46f423-9ac0-e611-80ef-005056a414c9",
+      "label": "May 2012",
+      "month": "2012-05",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=5c46f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "5946f423-9ac0-e611-80ef-005056a414c9",
+      "label": "March 2012",
+      "month": "2012-03",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=5946f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    },
+    {
+      "auction_id": "5546f423-9ac0-e611-80ef-005056a414c9",
+      "label": "February 2012",
+      "month": "2012-02",
+      "results_url": "https://www.allsop.co.uk/property-search?auction_id=5546f423-9ac0-e611-80ef-005056a414c9&view=table",
+      "source_index_url": "https://www.allsop.co.uk/auctions/all-past-auction-results/"
+    }
+  ]
+}
