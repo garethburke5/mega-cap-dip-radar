@@ -1,0 +1,905 @@
+{
+  "results": [
+    {
+      "auction_id": "771b1f0e-119b-11f1-82cb-0242ac110002",
+      "label": "July 2026",
+      "requested_url": "https://www.allsop.co.uk/property-search?auction_id=771b1f0e-119b-11f1-82cb-0242ac110002&view=table",
+      "final_url": "https://www.allsop.co.uk/property-search?auction_id=771b1f0e-119b-11f1-82cb-0242ac110002&view=table",
+      "status": 200,
+      "title": "Property Search - Allsop LLP",
+      "lot_href_count": 0,
+      "lot_hrefs": [],
+      "all_href_count": 106,
+      "sample_hrefs": [
+        "https://www.allsop.co.uk/careers/#",
+        "https://www.allsop.co.uk/my-account/welcome-to-allsop",
+        "https://www.allsop.co.uk/find-a-property/#",
+        "https://www.allsop.co.uk/auctions/",
+        "https://www.allsop.co.uk/auctions/commercial-auctions/",
+        "https://www.allsop.co.uk/auctions/residential-auctions/",
+        "https://www.allsop.co.uk/auctions/how-to-buy-property-at-auction/",
+        "https://www.allsop.co.uk/auctions/how-to-buy-property-at-auction/how-to-register-to-bid/",
+        "https://www.allsop.co.uk/auctions/how-to-buy-property-at-auction/bidding-at-a-live-streamed-auction/",
+        "https://www.allsop.co.uk/#",
+        "https://www.allsop.co.uk/auctions/how-to-buy-property-at-auction/anti-money-laundering-regulations/",
+        "https://www.allsop.co.uk/auctions/how-to-buy-property-at-auction/conditions-of-sale-notices/",
+        "https://www.allsop.co.uk/auctions/how-to-sell-property-at-auction/",
+        "https://www.allsop.co.uk/#",
+        "https://www.allsop.co.uk/auctions/how-to-sell-property-at-auction/entries-invited/",
+        "https://www.allsop.co.uk/auctions/how-to-sell-property-at-auction/anti-money-laundering-regulations/",
+        "https://www.allsop.co.uk/auctions/future-auction-dates/",
+        "https://www.allsop.co.uk/auctions/past-auction-results/",
+        "https://www.allsop.co.uk/auctions/understanding-auctions/",
+        "https://www.allsop.co.uk/investment-development/",
+        "https://www.allsop.co.uk/investment-development/build-to-rent/#",
+        "https://www.allsop.co.uk/investment-development/commercial-property-asset-management/#",
+        "https://www.allsop.co.uk/investment-development/central-london-investment/#",
+        "https://www.allsop.co.uk/investment-development/commercial-development-consultancy/#",
+        "https://www.allsop.co.uk/investment-development/national-investment/#",
+        "https://www.allsop.co.uk/investment-development/land-development/#",
+        "https://www.allsop.co.uk/investment-development/residential-investment/#",
+        "https://www.allsop.co.uk/investment-development/student-housing/#",
+        "https://www.allsop.co.uk/central-london-office-leasing/#",
+        "https://www.allsop.co.uk/central-london-office-leasing/flexible-office-space-to-let/",
+        "https://www.allsop.co.uk/professional-services-management/#",
+        "https://www.allsop.co.uk/professional-services-management/build-to-rent-operational-consultancy/#",
+        "https://www.allsop.co.uk/professional-services-management/business-rates/",
+        "https://www.allsop.co.uk/investment-development/commercial-property-asset-management/#",
+        "https://www.allsop.co.uk/investment-development/commercial-development-consultancy/#",
+        "https://www.allsop.co.uk/professional-services-management/commercial-lease-advisory/#",
+        "https://www.allsop.co.uk/professional-services-management/planning/",
+        "https://www.allsop.co.uk/professional-services-management/research/",
+        "https://www.allsop.co.uk/professional-services-management/residential-development-consultancy/#",
+        "https://www.allsop.co.uk/professional-services-management/residential-letting-management/#",
+        "https://www.allsop.co.uk/professional-services-management/valuation/#",
+        "https://www.allsop.co.uk/sectors/",
+        "https://www.allsop.co.uk/sectors/co-living/",
+        "https://www.allsop.co.uk/sectors/energy-and-sustainability-in-property/",
+        "https://www.allsop.co.uk/sectors/hmos/",
+        "https://www.allsop.co.uk/sectors/hotels-alternatives-property-services/",
+        "https://www.allsop.co.uk/sectors/industrial-and-logistics-property-specialists/",
+        "https://www.allsop.co.uk/sectors/life-sciences-property-services/",
+        "https://www.allsop.co.uk/sectors/office-property-and-office-space-specialists/",
+        "https://www.allsop.co.uk/sectors/public-sector-property-consultancy-services/",
+        "https://www.allsop.co.uk/sectors/retail-property-specialists/",
+        "https://www.allsop.co.uk/sectors/senior-living-healthcare-supported-living/",
+        "https://www.allsop.co.uk/sectors/student-accommodation/",
+        "https://www.allsop.co.uk/insights/#",
+        "https://www.allsop.co.uk/people-search/#",
+        "https://www.allsop.co.uk/about-us/",
+        "https://www.allsop.co.uk/property-search",
+        "https://www.allsop.co.uk/property-search",
+        "https://www.allsop.co.uk/property-search",
+        "https://www.allsop.co.uk/property-search",
+        "https://www.allsop.co.uk/property-search",
+        "https://www.allsop.co.uk/property-search",
+        "https://www.allsop.co.uk/",
+        "https://www.allsop.co.uk/find-a-property/#",
+        "https://www.allsop.co.uk/insights/#",
+        "https://www.allsop.co.uk/people-search/",
+        "https://www.allsop.co.uk/about-us/",
+        "https://www.allsop.co.uk/careers/",
+        "https://www.allsop.co.uk/my-account/welcome-to-allsop",
+        "https://www.allsop.co.uk/policies-legal/",
+        "https://www.allsop.co.uk/auctions/commercial-auctions/",
+        "https://www.allsop.co.uk/investment-development/commercial-property-asset-management/",
+        "https://www.allsop.co.uk/professional-services-management/business-rates/",
+        "https://www.allsop.co.uk/investment-development/central-london-investment/",
+        "https://www.allsop.co.uk/central-london-office-leasing/",
+        "https://www.allsop.co.uk/investment-development/commercial-development-consultancy/",
+        "https://www.allsop.co.uk/professional-services-management/commercial-lease-advisory/",
+        "https://www.allsop.co.uk/investment-development/national-investment/",
+        "https://www.allsop.co.uk/professional-services-management/planning/",
+        "https://www.allsop.co.uk/professional-services-management/valuation/"
+      ],
+      "buttons": [
+        "Toggle navigation",
+        "SUBMIT",
+        "GO",
+        "Go",
+        "Previous",
+        "Next",
+        "Today"
+      ],
+      "inputs": [
+        {
+          "name": "searchterm",
+          "type": "text",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "geo_location_lat",
+          "type": "hidden",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "geo_location_lng",
+          "type": "hidden",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "geo_place_id",
+          "type": "hidden",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "radius",
+          "type": "hidden",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "area",
+          "type": "hidden",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "location",
+          "type": "text",
+          "value": "",
+          "placeholder": "Enter Location"
+        },
+        {
+          "name": "available_only",
+          "type": "checkbox",
+          "value": "false",
+          "placeholder": ""
+        },
+        {
+          "name": "",
+          "type": "text",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "",
+          "type": "text",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "featured_first",
+          "type": "checkbox",
+          "value": "On",
+          "placeholder": ""
+        }
+      ],
+      "body_text": "Careers\nSign Up\n / \nLogin\nAllsop\nFind a Property\nOur Services\nInsights\nPeople & Offices\nAbout Us\nSearch\nSUBMIT\nHome > Property Search\nCommercial Auction\n14th July 2026 - Live Stream (the first lot to be offered at 11.00 am)\nRadiuskeyboard_arrow_down\nRegionkeyboard_arrow_down\nAuction Datekeyboard_arrow_down\nProperty Typekeyboard_arrow_down\nFilterskeyboard_arrow_down\nProperties for sale by auction\nCommercial Auction, 14th July 2026clear\nSAVE SEARCH CRITERIA\nGo to lot\nGO\n1 - 20 of 88 ResultsView:\n20\n40\n60\n80\n100\nview_module\nview_headline\nview_list\nSort By:\nMax Price\nMin Price\nLot Number Descending\nLot Number Ascending\nDate Descending\nDate Ascending\n\nShow featured lots first\n\nLot Number\tType\tLocation\tDate\tRegion\tInitial Yield\tStatus\tGuide Price *\tAuction\tWatch\n1\tFreehold Convenience Store Investment\tMilton Keynes MK12\t14/07/2026\t\t6.78%\tSold\t£515,000\tCommercial\t\n\n2\tFreehold Shop and Residential Investment\tLondon SW14\t14/07/2026\tGreater London\t5.36%\tSold\t£785,000\tCommercial\t\n\n3\tFreehold Shop and Residential Investment\tWatford WD24\t14/07/2026\tSouth East\t\tSold After\tSold After\tCommercial\t\n\n4\tWell Located Freehold Shop and Residential Investment\tLondon SW15\t14/07/2026\tGreater London\t6.48%\tAvailable\t£750,000+\tCommercial\t\n\n5\tFreehold Estate Agency Investment and Vacant Maisonette\tWantage OX12\t14/07/2026\tSouth East\t\tWithdrawn\tWithdrawn\tCommercial\t\n\n6\tWell Located Freehold Shop and Residential Investment\tLondon SW15\t14/07/2026\tGreater London\t\tSold After\tSold After\tCommercial\t\n\n7\tFreehold Charity Shop Investment\tBishop's Stortford CM23\t14/07/2026\tEast of England\t\tSold After\tSold After\tCommercial\t\n\n8\tFreehold Supermarket Investment\tPontefract WF8\t14/07/2026\tYorkshire and Humberside\t7.55%\tSold\t£1,250,000\tCommercial\t\n\n9\tNewly Developed Freehold Convenience Store Investment & Two Vacant Self Contained Flats\tHemel Hempstead HP3\t14/07/2026\t\t\tAvailable\t£1.5M+\tCommercial\t\n\n10\tWell Located Freehold Shop Investment\tLondon NW1\t14/07/2026\tGreater London\t7.22%\tWithdrawn\tWithdrawn\tCommercial\t\n\n11\tModern Freehold Convenience Store Investment\tWigan WN1\t14/07/2026\tNorth West\t\tSold Prior\tSold Prior\tCommercial\t\n\n12\tWell Located Freehold Pharmacy Investment with Planning Permission\tLondon E13\t14/07/2026\tGreater London\t\tSold After\tSold After\tCommercial\t\n\n13\tAttractive Grade II Listed Freehold Leisure Ground Rent Investment\tPlymouth PL4\t14/07/2026\tSouth West\t\tSold Prior\tSold Prior\tCommercial\t\n\n14\tWell Located Virtual Freehold Convenience Store\tLondon W12\t14/07/2026\tGreater London\t6.15%\tSold\t£1,300,000\tCommercial\t\n\n15\tWell Located Freehold Office Investment\tSevenoaks TN13\t14/07/2026\tSouth East\t\tSold Prior\tSold Prior\tCommercial\t\n\n16\tFreehold Hotel and Public House Ground Rent Investment\tPlymouth PL4\t14/07/2026\tSouth West\t\tSold Prior\tSold Prior\tCommercial\t\n\n17\tFreehold Vacant Retail and Warehouse Unit with Residential Development Potential\tGerrards Cross SL9\t14/07/2026\tSouth East\t\tWithdrawn\tWithdrawn\tCommercial\t\n\n18\tProminent Corner Freehold Vacant Office Building Opportunity\tLondon EC1V\t14/07/2026\tGreater London\t\tSold\t£800,000\tCommercial\t\n\n19\tFreehold Industrial Investment\tBarnstaple EX32\t14/07/2026\tSouth West\t\tSold Prior\tSold Prior\tCommercial\t\n\n20\tWell Located Freehold Retail and Residential Investment\tBromley BR1\t14/07/2026\tGreater London\t8.68%\tSold\t£1,400,000\tCommercial\t\nPrevious\n1\n2\n3\n4\n5\nNext\n Previous\nCommercial LOT 46 - July 2026\nFEATURED LOT\nStoke-on-trent ST3\nFreehold Retail Warehouse Investment\nGuide Price*\n£1.5M+\nCommercial LOT 35 - July 2026\nFEATURED LOT\nDeal CT14\nFreehold Care Home Investment\nGuide Price*\n£1.35M - £1.45M\nCommercial LOT 32 - July 2026\nFEATURED LOT\nBristol BS7\nVacant Freehold Development Opportunity\nGuide Price*\n£1.325M+\nOct 2026\nFEATURED LOT\nSheffield S10\nSubstantial Freehold Retail, Supermarket & Car Park Investment\nGuide Price*\n£5.8M\nOct 2026\nFEATURED LOT\nDarwen BB3\nNewly Constructed Freehold Post Office Distribution Centre Invest...\nGuide Price*\n£4M+\nCommercial LOT 32 - June 2026\nFEATURED LOT\nManchester M2\nFreehold Shop and Residential Investment\nGuide Price*\n£3.25M - £3.5M\nCommercial LOT 33 - March 2026\nFEATURED LOT\nLondon NW1\nWell Located Vacant Freehold Office with Re-Development Potential\nGuide Price*\nUnsold\nCommercial LOT 45 - July 2026\nFEATURED LOT\nDeal CT14\nFreehold Care Home Investment\nGuide Price*\n£2M - £2.2M\nCommercial LOT 56 - March 2026\nFEATURED LOT\nLondon W1H\nGrade II Listed Leasehold Office and Residential Investment\nGuide Price*\nUnsold\nCommercial LOT 12 - June 2026\nFEATURED LOT\nLondon WC1R\nVacant Leasehold Office\nGuide Price*\n£2M+\nCommercial LOT 26 - June 2026\nFEATURED LOT\nLondon NW6\nProminent Freehold Shop and Residential Investment\nAvailable At\n£1,950,000\nCommercial LOT 27 - June 2026\nFEATURED LOT\nChard TA20\nTown Centre Freehold Supermarket Investment\nAvailable At\n£1,900,000\nCommercial LOT 18 - May 2026\nFEATURED LOT\nStoke-on-trent ST3\nFreehold Retail Warehouse Investment\nGuide Price*\nUnsold\nCommercial LOT 23 - June 2026\nFEATURED LOT\nLondon N12\nFreehold Trade Counter and Office Investment\nAvailable At\n£1,800,000\nCommercial LOT 12 - May 2026\nFEATURED LOT\nLondon N17\nFreehold Shop and Residential Investment\nGuide Price*\nUnsold\nCommercial LOT 9 - July 2026\nFEATURED LOT\nHemel Hempstead HP3\nNewly Developed Freehold Convenience Store Investment & Two Vacan...\nGuide Price*\n£1.5M+\nCommercial LOT 46 - July 2026\nFEATURED LOT\nStoke-on-trent ST3\nFreehold Retail Warehouse Investment\nGuide Price*\n£1.5M+\nCommercial LOT 35 - July 2026\nFEATURED LOT\nDeal CT14\nFreehold Care Home Investment\nGuide Price*\n£1.35M - £1.45M\nCommercial LOT 32 - July 2026\nFEATURED LOT\nBristol BS7\nVacant Freehold Development Opportunity\nGuide Price*\n£1.325M+\nOct 2026\nFEATURED LOT\nSheffield S10\nSubstantial Freehold Retail, Supermarket & Car Park Investment\nGuide Price*\n£5.8M\nOct 2026\nFEATURED LOT\nDarwen BB3\nNewly Constructed Freehold Post Office Distribution Centre Invest...\nGuide Price*\n£4M+\nCommercial LOT 32 - June 2026\nFEATURED LOT\nManchester M2\nFreehold Shop and Residential Investment\nGuide Price*\n£3.25M - £3.5M\nCommerc",
+      "network": [
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/property-search?auction_id=771b1f0e-119b-11f1-82cb-0242ac110002&view=table",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 200,
+          "url": "https://fonts.googleapis.com/icon?family=Material+Icons",
+          "content_type": "text/css; charset=utf-8"
+        },
+        {
+          "status": 200,
+          "url": "https://cmp.inmobi.com/geoip",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://cmp.inmobi.com/GVL-v2/vendor-list-trimmed-v1.json",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/auth?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/track",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/routes?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://assets.allsop-cdn.co.uk/build/images/packages/platform/frontend/icons/icon-search-red-add9b69732.svg",
+          "content_type": "image/svg+xml"
+        },
+        {
+          "status": 200,
+          "url": "https://www.google.com/ccm/collect?rcb=16&frm=0&apvc=1&ae=g&auid=578039661.1788783590&dt=Property%20Search%20-%20Allsop%20LLP&en=page_view&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&scrsrc=www.googletagmanager.com&rnd=672212230.1788783590&navt=n&npa=0&us_privacy=1---&ep.ads_data_redaction=0&gtm=45He6921v897945802za200zd897945802xea&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938468~117776795~118897920~118897930~120385422~120469145~120469153~120914214&tft=1788783590086&tfd=895&fmt=8",
+          "content_type": ""
+        },
+        {
+          "status": 200,
+          "url": "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=1856000905&t=pageview&_s=1&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&dp=%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&ul=en-us&dt=Property%20Search%20-%20Allsop%20LLP&sr=1280x720&vp=1280x720&_u=YEBAAEABAAAAACgAI~&jid=1993763227&gjid=1297477785&cid=2146367397.1788783590&tid=UA-20615595-1&_gid=1426277046.1788783590&_r=1&_slc=1&gtm=45He6921n81TZ32GJSv897945802za200zd897945802&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938468~117776795~118897920~118897930~120385422~120469145~120469153~120914214&z=993603361",
+          "content_type": "text/plain"
+        },
+        {
+          "status": 200,
+          "url": "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=1856000905&t=pageview&_s=1&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&dp=%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&ul=en-us&dt=Property%20Search%20-%20Allsop%20LLP&sr=1280x720&vp=1280x720&_u=YEDAAEABAAAAACgAIAC~&jid=23972714&gjid=1663237&cid=2146367397.1788783590&tid=UA-21342729-4&_gid=1426277046.1788783590&_r=1&_slc=1&gtm=45He6921n81TZ32GJSv897945802za200zd897945802&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938468~117776795~118897920~118897930~120385422~120469145~120469153~120914214&z=1935075020",
+          "content_type": "text/plain"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/sitemap?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/property-search?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/systemParameters/idle-timeout?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/systemParameters/byline-highlight?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/auctions/771b1f0e-119b-11f1-82cb-0242ac110002?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/regions?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/systemParameters/propertyTypeFilters?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 204,
+          "url": "https://analytics.google.com/g/collect?v=2&tid=G-XCPHDZEZ3M&gtm=45je6921v897968400z8897945802za20gzb897945802zd897945802&_p=1788783589935&_gaz=1&gcd=13l3l3l3l1l1&npa=0&dma=0&tcfd=10000&ecid=1263673371&_eu=AAAAAGAC&are=1&cid=2146367397.1788783590&ec_mode=a&frm=0&pscdl=noapi&rcb=0&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253DA%253FBrand%3B99.0.0.0%7CHeadlessChrome%3B151.0.7922.34%7CChromium%3B151.0.7922.34&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&gaf=2&_s=1&tag_exp=115616986~115938466~115938468~118897920~118897930~120213116~120385423~120469145~120469153~120914213&sid=1788783590&sct=1&seg=0&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&dt=Property%20Search%20-%20Allsop%20LLP&en=page_view&_fv=1&_ss=1&tfd=1130",
+          "content_type": "text/plain"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/search?auction_id=771b1f0e-119b-11f1-82cb-0242ac110002&view=table&react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/auctions/currentskiplots?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/getallnavs?react",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/systemParameters/old-auction-day?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 302,
+          "url": "https://px.ads.linkedin.com/collect?v=2&fmt=js&pid=2897004&time=1788783590353&li_adsId=e384c427-aaae-49f2-acc9-bf2a81b0a142&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable",
+          "content_type": ""
+        },
+        {
+          "status": 200,
+          "url": "https://px.ads.linkedin.com/attribution_trigger?pid=2897004&time=1788783590353&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.facebook.com/tr/?id=613932433534484&ev=PageView&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&rl=&if=false&ts=1788783590387&iw=false&sw=1280&sh=720&v=2.9.393&r=stable&ec=0&o=12318&aems=0%3B0&fbp=fb.2.1788783590380.362080300377380156&ler=empty&pmd[title]=Property%20Search%20-%20Allsop%20LLP&pmd[locale]=en&pmd[description]=&plt=746.8999999999942&iss=1&ss=%7B%22page_title%22%3A%5B%7B%22rid%22%3A%221616647646681256%22%2C%22v%22%3A%5B%22Commercial%20Auction%22%5D%7D%5D%7D&imft=1&tz=0&it=1788783590231&coo=false&expv2[0]=pl0&expv2[1]=el3&expv2[2]=bc1&expv2[3]=ra2&expv2[4]=rp2&expv2[5]=im1&expv2[6]=hf1&expv2[7]=sd1&expv2[8]=sp1&expv2[9]=ek1&expv2[10]=pc1&expv2[11]=gs1&expv2[12]=zs1&expv2[13]=cp1&expv2[14]=es1&expv2[15]=ac1&expv2[16]=so1&expv2[17]=wc1&expv2[18]=la1&expv2[19]=sf1&expv2[20]=da1&expv2[21]=io1&expv2[22]=ae1&expv2[23]=sx1&expv2[24]=if1&expv2[25]=fd1&expv2[26]=bg1&expv2[27]=mg1&expv2[28]=kl1&expv2[29]=sg1&expv2[30]=mk1&expv2[31]=sn1&expv2[32]=ec1&expv2[33]=mp1&expv2[34]=ps1&expv2[35]=fx1&expv2[36]=vt1&rqm=GET",
+          "content_type": "text/plain"
+        },
+        {
+          "status": 302,
+          "url": "https://px.ads.linkedin.com/collect?v=2&fmt=js&pid=2897004&time=1788783590353&li_adsId=e384c427-aaae-49f2-acc9-bf2a81b0a142&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&cookiesTest=true",
+          "content_type": ""
+        },
+        {
+          "status": 302,
+          "url": "https://www.linkedin.com/px/li_sync?redirect=https%3A%2F%2Fpx.ads.linkedin.com%2Fcollect%3Fv%3D2%26fmt%3Djs%26pid%3D2897004%26time%3D1788783590353%26li_adsId%3De384c427-aaae-49f2-acc9-bf2a81b0a142%26url%3Dhttps%253A%252F%252Fwww.allsop.co.uk%252Fproperty-search%253Fauction_id%253D771b1f0e-119b-11f1-82cb-0242ac110002%2526view%253Dtable%26cookiesTest%3Dtrue%26liSync%3Dtrue",
+          "content_type": ""
+        },
+        {
+          "status": 204,
+          "url": "https://analytics.google.com/g/collect?v=2&tid=G-7BGSHL6GPK&gtm=45je6921v9136102514za20g&_p=1788783589935&_gaz=1&gcd=13l3l3l3l2l1&npa=0&dma=0&tcfd=10000&_eu=ABAIAGAC&_ng=1&are=1&cid=2146367397.1788783590&frm=0&pscdl=noapi&rcb=8&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253DA%253FBrand%3B99.0.0.0%7CHeadlessChrome%3B151.0.7922.34%7CChromium%3B151.0.7922.34&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&gaf=2&_s=1&tag_exp=115938466~115938468~118897920~118897930~120213116~120385423~120469145~120469153&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&dp=%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&dt=Property%20Search%20-%20Allsop%20LLP&sid=1788783590&sct=1&seg=0&en=page_view&_fv=1&_ss=1&_ee=1&gap.uat=115938466~115938468~117776795~118897920~118897930~120385422~120469145~120469153~120914214&tfd=1342",
+          "content_type": "text/plain"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/property-search?&react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 204,
+          "url": "https://analytics.google.com/g/collect?v=2&tid=G-V30SE69E39&gtm=45je6921v9136080987za20g&_p=1788783589935&_gaz=1&gcd=13l3l3l3l2l1&npa=0&dma=0&tcfd=10000&_eu=ABAIAGAC&_ng=1&are=1&cid=2146367397.1788783590&frm=0&pscdl=noapi&rcb=12&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253DA%253FBrand%3B99.0.0.0%7CHeadlessChrome%3B151.0.7922.34%7CChromium%3B151.0.7922.34&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&gaf=2&_s=1&tag_exp=115616986~115938466~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&dp=%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&dt=Property%20Search%20-%20Allsop%20LLP&sid=1788783590&sct=1&seg=0&en=page_view&_fv=1&_ss=1&_ee=1&gap.uat=115938466~115938468~117776795~118897920~118897930~120385422~120469145~120469153~120914214&tfd=1421",
+          "content_type": "text/plain"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/systemParameters/guide-price-disclaimer-text?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/auctions/com_carousel?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://px.ads.linkedin.com/collect?v=2&fmt=js&pid=2897004&time=1788783590353&li_adsId=e384c427-aaae-49f2-acc9-bf2a81b0a142&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&cookiesTest=true&liSync=true",
+          "content_type": "application/javascript"
+        },
+        {
+          "status": 200,
+          "url": "https://www.google.com/ccm/collect?rcb=7&frm=0&apvc=0&ae=g&auid=578039661.1788783590&dt=Property%20Search%20-%20Allsop%20LLP&tid=AW-874341724&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&scrsrc=www.googletagmanager.com&rnd=672212230.1788783590&navt=n&npa=0&us_privacy=1---&gpp=DBAA&_tu=CA&gtm=45be6921v887519854z8897945802za20gzb897945802zd897945802xea&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938469~117776795~118897920~118897930~120213116~120385423~120469145~120469153~120914213&tft=1788783590929&tfd=1738&tids=AW-874341724&fmt=8",
+          "content_type": ""
+        },
+        {
+          "status": 200,
+          "url": "https://www.google.com/rmkt/collect/874341724/?random=1788783590916&cv=11&fst=1788783590916&fmt=8&bg=ffffff&guid=ON&async=1&gtm=45be6921v887519854z8897945802za20gzb897945802zd897945802xea&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938469~117776795~118897920~118897930~120213116~120385423~120469145~120469153~120914213&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&rcb=7&frm=0&tiba=Property%20Search%20-%20Allsop%20LLP&hn=www.googleadservices.com&npa=0&us_privacy=1---&pscdl=noapi&auid=578039661.1788783590&uaa=x86&uab=64&uafvl=Not%253DA%253FBrand%3B99.0.0.0%7CHeadlessChrome%3B151.0.7922.34%7CChromium%3B151.0.7922.34&uamb=0&uam=&uap=Linux&uapv=&uaw=0&gpp=DBAA&_tu=CA&ept=68&gcp=5",
+          "content_type": ""
+        },
+        {
+          "status": 200,
+          "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/874341724/?random=1788783590916&cv=11&fst=1788783590916&bg=ffffff&guid=ON&async=1&gtm=45be6921v887519854z8897945802za20gzb897945802zd897945802xea&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938469~117776795~118897920~118897930~120213116~120385423~120469145~120469153~120914213&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&rcb=7&frm=0&tiba=Property%20Search%20-%20Allsop%20LLP&hn=www.googleadservices.com&npa=0&us_privacy=1---&pscdl=noapi&auid=578039661.1788783590&uaa=x86&uab=64&uafvl=Not%253DA%253FBrand%3B99.0.0.0%7CHeadlessChrome%3B151.0.7922.34%7CChromium%3B151.0.7922.34&uamb=0&uam=&uap=Linux&uapv=&uaw=0&gpp=DBAA&_tu=CA&ept=9&rfmt=3&fmt=4",
+          "content_type": "text/javascript; charset=UTF-8"
+        },
+        {
+          "status": 200,
+          "url": "https://www.google.com/pagead/1p-user-list/874341724/?random=1788783590916&cv=11&fst=1788782400000&bg=ffffff&guid=ON&async=1&gtm=45be6921v887519854z8897945802za20gzb897945802zd897945802xea&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938469~117776795~118897920~118897930~120213116~120385423~120469145~120469153~120914213&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3D771b1f0e-119b-11f1-82cb-0242ac110002%26view%3Dtable&rcb=7&frm=0&tiba=Property%20Search%20-%20Allsop%20LLP&hn=www.googleadservices.com&npa=0&us_privacy=1---&pscdl=noapi&auid=578039661.1788783590&uaa=x86&uab=64&uafvl=Not%253DA%253FBrand%3B99.0.0.0%7CHeadlessChrome%3B151.0.7922.34%7CChromium%3B151.0.7922.34&uamb=0&uam=&uap=Linux&uapv=&uaw=0&gpp=DBAA&_tu=CA&ept=9&rfmt=3&fmt=3&is_vtc=1&cid=CAQS0wEAQM4h3C-q7V9agSwf46s_AwPQuqWaLXFkoBQ5gBUIBhjUw-0wiqJpMe_DGkId8_CNHXDXIB4IyF9ddW8NvhCWRelFUl4JxgePmn2Knb6PsbZot1KWYsyKy3OkF4wv2ACRj16rTq3vgWriUewvnIB1ltSa7hyYA1LgDoc2zRubr1itW7_-MNggdr_1U48PJ3X0OOxGsPTzHBMp86c7LA_pKh9ct3mVp7wKxeUeU4bjq5FMJ3qVMzSOrJ8lbf-MxB1FVxdDbQY9CcKXz0gE_0zvY8SV&random=3361118090&rmt_tld=0&ipr=y",
+          "content_type": "image/gif"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/3433c07c-6fee-11f1-b3e7-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/16fe1460-0d80-11f1-b0f1-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/38a2358c-70be-11f1-9164-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/ab9c0cbe-6edb-11f1-aedf-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/350795d0-7095-11f1-b89d-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/a58c5f0a-55df-11f1-a0aa-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/edaea3f6-a2c9-11f1-8b16-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/958f0cc8-1977-11f1-9f03-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/483a554a-a77a-11f1-afd6-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/f2934a04-70a4-11f1-88a9-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/0319f458-3a73-11f1-a9cc-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/a47a57d4-3a7d-11f1-a92c-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/4246c750-5a8f-11f1-acdf-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/ab1518f8-55ef-11f1-b3bf-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/dabc7e3c-55c4-11f1-ba4d-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/960624fc-55e0-11f1-8fbe-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 429,
+          "url": "https://o4509565244276736.ingest.de.sentry.io/api/4510001552293968/envelope/?sentry_version=7&sentry_key=c2d259d7d94438b405bca8d0b1d9e6bc&sentry_client=sentry.javascript.browser%2F10.73.0",
+          "content_type": "application/json"
+        }
+      ]
+    },
+    {
+      "auction_id": "eb91d024-f848-11f0-a7b9-0242ac110002",
+      "label": "June 2026",
+      "requested_url": "https://www.allsop.co.uk/property-search?auction_id=eb91d024-f848-11f0-a7b9-0242ac110002&view=table",
+      "final_url": "https://www.allsop.co.uk/property-search?auction_id=eb91d024-f848-11f0-a7b9-0242ac110002&view=table",
+      "status": 200,
+      "title": "Property Search - Allsop LLP",
+      "lot_href_count": 0,
+      "lot_hrefs": [],
+      "all_href_count": 105,
+      "sample_hrefs": [
+        "https://www.allsop.co.uk/careers/#",
+        "https://www.allsop.co.uk/my-account/welcome-to-allsop",
+        "https://www.allsop.co.uk/find-a-property/#",
+        "https://www.allsop.co.uk/auctions/",
+        "https://www.allsop.co.uk/auctions/commercial-auctions/",
+        "https://www.allsop.co.uk/auctions/residential-auctions/",
+        "https://www.allsop.co.uk/auctions/how-to-buy-property-at-auction/",
+        "https://www.allsop.co.uk/auctions/how-to-buy-property-at-auction/how-to-register-to-bid/",
+        "https://www.allsop.co.uk/auctions/how-to-buy-property-at-auction/bidding-at-a-live-streamed-auction/",
+        "https://www.allsop.co.uk/#",
+        "https://www.allsop.co.uk/auctions/how-to-buy-property-at-auction/anti-money-laundering-regulations/",
+        "https://www.allsop.co.uk/auctions/how-to-buy-property-at-auction/conditions-of-sale-notices/",
+        "https://www.allsop.co.uk/auctions/how-to-sell-property-at-auction/",
+        "https://www.allsop.co.uk/#",
+        "https://www.allsop.co.uk/auctions/how-to-sell-property-at-auction/entries-invited/",
+        "https://www.allsop.co.uk/auctions/how-to-sell-property-at-auction/anti-money-laundering-regulations/",
+        "https://www.allsop.co.uk/auctions/future-auction-dates/",
+        "https://www.allsop.co.uk/auctions/past-auction-results/",
+        "https://www.allsop.co.uk/auctions/understanding-auctions/",
+        "https://www.allsop.co.uk/investment-development/",
+        "https://www.allsop.co.uk/investment-development/build-to-rent/#",
+        "https://www.allsop.co.uk/investment-development/commercial-property-asset-management/#",
+        "https://www.allsop.co.uk/investment-development/central-london-investment/#",
+        "https://www.allsop.co.uk/investment-development/commercial-development-consultancy/#",
+        "https://www.allsop.co.uk/investment-development/national-investment/#",
+        "https://www.allsop.co.uk/investment-development/land-development/#",
+        "https://www.allsop.co.uk/investment-development/residential-investment/#",
+        "https://www.allsop.co.uk/investment-development/student-housing/#",
+        "https://www.allsop.co.uk/central-london-office-leasing/#",
+        "https://www.allsop.co.uk/central-london-office-leasing/flexible-office-space-to-let/",
+        "https://www.allsop.co.uk/professional-services-management/#",
+        "https://www.allsop.co.uk/professional-services-management/build-to-rent-operational-consultancy/#",
+        "https://www.allsop.co.uk/professional-services-management/business-rates/",
+        "https://www.allsop.co.uk/investment-development/commercial-property-asset-management/#",
+        "https://www.allsop.co.uk/investment-development/commercial-development-consultancy/#",
+        "https://www.allsop.co.uk/professional-services-management/commercial-lease-advisory/#",
+        "https://www.allsop.co.uk/professional-services-management/planning/",
+        "https://www.allsop.co.uk/professional-services-management/research/",
+        "https://www.allsop.co.uk/professional-services-management/residential-development-consultancy/#",
+        "https://www.allsop.co.uk/professional-services-management/residential-letting-management/#",
+        "https://www.allsop.co.uk/professional-services-management/valuation/#",
+        "https://www.allsop.co.uk/sectors/",
+        "https://www.allsop.co.uk/sectors/co-living/",
+        "https://www.allsop.co.uk/sectors/energy-and-sustainability-in-property/",
+        "https://www.allsop.co.uk/sectors/hmos/",
+        "https://www.allsop.co.uk/sectors/hotels-alternatives-property-services/",
+        "https://www.allsop.co.uk/sectors/industrial-and-logistics-property-specialists/",
+        "https://www.allsop.co.uk/sectors/life-sciences-property-services/",
+        "https://www.allsop.co.uk/sectors/office-property-and-office-space-specialists/",
+        "https://www.allsop.co.uk/sectors/public-sector-property-consultancy-services/",
+        "https://www.allsop.co.uk/sectors/retail-property-specialists/",
+        "https://www.allsop.co.uk/sectors/senior-living-healthcare-supported-living/",
+        "https://www.allsop.co.uk/sectors/student-accommodation/",
+        "https://www.allsop.co.uk/insights/#",
+        "https://www.allsop.co.uk/people-search/#",
+        "https://www.allsop.co.uk/about-us/",
+        "https://www.allsop.co.uk/property-search",
+        "https://www.allsop.co.uk/property-search",
+        "https://www.allsop.co.uk/property-search",
+        "https://www.allsop.co.uk/property-search",
+        "https://www.allsop.co.uk/property-search",
+        "https://www.allsop.co.uk/",
+        "https://www.allsop.co.uk/find-a-property/#",
+        "https://www.allsop.co.uk/insights/#",
+        "https://www.allsop.co.uk/people-search/",
+        "https://www.allsop.co.uk/about-us/",
+        "https://www.allsop.co.uk/careers/",
+        "https://www.allsop.co.uk/my-account/welcome-to-allsop",
+        "https://www.allsop.co.uk/policies-legal/",
+        "https://www.allsop.co.uk/auctions/commercial-auctions/",
+        "https://www.allsop.co.uk/investment-development/commercial-property-asset-management/",
+        "https://www.allsop.co.uk/professional-services-management/business-rates/",
+        "https://www.allsop.co.uk/investment-development/central-london-investment/",
+        "https://www.allsop.co.uk/central-london-office-leasing/",
+        "https://www.allsop.co.uk/investment-development/commercial-development-consultancy/",
+        "https://www.allsop.co.uk/professional-services-management/commercial-lease-advisory/",
+        "https://www.allsop.co.uk/investment-development/national-investment/",
+        "https://www.allsop.co.uk/professional-services-management/planning/",
+        "https://www.allsop.co.uk/professional-services-management/valuation/",
+        "https://www.allsop.co.uk/auctions/residential-auctions/"
+      ],
+      "buttons": [
+        "Toggle navigation",
+        "SUBMIT",
+        "GO",
+        "Go",
+        "Previous",
+        "Next",
+        "Today"
+      ],
+      "inputs": [
+        {
+          "name": "searchterm",
+          "type": "text",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "geo_location_lat",
+          "type": "hidden",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "geo_location_lng",
+          "type": "hidden",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "geo_place_id",
+          "type": "hidden",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "radius",
+          "type": "hidden",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "area",
+          "type": "hidden",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "location",
+          "type": "text",
+          "value": "",
+          "placeholder": "Enter Location"
+        },
+        {
+          "name": "available_only",
+          "type": "checkbox",
+          "value": "false",
+          "placeholder": ""
+        },
+        {
+          "name": "",
+          "type": "text",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "",
+          "type": "text",
+          "value": "",
+          "placeholder": ""
+        },
+        {
+          "name": "featured_first",
+          "type": "checkbox",
+          "value": "On",
+          "placeholder": ""
+        }
+      ],
+      "body_text": "Careers\nSign Up\n / \nLogin\nAllsop\nFind a Property\nOur Services\nInsights\nPeople & Offices\nAbout Us\nSearch\nSUBMIT\nHome > Property Search\nCommercial Auction\n9th June 2026 - Live Stream (the first lot to be offered at 11.00 am)\nRadiuskeyboard_arrow_down\nRegionkeyboard_arrow_down\nAuction Datekeyboard_arrow_down\nProperty Typekeyboard_arrow_down\nFilterskeyboard_arrow_down\nProperties for sale by auction\nCommercial Auction, 9th June 2026clear\nSAVE SEARCH CRITERIA\nGo to lot\nGO\n1 - 20 of 72 ResultsView:\n20\n40\n60\n80\n100\nview_module\nview_headline\nview_list\nSort By:\nMax Price\nMin Price\nLot Number Descending\nLot Number Ascending\nDate Descending\nDate Ascending\n\nShow featured lots first\n\nLot Number\tType\tLocation\tDate\tRegion\tInitial Yield\tStatus\tGuide Price *\tAuction\tWatch\n1\tWell Located Freehold Shop and Residential Investment\tRuislip HA4\t09/06/2026\tGreater London\t7.5%\tAvailable\t£600,000 - £650,000\tCommercial\t\n\n2\tVirtual Freehold Betting Office Investment\tLondon SW20\t09/06/2026\tGreater London\t7.81%\tSold\t£132,000\tCommercial\t\n\n3\tFreehold Convenience Store Investment\tMilton Keynes MK6\t09/06/2026\t\t6.77%\tSold\t£572,500\tCommercial\t\n\n4\tFreehold Hot Food Takeaway Shop & Residential Investment\tLondon W12\t09/06/2026\tGreater London\t9.99%\tWithdrawn\tWithdrawn\tCommercial\t\n\n6\tWell located Freehold Veterinary Practice and Residential Investment\tHove BN3\t09/06/2026\tSouth East\t\tSold After\tSold After\tCommercial\t\n\n7\tWell Located Freehold Public House Investment\tLondon SE3\t09/06/2026\tGreater London\t\tSold Prior\tSold Prior\tCommercial\t\n\n8\tLeasehold Shop Investment\tLondon E16\t09/06/2026\tGreater London\t10.84%\tSold\t£225,000\tCommercial\t\n\n9\tFreehold Shop Investment with Vacant Maisonette\tPoole BH15\t09/06/2026\tSouth West\t\tSold After\tSold After\tCommercial\t\n\n10\tGrade II Listed Freehold Shop and Residential Investment\tBuckingham MK18\t09/06/2026\t\t6.57%\tAvailable At\t£350,000\tCommercial\t\n\n11\tFreehold Warehouse Investment\tBoldon Colliery NE35\t09/06/2026\tNorth East\t8.08%\tWithdrawn\tWithdrawn\tCommercial\t\n\n12\tVacant Leasehold Office\tLondon WC1R\t09/06/2026\tGreater London\t\tAvailable\t£2M+\tCommercial\t\n\n13\tWell Located Freehold Restaurant Investment\tLondon N1\t09/06/2026\tGreater London\t5.87%\tSold\t£1,500,000\tCommercial\t\n\n14\tFreehold Shop and Residential Investment\tLondon N17\t09/06/2026\tGreater London\t\tSold Prior\tSold Prior\tCommercial\t\n\n15\tWell Located Freehold Industrial Investment\tCroydon CR0\t09/06/2026\t\t\tSold Prior\tSold Prior\tCommercial\t\n\n16\tWell Located Freehold Hot Food Takeaway Restaurant and Residential Investment\tLondon SE27\t09/06/2026\tGreater London\t\tSold Prior\tSold Prior\tCommercial\t\n\n17\tWell Located Freehold Public House Investment\tLondon SW14\t09/06/2026\tGreater London\t9.53%\tAvailable\t£1.3M\tCommercial\t\n\n18\tWell Located City Centre Freehold Restaurant Investment\tLeeds LS1\t09/06/2026\tYorkshire and Humberside\t\tSold After\tSold After\tCommercial\t\n\n19\tFreehold Industrial Estate Investment\tMorden SM4\t09/06/2026\tGreater London\t\tSold Prior\tSold Prior\tCommercial\t\n\n20\tAttractive Grade II Listed Freehold City Centre Retail Investment\tCanterbury CT1\t09/06/2026\tSouth East\t9.93%\tSold\t£1,400,000\tCommercial\t\n\n21\tTown Centre Freehold Shop Investment\tClacton-on-sea CO15\t09/06/2026\tEast of England\t9.90%\tSold\t£280,000\tCommercial\t\nPrevious\n1\n2\n3\n4\nNext\n Previous\nCommercial LOT 46 - July 2026\nFEATURED LOT\nStoke-on-trent ST3\nFreehold Retail Warehouse Investment\nGuide Price*\n£1.5M+\nCommercial LOT 35 - July 2026\nFEATURED LOT\nDeal CT14\nFreehold Care Home Investment\nGuide Price*\n£1.35M - £1.45M\nCommercial LOT 32 - July 2026\nFEATURED LOT\nBristol BS7\nVacant Freehold Development Opportunity\nGuide Price*\n£1.325M+\nOct 2026\nFEATURED LOT\nSheffield S10\nSubstantial Freehold Retail, Supermarket & Car Park Investment\nGuide Price*\n£5.8M\nOct 2026\nFEATURED LOT\nDarwen BB3\nNewly Constructed Freehold Post Office Distribution Centre Invest...\nGuide Price*\n£4M+\nCommercial LOT 32 - June 2026\nFEATURED LOT\nManchester M2\nFreehold Shop and Residential Investment\nGuide Price*\n£3.25M - £3.5M\nCommercial LOT 33 - March 2026\nFEATURED LOT\nLondon NW1\nWell Located Vacant Freehold Office with Re-Development Potential\nGuide Price*\nUnsold\nCommercial LOT 45 - July 2026\nFEATURED LOT\nDeal CT14\nFreehold Care Home Investment\nGuide Price*\n£2M - £2.2M\nCommercial LOT 56 - March 2026\nFEATURED LOT\nLondon W1H\nGrade II Listed Leasehold Office and Residential Investment\nGuide Price*\nUnsold\nCommercial LOT 12 - June 2026\nFEATURED LOT\nLondon WC1R\nVacant Leasehold Office\nGuide Price*\n£2M+\nCommercial LOT 26 - June 2026\nFEATURED LOT\nLondon NW6\nProminent Freehold Shop and Residential Investment\nAvailable At\n£1,950,000\nCommercial LOT 27 - June 2026\nFEATURED LOT\nChard TA20\nTown Centre Freehold Supermarket Investment\nAvailable At\n£1,900,000\nCommercial LOT 18 - May 2026\nFEATURED LOT\nStoke-on-trent ST3\nFreehold Retail Warehouse Investment\nGuide Price*\nUnsold\nCommercial LOT 23 - June 2026\nFEATURED LOT\nLondon N12\nFreehold Trade Counter and Office Investment\nAvailable At\n£1,800,000\nCommercial LOT 12 - May 2026\nFEATURED LOT\nLondon N17\nFreehold Shop and Residential Investment\nGuide Price*\nUnsold\nCommercial LOT 9 - July 2026\nFEATURED LOT\nHemel Hempstead HP3\nNewly Developed Freehold Convenience Store Investment & Two Vacan...\nGuide Price*\n£1.5M+\nCommercial LOT 46 - July 2026\nFEATURED LOT\nStoke-on-trent ST3\nFreehold Retail Warehouse Investment\nGuide Price*\n£1.5M+\nCommercial LOT 35 - July 2026\nFEATURED LOT\nDeal CT14\nFreehold Care Home Investment\nGuide Price*\n£1.35M - £1.45M\nCommercial LOT 32 - July 2026\nFEATURED LOT\nBristol BS7\nVacant Freehold Development Opportunity\nGuide Price*\n£1.325M+\nOct 2026\nFEATURED LOT\nSheffield S10\nSubstantial Freehold Retail, Supermarket & Car Park Investment\nGuide Price*\n£5.8M\nOct 2026\nFEATURED LOT\nDarwen BB3\nNewly Constructed Freehold Post Office Distribution Centre Invest...\nGuide Price*\n£4M+\nCommercial LOT 32 - June 2026\nFEATURED LOT\nManchester M2\nFreehold Shop and Residential Investment\nGuide Price*\n£3.25M - £3.5M\nCommercial LOT 33 - March 2026\nFEATURED LOT\nLondon NW1\nWell Located Vacant Freehold Office with ",
+      "network": [
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/property-search?auction_id=eb91d024-f848-11f0-a7b9-0242ac110002&view=table",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 200,
+          "url": "https://fonts.googleapis.com/icon?family=Material+Icons",
+          "content_type": "text/css; charset=utf-8"
+        },
+        {
+          "status": 200,
+          "url": "https://cmp.inmobi.com/geoip",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://cmp.inmobi.com/GVL-v2/vendor-list-trimmed-v1.json",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/track",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/auth?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/routes?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://assets.allsop-cdn.co.uk/build/images/packages/platform/frontend/icons/icon-search-red-add9b69732.svg",
+          "content_type": "image/svg+xml"
+        },
+        {
+          "status": 200,
+          "url": "https://www.google.com/ccm/collect?rcb=18&frm=0&apvc=1&ae=g&auid=669203585.1788783598&dt=Property%20Search%20-%20Allsop%20LLP&en=page_view&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&scrsrc=www.googletagmanager.com&rnd=763162705.1788783598&navt=n&npa=0&us_privacy=1---&ep.ads_data_redaction=0&gtm=45He6921v897945802za200zd897945802xea&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938469~118897920~118897930~120385422~120469145~120469153&tft=1788783597766&tfd=741&fmt=8",
+          "content_type": ""
+        },
+        {
+          "status": 200,
+          "url": "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=1360234634&t=pageview&_s=1&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&dp=%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&ul=en-us&dt=Property%20Search%20-%20Allsop%20LLP&sr=1280x720&vp=1280x720&_u=YEBAAEABAAAAACgAI~&jid=1841804032&gjid=1476883643&cid=1265882664.1788783598&tid=UA-20615595-1&_gid=1854911552.1788783598&_r=1&_slc=1&gtm=45He6921n81TZ32GJSv897945802za200zd897945802&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938469~118897920~118897930~120385422~120469145~120469153&z=1445288759",
+          "content_type": "text/plain"
+        },
+        {
+          "status": 200,
+          "url": "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=1360234634&t=pageview&_s=1&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&dp=%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&ul=en-us&dt=Property%20Search%20-%20Allsop%20LLP&sr=1280x720&vp=1280x720&_u=YEDAAEABAAAAACgAIAC~&jid=896944035&gjid=1136814207&cid=1265882664.1788783598&tid=UA-21342729-4&_gid=1854911552.1788783598&_r=1&_slc=1&gtm=45He6921n81TZ32GJSv897945802za200zd897945802&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938469~118897920~118897930~120385422~120469145~120469153&z=1416905850",
+          "content_type": "text/plain"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/systemParameters/idle-timeout?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 302,
+          "url": "https://px.ads.linkedin.com/collect?v=2&fmt=js&pid=2897004&time=1788783597930&li_adsId=b5ef9be7-f766-49ab-8625-dc0a1c52369c&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable",
+          "content_type": ""
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/regions?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/auctions/eb91d024-f848-11f0-a7b9-0242ac110002?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/systemParameters/byline-highlight?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/sitemap?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/property-search?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/getallnavs?react",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 200,
+          "url": "https://px.ads.linkedin.com/attribution_trigger?pid=2897004&time=1788783597930&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable",
+          "content_type": "application/json"
+        },
+        {
+          "status": 204,
+          "url": "https://analytics.google.com/g/collect?v=2&tid=G-XCPHDZEZ3M&gtm=45je6921v897968400z8897945802za20gzb897945802zd897945802&_p=1788783597618&_gaz=1&gcd=13l3l3l3l1l1&npa=0&dma=0&tcfd=10000&ecid=1399267383&_eu=AAAAAGAC&are=1&cid=1265882664.1788783598&ec_mode=a&frm=0&pscdl=noapi&rcb=17&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253DA%253FBrand%3B99.0.0.0%7CHeadlessChrome%3B151.0.7922.34%7CChromium%3B151.0.7922.34&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&gaf=2&_s=1&tag_exp=115938466~115938469~118897920~118897930~120213116~120385423~120469145~120469153&sid=1788783597&sct=1&seg=0&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&dt=Property%20Search%20-%20Allsop%20LLP&en=page_view&_fv=1&_ss=1&tfd=985",
+          "content_type": "text/plain"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/auctions/currentskiplots?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/systemParameters/propertyTypeFilters?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/systemParameters/old-auction-day?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/search?auction_id=eb91d024-f848-11f0-a7b9-0242ac110002&view=table&react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 302,
+          "url": "https://px.ads.linkedin.com/collect?v=2&fmt=js&pid=2897004&time=1788783597930&li_adsId=b5ef9be7-f766-49ab-8625-dc0a1c52369c&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&cookiesTest=true",
+          "content_type": ""
+        },
+        {
+          "status": 200,
+          "url": "https://www.facebook.com/tr/?id=613932433534484&ev=PageView&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&rl=&if=false&ts=1788783598068&iw=false&sw=1280&sh=720&v=2.9.393&r=stable&ec=0&o=12318&aems=0%3B0&fbp=fb.2.1788783598058.97327445839195024&ler=empty&pmd[title]=Property%20Search%20-%20Allsop%20LLP&pmd[locale]=en&pmd[description]=&plt=596.2000000000044&iss=1&ss=%7B%22page_title%22%3A%5B%7B%22rid%22%3A%221616647646681256%22%2C%22v%22%3A%5B%22Commercial%20Auction%22%5D%7D%5D%7D&imft=1&tz=0&it=1788783597919&coo=false&exp=s0&expv2[0]=pl1&expv2[1]=el2&expv2[2]=bc1&expv2[3]=ra2&expv2[4]=rp2&expv2[5]=im1&expv2[6]=hf1&expv2[7]=sd1&expv2[8]=sp1&expv2[9]=ek1&expv2[10]=pc1&expv2[11]=gs1&expv2[12]=zs1&expv2[13]=cp1&expv2[14]=es1&expv2[15]=ac1&expv2[16]=so1&expv2[17]=wc1&expv2[18]=la1&expv2[19]=sf1&expv2[20]=da1&expv2[21]=io1&expv2[22]=ae1&expv2[23]=sx1&expv2[24]=if1&expv2[25]=fd1&expv2[26]=bg1&expv2[27]=mg1&expv2[28]=kl1&expv2[29]=sg1&expv2[30]=mk1&expv2[31]=sn1&expv2[32]=ec1&expv2[33]=mp1&expv2[34]=ps1&expv2[35]=fx1&expv2[36]=vt1&expv2[37]=ee1&rqm=GET",
+          "content_type": "text/plain"
+        },
+        {
+          "status": 302,
+          "url": "https://www.linkedin.com/px/li_sync?redirect=https%3A%2F%2Fpx.ads.linkedin.com%2Fcollect%3Fv%3D2%26fmt%3Djs%26pid%3D2897004%26time%3D1788783597930%26li_adsId%3Db5ef9be7-f766-49ab-8625-dc0a1c52369c%26url%3Dhttps%253A%252F%252Fwww.allsop.co.uk%252Fproperty-search%253Fauction_id%253Deb91d024-f848-11f0-a7b9-0242ac110002%2526view%253Dtable%26cookiesTest%3Dtrue%26liSync%3Dtrue",
+          "content_type": ""
+        },
+        {
+          "status": 204,
+          "url": "https://analytics.google.com/g/collect?v=2&tid=G-7BGSHL6GPK&gtm=45je6930h2v9136102514za20g&_p=1788783597618&_gaz=1&gcd=13l3l3l3l2l1&npa=0&dma=0&tcfd=10000&_eu=ABAIAGAC&_ng=1&are=1&cid=1265882664.1788783598&frm=0&pscdl=noapi&rcb=19&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253DA%253FBrand%3B99.0.0.0%7CHeadlessChrome%3B151.0.7922.34%7CChromium%3B151.0.7922.34&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&gaf=2&_s=1&tag_exp=115938466~115938468~118897920~118897930~120213116~120385423~120469145~120469153&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&dp=%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&dt=Property%20Search%20-%20Allsop%20LLP&sid=1788783598&sct=1&seg=0&en=page_view&_fv=1&_ss=1&_ee=1&gap.uat=115938466~115938469~118897920~118897930~120385422~120469145~120469153&tfd=1185",
+          "content_type": "text/plain"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/systemParameters/guide-price-disclaimer-text?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/property-search?&react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 204,
+          "url": "https://analytics.google.com/g/collect?v=2&tid=G-V30SE69E39&gtm=45je6921v9136080987za20g&_p=1788783597618&_gaz=1&gcd=13l3l3l3l2l1&npa=0&dma=0&tcfd=10000&_eu=ABAIAGAC&_ng=1&are=1&cid=1265882664.1788783598&frm=0&pscdl=noapi&rcb=1&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253DA%253FBrand%3B99.0.0.0%7CHeadlessChrome%3B151.0.7922.34%7CChromium%3B151.0.7922.34&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&gaf=2&_s=1&tag_exp=115616985~115938466~115938469~118012008~118897920~118897930~120213116~120385423~120469145~120469153~120914214&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&dp=%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&dt=Property%20Search%20-%20Allsop%20LLP&sid=1788783598&sct=1&seg=0&en=page_view&_fv=1&_ss=1&_ee=1&gap.uat=115938466~115938469~118897920~118897930~120385422~120469145~120469153&tfd=1264",
+          "content_type": "text/plain"
+        },
+        {
+          "status": 200,
+          "url": "https://www.allsop.co.uk/api/auctions/com_carousel?react",
+          "content_type": "application/json"
+        },
+        {
+          "status": 200,
+          "url": "https://px.ads.linkedin.com/collect?v=2&fmt=js&pid=2897004&time=1788783597930&li_adsId=b5ef9be7-f766-49ab-8625-dc0a1c52369c&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&cookiesTest=true&liSync=true",
+          "content_type": "application/javascript"
+        },
+        {
+          "status": 200,
+          "url": "https://www.google.com/ccm/collect?rcb=19&frm=0&apvc=0&ae=g&auid=669203585.1788783598&dt=Property%20Search%20-%20Allsop%20LLP&tid=AW-874341724&dl=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&scrsrc=www.googletagmanager.com&rnd=763162705.1788783598&navt=n&npa=0&us_privacy=1---&gpp=DBAA&_tu=CA&gtm=45be6921v887519854z8897945802za20gzb897945802zd897945802xea&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938469~118897920~118897930~120213116~120385423~120469145~120469153~120914213&tft=1788783598582&tfd=1557&tids=AW-874341724&fmt=8",
+          "content_type": ""
+        },
+        {
+          "status": 200,
+          "url": "https://www.google.com/rmkt/collect/874341724/?random=1788783598570&cv=11&fst=1788783598570&fmt=8&bg=ffffff&guid=ON&async=1&gtm=45be6921v887519854z8897945802za20gzb897945802zd897945802xea&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938469~118897920~118897930~120213116~120385423~120469145~120469153~120914213&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&rcb=19&frm=0&tiba=Property%20Search%20-%20Allsop%20LLP&hn=www.googleadservices.com&npa=0&us_privacy=1---&pscdl=noapi&auid=669203585.1788783598&uaa=x86&uab=64&uafvl=Not%253DA%253FBrand%3B99.0.0.0%7CHeadlessChrome%3B151.0.7922.34%7CChromium%3B151.0.7922.34&uamb=0&uam=&uap=Linux&uapv=&uaw=0&gpp=DBAA&_tu=CA&ept=68&gcp=5",
+          "content_type": ""
+        },
+        {
+          "status": 200,
+          "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/874341724/?random=1788783598570&cv=11&fst=1788783598570&bg=ffffff&guid=ON&async=1&gtm=45be6921v887519854z8897945802za20gzb897945802zd897945802xea&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938469~118897920~118897930~120213116~120385423~120469145~120469153~120914213&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&rcb=19&frm=0&tiba=Property%20Search%20-%20Allsop%20LLP&hn=www.googleadservices.com&npa=0&us_privacy=1---&pscdl=noapi&auid=669203585.1788783598&uaa=x86&uab=64&uafvl=Not%253DA%253FBrand%3B99.0.0.0%7CHeadlessChrome%3B151.0.7922.34%7CChromium%3B151.0.7922.34&uamb=0&uam=&uap=Linux&uapv=&uaw=0&gpp=DBAA&_tu=CA&ept=9&rfmt=3&fmt=4",
+          "content_type": "text/javascript; charset=UTF-8"
+        },
+        {
+          "status": 200,
+          "url": "https://www.google.com/pagead/1p-user-list/874341724/?random=1788783598570&cv=11&fst=1788782400000&bg=ffffff&guid=ON&async=1&gtm=45be6921v887519854z8897945802za20gzb897945802zd897945802xea&gcd=13l3l3l3l1l1&dma=0&tcfd=10000&tag_exp=115938466~115938469~118897920~118897930~120213116~120385423~120469145~120469153~120914213&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.allsop.co.uk%2Fproperty-search%3Fauction_id%3Deb91d024-f848-11f0-a7b9-0242ac110002%26view%3Dtable&rcb=19&frm=0&tiba=Property%20Search%20-%20Allsop%20LLP&hn=www.googleadservices.com&npa=0&us_privacy=1---&pscdl=noapi&auid=669203585.1788783598&uaa=x86&uab=64&uafvl=Not%253DA%253FBrand%3B99.0.0.0%7CHeadlessChrome%3B151.0.7922.34%7CChromium%3B151.0.7922.34&uamb=0&uam=&uap=Linux&uapv=&uaw=0&gpp=DBAA&_tu=CA&ept=9&rfmt=3&fmt=3&is_vtc=1&cid=CAQS0wEAQM4h3MI5wMGY5QINlTuC0E9O3aPDnBDfKvQalrTB2KzN38zw1OHk0Ib9QZicLPHGSDwpKTbdCJbIejRna4W9VKMaLAm8zPhW9kj7x2t01O8NX_-AHUjWXPym8deV54T6eQEItMStpqb0PYJ58IC3sJmPns383NqmB9VBzeCDNuM6bIhPPbDxQq9XMk-tCRkkyu1WeymYtvdCkRcQbprpgZTHltiujs5wnbvQRnRWYF2hVOFGCjHzZwEnv4rToughglW90bb56vsG8MmpzxWv-v60&random=2927076974&rmt_tld=0&ipr=y",
+          "content_type": "image/gif"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/38a2358c-70be-11f1-9164-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/483a554a-a77a-11f1-afd6-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/a58c5f0a-55df-11f1-a0aa-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/4246c750-5a8f-11f1-acdf-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/958f0cc8-1977-11f1-9f03-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/f2934a04-70a4-11f1-88a9-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/350795d0-7095-11f1-b89d-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/edaea3f6-a2c9-11f1-8b16-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/3433c07c-6fee-11f1-b3e7-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/ab1518f8-55ef-11f1-b3bf-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/dabc7e3c-55c4-11f1-ba4d-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/a47a57d4-3a7d-11f1-a92c-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/960624fc-55e0-11f1-8fbe-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/0319f458-3a73-11f1-a9cc-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/16fe1460-0d80-11f1-b0f1-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 302,
+          "url": "https://www.allsop.co.uk/api/image/ab9c0cbe-6edb-11f1-aedf-0242ac110002/600/450",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "status": 429,
+          "url": "https://o4509565244276736.ingest.de.sentry.io/api/4510001552293968/envelope/?sentry_version=7&sentry_key=c2d259d7d94438b405bca8d0b1d9e6bc&sentry_client=sentry.javascript.browser%2F10.73.0",
+          "content_type": "application/json"
+        },
+        {
+          "status": 429,
+          "url": "https://o4509565244276736.ingest.de.sentry.io/api/4510001552293968/envelope/?sentry_version=7&sentry_key=c2d259d7d94438b405bca8d0b1d9e6bc&sentry_client=sentry.javascript.browser%2F10.73.0",
+          "content_type": "application/json"
+        }
+      ]
+    }
+  ]
+}

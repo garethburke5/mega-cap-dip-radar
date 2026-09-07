@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-07T12:17:41.435624+00:00",
+  "updated_at": "2026-09-07T12:20:16.080339+00:00",
   "sources": {
     "Allsop Commercial": {
       "status": "RUNNING",
@@ -9,23 +9,23 @@
       "latest_month_seen": "2026-07",
       "auctions_completed": 0,
       "lots_captured": 0,
-      "last_run_started": "2026-09-07T12:17:29.276237+00:00",
+      "last_run_started": "2026-09-07T12:20:04.843333+00:00",
       "failures": [
         {
           "auction_id": "771b1f0e-119b-11f1-82cb-0242ac110002",
           "label": "July 2026",
           "error": "RuntimeError: No lot-overview links found after requests and browser rendering",
-          "at": "2026-09-07T12:17:35.528099+00:00"
+          "at": "2026-09-07T12:20:10.823779+00:00"
         },
         {
           "auction_id": "eb91d024-f848-11f0-a7b9-0242ac110002",
           "label": "June 2026",
           "error": "RuntimeError: No lot-overview links found after requests and browser rendering",
-          "at": "2026-09-07T12:17:41.435294+00:00"
+          "at": "2026-09-07T12:20:16.080077+00:00"
         }
       ],
       "remaining_auctions": 100,
-      "last_run_completed": "2026-09-07T12:17:41.435617+00:00"
+      "last_run_completed": "2026-09-07T12:20:16.080334+00:00"
     }
   }
 }
