@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -38,6 +39,12 @@ def num(v):
         return float(v) if v not in (None, '') else None
     except Exception:
         return None
+
+
+def lot_sort_value(value):
+    text = str(value or '').strip()
+    m = re.match(r'^(\d+(?:\.\d+)?)', text)
+    return float(m.group(1)) if m else -1.0
 
 
 def tenant_summary(raw):
@@ -235,7 +242,7 @@ def main(batch_size=2):
     progress['updated_at'] = now_iso()
     lot_db['schema_version'] = 2
     lot_db['generated_at'] = now_iso()
-    lot_db['lots'] = sorted(existing.values(), key=lambda x: (x.get('auction_month') or '', int(x.get('lot_number') or 0)), reverse=True)
+    lot_db['lots'] = sorted(existing.values(), key=lambda x: (x.get('auction_month') or '', lot_sort_value(x.get('lot_number'))), reverse=True)
     save(LOTS, lot_db)
     save(PROGRESS, progress)
     print(json.dumps({
