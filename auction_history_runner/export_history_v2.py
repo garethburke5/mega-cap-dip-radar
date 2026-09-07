@@ -11,6 +11,7 @@ SOURCE = OUT / 'allsop_lots.json'
 V2 = OUT / 'history_v2'
 EVENTS = V2 / 'allsop_events.json'
 INDEX = V2 / 'allsop_index.json'
+SUMMARY = V2 / 'summary.json'
 POSTCODE_RE = re.compile(r'\b([A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2})\b', re.I)
 
 
@@ -38,8 +39,6 @@ def norm_address(address):
 
 
 def building_tokens(address):
-    # Conservative: preserve numbered premises incl 33a. Range punctuation is lost in
-    # norm_address so both ends remain visible and can be treated as ambiguity by UI.
     return re.findall(r'\b\d+[a-z]?\b', norm_address(address))[:6]
 
 
@@ -135,12 +134,14 @@ def export():
                 'source': source,
             })
 
-    # Stable newest-first output keeps diffs deterministic.
     events.sort(key=lambda e: ((e.get('auction_date') or ''), e.get('source_id') or ''), reverse=True)
     for rows in by_postcode.values():
         rows.sort(key=lambda r: (r.get('auction_date') or '', r.get('event_id') or ''), reverse=True)
 
     generated = now_iso()
+    sale_count = sum(1 for e in events if e.get('sale_price') is not None)
+    evidence_count = sum(1 for e in events if (e.get('evidence') or {}).get('listing_url'))
+    unique_event_ids = len({e['event_id'] for e in events})
     V2.mkdir(parents=True, exist_ok=True)
     EVENTS.write_text(json.dumps({
         'schema_version': 2,
@@ -160,14 +161,23 @@ def export():
         'event_count': len(events),
         'by_postcode': by_postcode,
     }, separators=(',', ':'), ensure_ascii=False), encoding='utf-8')
-    print(json.dumps({
+    summary = {
+        'schema_version': 2,
+        'generated_at': generated,
+        'source': 'Allsop Commercial',
         'source_rows': len(lots),
         'accepted_events': len(events),
+        'unique_event_ids': unique_event_ids,
         'rejected': len(rejected),
-        'postcodes': len(by_postcode),
-        'events_path': str(EVENTS),
-        'index_path': str(INDEX),
-    }, indent=2))
+        'postcodes_indexed': len(by_postcode),
+        'events_with_sale_price': sale_count,
+        'events_with_listing_evidence': evidence_count,
+        'source_rows_accounted_for': len(events) + len(rejected),
+        'idempotency_ok': unique_event_ids == len(events),
+        'evidence_coverage_pct': round((evidence_count / len(events) * 100.0), 2) if events else 0.0,
+    }
+    SUMMARY.write_text(json.dumps(summary, indent=2), encoding='utf-8')
+    print(json.dumps(summary, indent=2))
 
 
 if __name__ == '__main__':
