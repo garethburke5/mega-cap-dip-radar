@@ -34,8 +34,8 @@ jobs:
       - name: Install lightweight crawler dependencies
         run: pip install requests
 
-      - name: Backfill next ten Allsop historical auctions from JSON API
-        run: python -c "from auction_history_runner.backfill_allsop_api import main; main(10)"
+      - name: Backfill next twenty Allsop historical auctions from JSON API
+        run: python -c "from auction_history_runner.backfill_allsop_api import main; main(20)"
 
       - name: Publish history records and telemetry to isolated branch
         if: always()
