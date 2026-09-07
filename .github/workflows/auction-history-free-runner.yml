@@ -37,8 +37,8 @@ jobs:
       - name: Refresh Allsop historical auction discovery
         run: python auction_history_runner/discover_allsop.py
 
-      - name: Backfill Allsop history from JSON API
-        run: python auction_history_runner/backfill_allsop_api.py
+      - name: Backfill next ten Allsop historical auctions from JSON API
+        run: python -c "from auction_history_runner.backfill_allsop_api import main; main(10)"
 
       - name: Publish history records and telemetry to isolated branch
         if: always()
