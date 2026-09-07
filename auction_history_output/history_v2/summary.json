@@ -1,0 +1,15 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-09-07T15:38:00.924120+00:00",
+  "source": "Allsop Commercial",
+  "source_rows": 13792,
+  "accepted_events": 13792,
+  "unique_event_ids": 13792,
+  "rejected": 0,
+  "postcodes_indexed": 9562,
+  "events_with_sale_price": 7221,
+  "events_with_listing_evidence": 13792,
+  "source_rows_accounted_for": 13792,
+  "idempotency_ok": true,
+  "evidence_coverage_pct": 100.0
+}
