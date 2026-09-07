@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-07T13:30:09.947081+00:00",
+  "updated_at": "2026-09-07T13:52:30.633680+00:00",
   "sources": {
     "Allsop Commercial": {
-      "status": "RUNNING",
+      "status": "CAUGHT UP",
       "auctions_discovered": 100,
-      "earliest_month_reached": "2015-05",
+      "earliest_month_reached": "2012-02",
       "latest_month_seen": "2026-07",
       "failures": [],
-      "auctions_completed": 80,
-      "lots_captured": 10755,
-      "last_run_started": "2026-09-07T13:29:01.730201+00:00",
+      "auctions_completed": 100,
+      "lots_captured": 13792,
+      "last_run_started": "2026-09-07T13:51:34.981648+00:00",
       "ingestion_method": "Allsop /api/search JSON",
       "completed_auction_ids": [
         "01b61362-e952-11ef-b1ea-0242ac110002",
@@ -38,15 +38,35 @@
         "46246f41-3c3a-e711-80f9-005056a414c9",
         "4c5d617a-7117-11f0-bb92-0242ac110002",
         "52745b0a-0236-11ea-ad5a-0242ac110002",
+        "5546f423-9ac0-e611-80ef-005056a414c9",
         "5673efd4-c355-11ed-846c-0242ac110002",
+        "5946f423-9ac0-e611-80ef-005056a414c9",
+        "5c46f423-9ac0-e611-80ef-005056a414c9",
         "5cbf8486-2e5e-11eb-b4cf-0242ac110002",
+        "5f46f423-9ac0-e611-80ef-005056a414c9",
         "604e1f02-e6da-11ea-8e80-0242ac110002",
+        "6246f423-9ac0-e611-80ef-005056a414c9",
+        "6646f423-9ac0-e611-80ef-005056a414c9",
+        "6846f423-9ac0-e611-80ef-005056a414c9",
+        "6946f423-9ac0-e611-80ef-005056a414c9",
+        "6e46f423-9ac0-e611-80ef-005056a414c9",
         "70233bd0-1327-11ed-9f65-0242ac110002",
+        "7146f423-9ac0-e611-80ef-005056a414c9",
+        "7546f423-9ac0-e611-80ef-005056a414c9",
         "771b1f0e-119b-11f1-82cb-0242ac110002",
+        "7746f423-9ac0-e611-80ef-005056a414c9",
         "78d79e86-60f8-11e9-affb-0242ac110002",
+        "7946f423-9ac0-e611-80ef-005056a414c9",
+        "7a46f423-9ac0-e611-80ef-005056a414c9",
+        "7c46f423-9ac0-e611-80ef-005056a414c9",
+        "8046f423-9ac0-e611-80ef-005056a414c9",
+        "8146f423-9ac0-e611-80ef-005056a414c9",
         "82e225de-8188-11ef-8bc5-0242ac110002",
+        "8446f423-9ac0-e611-80ef-005056a414c9",
         "851aa14c-24d5-e711-8102-005056a414c9",
         "85962144-2e5e-11eb-8610-0242ac110002",
+        "8646f423-9ac0-e611-80ef-005056a414c9",
+        "8846f423-9ac0-e611-80ef-005056a414c9",
         "88b75cc4-e6da-11ea-a604-0242ac110002",
         "8a46f423-9ac0-e611-80ef-005056a414c9",
         "8b6e0cc0-0237-11ea-aae7-0242ac110002",
@@ -94,12 +114,12 @@
         "f5af66e0-04bc-11ec-95fd-0242ac110002",
         "fc2df3b8-69a3-11ed-b23b-0242ac110002"
       ],
-      "last_success": "2026-09-07T13:30:09.947037+00:00",
+      "last_success": "2026-09-07T13:52:30.633638+00:00",
       "last_auction": {
-        "auction_id": "8a46f423-9ac0-e611-80ef-005056a414c9",
-        "label": "May 2015",
-        "rows_captured": 166,
-        "total_hint": 166,
+        "auction_id": "5546f423-9ac0-e611-80ef-005056a414c9",
+        "label": "February 2012",
+        "rows_captured": 108,
+        "total_hint": 108,
         "page_shapes": [
           {
             "page": 1,
@@ -108,9 +128,9 @@
               "results",
               "total"
             ],
-            "first_id": "3e175217-c832-e911-8121-005056a414c9",
-            "last_id": "c2721647-c832-e911-8121-005056a414c9",
-            "total_hint": 166
+            "first_id": "c9db78f9-c732-e911-8121-005056a414c9",
+            "last_id": "e6d75911-c832-e911-8121-005056a414c9",
+            "total_hint": 108
           },
           {
             "page": 2,
@@ -119,9 +139,9 @@
               "results",
               "total"
             ],
-            "first_id": "a3aa4ee8-c832-e911-8121-005056a414c9",
-            "last_id": "2517ceb7-c732-e911-8121-005056a414c9",
-            "total_hint": 166
+            "first_id": "320cdee0-c632-e911-8121-005056a414c9",
+            "last_id": "e152e770-c832-e911-8121-005056a414c9",
+            "total_hint": 108
           },
           {
             "page": 3,
@@ -130,9 +150,9 @@
               "results",
               "total"
             ],
-            "first_id": "9f14ef6a-c832-e911-8121-005056a414c9",
-            "last_id": "de18afcf-c732-e911-8121-005056a414c9",
-            "total_hint": 166
+            "first_id": "d252e770-c832-e911-8121-005056a414c9",
+            "last_id": "3011d082-c832-e911-8121-005056a414c9",
+            "total_hint": 108
           },
           {
             "page": 4,
@@ -141,9 +161,9 @@
               "results",
               "total"
             ],
-            "first_id": "cb59c6bd-c732-e911-8121-005056a414c9",
-            "last_id": "255a88ed-c732-e911-8121-005056a414c9",
-            "total_hint": 166
+            "first_id": "4c5ac6bd-c732-e911-8121-005056a414c9",
+            "last_id": "dccc99ac-c832-e911-8121-005056a414c9",
+            "total_hint": 108
           },
           {
             "page": 5,
@@ -152,58 +172,25 @@
               "results",
               "total"
             ],
-            "first_id": "c843574c-c732-e911-8121-005056a414c9",
-            "last_id": "6c4b6bd0-c832-e911-8121-005056a414c9",
-            "total_hint": 166
+            "first_id": "d1db78f9-c732-e911-8121-005056a414c9",
+            "last_id": "e7596905-c832-e911-8121-005056a414c9",
+            "total_hint": 108
           },
           {
             "page": 6,
-            "rows": 20,
+            "rows": 8,
             "data_keys": [
               "results",
               "total"
             ],
-            "first_id": "eb057e2e-c732-e911-8121-005056a414c9",
-            "last_id": "cf12afcf-c732-e911-8121-005056a414c9",
-            "total_hint": 166
-          },
-          {
-            "page": 7,
-            "rows": 20,
-            "data_keys": [
-              "results",
-              "total"
-            ],
-            "first_id": "f0aeb9fe-c632-e911-8121-005056a414c9",
-            "last_id": "88964223-c832-e911-8121-005056a414c9",
-            "total_hint": 166
-          },
-          {
-            "page": 8,
-            "rows": 20,
-            "data_keys": [
-              "results",
-              "total"
-            ],
-            "first_id": "a49ffc93-c732-e911-8121-005056a414c9",
-            "last_id": "8e7b1182-c732-e911-8121-005056a414c9",
-            "total_hint": 166
-          },
-          {
-            "page": 9,
-            "rows": 6,
-            "data_keys": [
-              "results",
-              "total"
-            ],
-            "first_id": "e418afcf-c732-e911-8121-005056a414c9",
-            "last_id": "199dfc93-c732-e911-8121-005056a414c9",
-            "total_hint": 166
+            "first_id": "820bdee0-c632-e911-8121-005056a414c9",
+            "last_id": "d28982be-c832-e911-8121-005056a414c9",
+            "total_hint": 108
           }
         ]
       },
-      "remaining_auctions": 20,
-      "last_run_completed": "2026-09-07T13:30:09.947079+00:00"
+      "remaining_auctions": 0,
+      "last_run_completed": "2026-09-07T13:52:30.633677+00:00"
     }
   }
 }
