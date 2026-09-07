@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: auction-history-free-runner
+  cancel-in-progress: false
+
 jobs:
   run-isolated-auction-history:
     runs-on: ubuntu-latest
@@ -47,6 +51,5 @@ jobs:
           git add auction_history_output/allsop_discovery.json auction_history_output/progress.json auction_history_output/allsop_lots.json || true
           if ! git diff --cached --quiet; then
             git commit -m 'Backfill Allsop public auction history'
-            git pull --rebase origin auction-history-runner
             git push origin HEAD:auction-history-runner
           fi
