@@ -32,10 +32,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install lightweight crawler dependencies
-        run: pip install requests beautifulsoup4
-
-      - name: Refresh Allsop historical auction discovery
-        run: python auction_history_runner/discover_allsop.py
+        run: pip install requests
 
       - name: Backfill next ten Allsop historical auctions from JSON API
         run: python -c "from auction_history_runner.backfill_allsop_api import main; main(10)"
@@ -45,7 +42,7 @@ jobs:
         run: |
           git config user.name 'Auction History Free Runner'
           git config user.email 'actions@users.noreply.github.com'
-          git add auction_history_output/allsop_discovery.json auction_history_output/progress.json auction_history_output/allsop_lots.json || true
+          git add auction_history_output/progress.json auction_history_output/allsop_lots.json || true
           if ! git diff --cached --quiet; then
             git commit -m 'Backfill Allsop historical lots via public API'
             git push origin HEAD:auction-history-runner
