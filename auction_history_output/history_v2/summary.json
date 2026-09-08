@@ -1,22 +1,22 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-09-08T18:42:32.692207+00:00",
+  "generated_at": "2026-09-08T19:20:20.139843+00:00",
   "sources": {
     "Allsop Commercial": 13792,
-    "Savills": 2766
+    "Savills": 2813
   },
   "events_by_source": {
-    "Savills": 2766,
+    "Savills": 2813,
     "Allsop Commercial": 13792
   },
-  "source_rows": 16558,
-  "accepted_events": 16558,
-  "unique_event_ids": 16558,
+  "source_rows": 16605,
+  "accepted_events": 16605,
+  "unique_event_ids": 16605,
   "rejected": 0,
-  "postcodes_indexed": 10840,
-  "events_with_sale_price": 8313,
-  "events_with_listing_evidence": 16558,
-  "source_rows_accounted_for": 16558,
+  "postcodes_indexed": 10868,
+  "events_with_sale_price": 8335,
+  "events_with_listing_evidence": 16605,
+  "source_rows_accounted_for": 16605,
   "idempotency_ok": true,
   "evidence_coverage_pct": 100.0
 }
