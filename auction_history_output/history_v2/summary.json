@@ -1,9 +1,10 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-09-08T21:17:18.135924+00:00",
+  "generated_at": "2026-09-08T21:50:28.363400+00:00",
   "sources": {
     "Allsop Commercial": 13792,
-    "Savills": 3091
+    "Savills": 3091,
+    "Strettons": 0
   },
   "events_by_source": {
     "Savills": 3091,
