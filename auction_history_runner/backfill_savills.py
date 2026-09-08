@@ -17,8 +17,9 @@ PROGRESS_FILE = OUT / 'progress.json'
 UA = {'User-Agent': 'AuctionSniper-History/2.0 (+public historical research)'}
 POSTCODE = re.compile(r'\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b', re.I)
 EVENT_PATH = re.compile(r'^/auctions/[^/?#]+-\d+/?$')
-PAGE_PATH = re.compile(r'/page-(\d+)/?$')
+PAGE_PATH = re.compile(r'/page-(\d+)(?:/|$)')
 LOT_PATH = re.compile(r'^/auctions/[^/]+-\d+/[^/?#]+-\d+/?$')
+COMMERCIAL_TYPE = '253'
 
 
 def now_iso():
@@ -117,6 +118,13 @@ def discover_events():
     return rows
 
 
+def commercial_catalogue_url(event_url, page=1):
+    # Savills' default catalogue can be hydrated client-side for non-browser HTTP
+    # clients. The explicit commercial filter + quantity route is server-rendered
+    # and contains the exact lot anchors/results required by the history runner.
+    return event_url.rstrip('/') + f'/page-{page}/quantity-100/property_type-{COMMERCIAL_TYPE}/sort-by-0'
+
+
 def max_pages(html):
     soup = BeautifulSoup(html, 'html.parser')
     pages = [1]
@@ -148,17 +156,19 @@ def parse_status(block):
 def parse_page(event, page_url, html):
     soup = BeautifulSoup(html, 'html.parser')
     rows, seen = [], set()
+    event_prefix = urlparse(event['url']).path.rstrip('/') + '/'
     for a in soup.find_all('a', href=True):
         href = a.get('href') or ''
-        if not LOT_PATH.match(path_of(href)):
+        path = path_of(href)
+        if not path.startswith(event_prefix) or not LOT_PATH.match(path):
             continue
         full = urljoin(BASE, href)
         if full in seen:
             continue
-        seen.add(full)
         address = clean(a.get_text(' ', strip=True))
         if len(address) < 5 or not POSTCODE.search(address):
             continue
+        seen.add(full)
         block_node = nearest_lot_block(a)
         block = clean(block_node.get_text(' ', strip=True))
         lm = re.search(r'\bLot\s+([\w.-]+)\b', block, re.I)
@@ -177,7 +187,7 @@ def parse_page(event, page_url, html):
             available = float(am.group(1).replace(',', ''))
         rent = None
         for pat in (
-            r'(?:producing|rent(?:al)?(?: income)?|let at)[^£]{0,40}£\s*([\d,]+(?:\.\d+)?)\s*(?:p\.?a\.?|per annum|pa)',
+            r'(?:producing|rent(?:al)?(?: income)?|let at|investment let at)[^£]{0,60}£\s*([\d,]+(?:\.\d+)?)\s*(?:p\.?a\.?|per annum|pa)',
             r'£\s*([\d,]+(?:\.\d+)?)\s*(?:p\.?a\.?|per annum|pa)',
         ):
             rm = re.search(pat, block, re.I)
@@ -189,7 +199,7 @@ def parse_page(event, page_url, html):
             tenure = 'Freehold'
         elif re.search(r'\b(?:long\s+)?leasehold\b|\byear lease\b', block, re.I):
             tenure = 'Leasehold'
-        sid = re.search(r'-(\d+)/?$', path_of(full))
+        sid = re.search(r'-(\d+)/?$', path)
         rows.append({
             'source': 'Savills',
             'source_id': sid.group(1) if sid else full.rstrip('/').rsplit('/', 1)[-1],
@@ -214,18 +224,25 @@ def parse_page(event, page_url, html):
 
 
 def crawl_event(event):
-    first_html = get(event['url'])
+    first_url = commercial_catalogue_url(event['url'], 1)
+    first_html = get(first_url)
     pages = max_pages(first_html)
     collected, page_shapes = [], []
     for page in range(1, pages + 1):
-        url = event['url'] if page == 1 else event['url'].rstrip('/') + f'/page-{page}'
+        url = commercial_catalogue_url(event['url'], page)
         html = first_html if page == 1 else get(url)
         rows = parse_page(event, url, html)
         collected.extend(rows)
-        page_shapes.append({'page': page, 'rows': len(rows)})
+        page_shapes.append({'page': page, 'rows': len(rows), 'url': url})
     dedup = {row['source_id']: row for row in collected}
     rows = list(dedup.values())
-    return rows, {'pages': pages, 'page_shapes': page_shapes, 'unique_rows': len(rows), 'offered_hint': event.get('offered_hint')}
+    return rows, {
+        'pages': pages,
+        'page_shapes': page_shapes,
+        'unique_rows': len(rows),
+        'offered_hint': event.get('offered_hint'),
+        'catalogue_filter': f'property_type-{COMMERCIAL_TYPE}',
+    }
 
 
 def merge_global_progress(source_progress):
@@ -258,7 +275,7 @@ def main(batch_size=4):
         try:
             rows, evidence = crawl_event(event)
             if not rows:
-                raise RuntimeError('no property rows captured after exhausting paginator')
+                raise RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')
             for row in rows:
                 existing[str(row['source_id'])] = row
             completed.add(str(event['auction_id']))
@@ -289,11 +306,11 @@ def main(batch_size=4):
         'remaining_auctions': remaining,
         'completed_auction_ids': sorted(completed),
         'failures': failures[-50:],
-        'ingestion_method': 'Savills past-auction HTML catalogue pages',
+        'ingestion_method': f'Savills server-rendered commercial catalogue filter property_type-{COMMERCIAL_TYPE}',
         'last_auction': last_auction,
         'last_success': now_iso() if processed else old.get('last_success'),
         'last_run_completed': now_iso(),
-        'evidence_policy': 'lot URL + auction page + exact catalogue result page',
+        'evidence_policy': 'exact lot URL + auction page + exact filtered commercial catalogue result page',
     }
     merge_global_progress(source_progress)
     print(json.dumps({k: source_progress[k] for k in ('status','auctions_discovered','auctions_completed','lots_captured','remaining_auctions')}, indent=2))
