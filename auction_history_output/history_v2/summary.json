@@ -1,10 +1,11 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-09-08T21:56:15.667443+00:00",
+  "generated_at": "2026-09-08T23:27:35.269158+00:00",
   "sources": {
     "Allsop Commercial": 13792,
     "Savills": 3091,
-    "Strettons": 0
+    "Strettons": 0,
+    "Auction House Shared Platform": 0
   },
   "events_by_source": {
     "Savills": 3091,
