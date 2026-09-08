@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-08T21:53:47.941842+00:00",
+  "updated_at": "2026-09-08T21:56:10.588477+00:00",
   "sources": {
     "Allsop Commercial": {
       "status": "CAUGHT UP",
@@ -10,7 +10,7 @@
       "failures": [],
       "auctions_completed": 100,
       "lots_captured": 13792,
-      "last_run_started": "2026-09-08T21:53:37.930614+00:00",
+      "last_run_started": "2026-09-08T21:55:49.910738+00:00",
       "ingestion_method": "Allsop /api/search JSON",
       "completed_auction_ids": [
         "01b61362-e952-11ef-b1ea-0242ac110002",
@@ -190,7 +190,7 @@
         ]
       },
       "remaining_auctions": 0,
-      "last_run_completed": "2026-09-08T21:53:37.930674+00:00"
+      "last_run_completed": "2026-09-08T21:55:49.910802+00:00"
     },
     "Savills": {
       "status": "CAUGHT_UP",
@@ -378,7 +378,7 @@
         "legacy_fallback": "unfiltered server-rendered pages + strict commercial markers"
       },
       "last_success": "2026-09-08T21:17:12.996824+00:00",
-      "last_run_completed": "2026-09-08T21:53:45.987803+00:00",
+      "last_run_completed": "2026-09-08T21:56:01.991687+00:00",
       "evidence_policy": "exact lot URL + auction page + exact filtered commercial catalogue result page"
     },
     "Strettons": {
@@ -408,6 +408,12 @@
           "url": "https://www.strettons.co.uk/auctions/past-auctions/",
           "error": "archive discovery returned zero past-auction events",
           "at": "2026-09-08T21:53:47.941528+00:00"
+        },
+        {
+          "auction_id": null,
+          "url": "https://www.strettons.co.uk/auctions/past-auctions/",
+          "error": "archive discovery returned zero past-auction events",
+          "at": "2026-09-08T21:56:10.588134+00:00"
         }
       ],
       "discovery": {
@@ -422,16 +428,16 @@
           {
             "auction_id": null,
             "url": "https://residential.strettons.co.uk/auctions/past-auctions/",
-            "error": "ConnectionError(MaxRetryError('HTTPSConnectionPool(host=\\'residential.strettons.co.uk\\', port=443): Max retries exceeded with url: /auctions/past-auctions/ (Caused by NameResolutionError(\"HTTPSConnection(host=\\'residential.strettons.co.uk\\', port=443): Failed to resolve \\'residential.strettons.co.uk\\' ([Errno -2] Name or service not known)\"))'))"
+            "error": "Error('Page.goto: net::ERR_NAME_NOT_RESOLVED at https://residential.strettons.co.uk/auctions/past-auctions/\\nCall log:\\n  - navigating to \"https://residential.strettons.co.uk/auctions/past-auctions/\", waiting until \"domcontentloaded\"\\n')"
           }
         ],
-        "strategy": "dual-host raw HTML extraction + validated indexed result-page anchors"
+        "strategy": "plain HTTP where complete; Playwright render fallback; validated result-page bootstrap"
       },
       "ingestion_method": "Strettons server-rendered past-auction detail pages",
       "evidence_policy": "exact Strettons lot URL where available + exact past-auction result page",
       "last_auction": null,
       "last_success": null,
-      "last_run_completed": "2026-09-08T21:53:47.941727+00:00"
+      "last_run_completed": "2026-09-08T21:56:10.588364+00:00"
     }
   }
 }
