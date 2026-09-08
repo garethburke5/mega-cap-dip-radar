@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-08T20:41:02.643823+00:00",
+  "updated_at": "2026-09-08T21:17:12.997076+00:00",
   "sources": {
     "Allsop Commercial": {
       "status": "CAUGHT UP",
@@ -10,7 +10,7 @@
       "failures": [],
       "auctions_completed": 100,
       "lots_captured": 13792,
-      "last_run_started": "2026-09-08T20:40:36.632039+00:00",
+      "last_run_started": "2026-09-08T21:13:32.623681+00:00",
       "ingestion_method": "Allsop /api/search JSON",
       "completed_auction_ids": [
         "01b61362-e952-11ef-b1ea-0242ac110002",
@@ -190,18 +190,19 @@
         ]
       },
       "remaining_auctions": 0,
-      "last_run_completed": "2026-09-08T20:40:36.632101+00:00"
+      "last_run_completed": "2026-09-08T21:13:32.623745+00:00"
     },
     "Savills": {
-      "status": "BACKFILLING",
+      "status": "CAUGHT_UP",
       "auctions_discovered": 95,
-      "auctions_completed": 83,
-      "lots_captured": 2813,
-      "earliest_month_reached": "2020-09",
+      "auctions_completed": 95,
+      "lots_captured": 3091,
+      "earliest_month_reached": "2019-12",
       "latest_month_seen": "2026-09",
-      "remaining_auctions": 12,
+      "remaining_auctions": 0,
       "completed_auction_ids": [
         "10",
+        "102",
         "11",
         "111",
         "112",
@@ -269,12 +270,23 @@
         "227",
         "240",
         "241",
+        "3",
+        "5",
+        "6",
+        "66",
+        "7",
+        "71",
         "72",
+        "73",
+        "74",
         "75",
         "76",
+        "77",
         "78",
         "79",
+        "8",
         "85",
+        "9",
         "90",
         "91",
         "92",
@@ -285,179 +297,90 @@
         "97",
         "98"
       ],
-      "failures": [
-        {
-          "auction_id": "102",
-          "url": "https://auctions.savills.co.uk/auctions/december-2022-102",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T18:42:24.747392+00:00"
-        },
-        {
-          "auction_id": "102",
-          "url": "https://auctions.savills.co.uk/auctions/december-2022-102",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T19:19:51.954745+00:00"
-        },
-        {
-          "auction_id": "77",
-          "url": "https://auctions.savills.co.uk/auctions/october-2021-77",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T19:20:01.105201+00:00"
-        },
-        {
-          "auction_id": "74",
-          "url": "https://auctions.savills.co.uk/auctions/june-2021-74",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T19:20:05.187910+00:00"
-        },
-        {
-          "auction_id": "73",
-          "url": "https://auctions.savills.co.uk/auctions/april-2021-73",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T19:20:06.292350+00:00"
-        },
-        {
-          "auction_id": "71",
-          "url": "https://auctions.savills.co.uk/auctions/february-2021-71",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T19:20:07.692076+00:00"
-        },
-        {
-          "auction_id": "66",
-          "url": "https://auctions.savills.co.uk/auctions/august-2020-66",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T19:20:11.157947+00:00"
-        },
-        {
-          "auction_id": "9",
-          "url": "https://auctions.savills.co.uk/auctions/july-2020-9",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T19:20:11.850600+00:00"
-        },
-        {
-          "auction_id": "8",
-          "url": "https://auctions.savills.co.uk/auctions/june-2020-8",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T19:20:12.491963+00:00"
-        },
-        {
-          "auction_id": "7",
-          "url": "https://auctions.savills.co.uk/auctions/may-2020-7",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T19:20:13.044838+00:00"
-        },
-        {
-          "auction_id": "6",
-          "url": "https://auctions.savills.co.uk/auctions/march-2020-6",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T19:20:13.660051+00:00"
-        },
-        {
-          "auction_id": "5",
-          "url": "https://auctions.savills.co.uk/auctions/february-2020-5",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T19:20:14.388856+00:00"
-        },
-        {
-          "auction_id": "3",
-          "url": "https://auctions.savills.co.uk/auctions/december-2019-3",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T19:20:14.969701+00:00"
-        },
-        {
-          "auction_id": "102",
-          "url": "https://auctions.savills.co.uk/auctions/december-2022-102",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T20:40:49.753058+00:00"
-        },
-        {
-          "auction_id": "77",
-          "url": "https://auctions.savills.co.uk/auctions/october-2021-77",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T20:40:50.870578+00:00"
-        },
-        {
-          "auction_id": "74",
-          "url": "https://auctions.savills.co.uk/auctions/june-2021-74",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T20:40:54.084089+00:00"
-        },
-        {
-          "auction_id": "73",
-          "url": "https://auctions.savills.co.uk/auctions/april-2021-73",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T20:40:55.240285+00:00"
-        },
-        {
-          "auction_id": "71",
-          "url": "https://auctions.savills.co.uk/auctions/february-2021-71",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T20:40:56.211272+00:00"
-        },
-        {
-          "auction_id": "66",
-          "url": "https://auctions.savills.co.uk/auctions/august-2020-66",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T20:40:56.993468+00:00"
-        },
-        {
-          "auction_id": "9",
-          "url": "https://auctions.savills.co.uk/auctions/july-2020-9",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T20:40:58.126078+00:00"
-        },
-        {
-          "auction_id": "8",
-          "url": "https://auctions.savills.co.uk/auctions/june-2020-8",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T20:40:58.948406+00:00"
-        },
-        {
-          "auction_id": "7",
-          "url": "https://auctions.savills.co.uk/auctions/may-2020-7",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T20:40:59.875000+00:00"
-        },
-        {
-          "auction_id": "6",
-          "url": "https://auctions.savills.co.uk/auctions/march-2020-6",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T20:41:00.696383+00:00"
-        },
-        {
-          "auction_id": "5",
-          "url": "https://auctions.savills.co.uk/auctions/february-2020-5",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T20:41:01.745523+00:00"
-        },
-        {
-          "auction_id": "3",
-          "url": "https://auctions.savills.co.uk/auctions/december-2019-3",
-          "error": "RuntimeError('no commercial property rows captured from explicit Savills commercial catalogue route')",
-          "at": "2026-09-08T20:41:02.593279+00:00"
-        }
-      ],
+      "failures": [],
       "ingestion_method": "Savills server-rendered commercial catalogue filter property_type-253",
       "last_auction": {
-        "auction_id": "10",
-        "label": "September 2020",
-        "url": "https://auctions.savills.co.uk/auctions/september-2020-10",
-        "auction_date": "2020-09-24",
+        "auction_id": "3",
+        "label": "December 2019",
+        "url": "https://auctions.savills.co.uk/auctions/december-2019-3",
+        "auction_date": "2019-12-16",
         "offered_hint": null,
-        "pages": 1,
+        "pages": 11,
         "page_shapes": [
           {
             "page": 1,
-            "rows": 9,
-            "url": "https://auctions.savills.co.uk/auctions/september-2020-10/page-1/quantity-100/property_type-253/sort-by-0"
+            "rows_seen": 10,
+            "commercial_rows": 1,
+            "url": "https://auctions.savills.co.uk/auctions/december-2019-3"
+          },
+          {
+            "page": 2,
+            "rows_seen": 10,
+            "commercial_rows": 0,
+            "url": "https://auctions.savills.co.uk/auctions/december-2019-3/page-2"
+          },
+          {
+            "page": 3,
+            "rows_seen": 10,
+            "commercial_rows": 0,
+            "url": "https://auctions.savills.co.uk/auctions/december-2019-3/page-3"
+          },
+          {
+            "page": 4,
+            "rows_seen": 10,
+            "commercial_rows": 0,
+            "url": "https://auctions.savills.co.uk/auctions/december-2019-3/page-4"
+          },
+          {
+            "page": 5,
+            "rows_seen": 10,
+            "commercial_rows": 1,
+            "url": "https://auctions.savills.co.uk/auctions/december-2019-3/page-5"
+          },
+          {
+            "page": 6,
+            "rows_seen": 10,
+            "commercial_rows": 0,
+            "url": "https://auctions.savills.co.uk/auctions/december-2019-3/page-6"
+          },
+          {
+            "page": 7,
+            "rows_seen": 10,
+            "commercial_rows": 0,
+            "url": "https://auctions.savills.co.uk/auctions/december-2019-3/page-7"
+          },
+          {
+            "page": 8,
+            "rows_seen": 10,
+            "commercial_rows": 1,
+            "url": "https://auctions.savills.co.uk/auctions/december-2019-3/page-8"
+          },
+          {
+            "page": 9,
+            "rows_seen": 10,
+            "commercial_rows": 0,
+            "url": "https://auctions.savills.co.uk/auctions/december-2019-3/page-9"
+          },
+          {
+            "page": 10,
+            "rows_seen": 10,
+            "commercial_rows": 0,
+            "url": "https://auctions.savills.co.uk/auctions/december-2019-3/page-10"
+          },
+          {
+            "page": 11,
+            "rows_seen": 10,
+            "commercial_rows": 0,
+            "url": "https://auctions.savills.co.uk/auctions/december-2019-3/page-11"
           }
         ],
-        "unique_rows": 9,
-        "catalogue_filter": "property_type-253"
+        "unique_rows": 3,
+        "legacy_fallback": "unfiltered server-rendered pages + strict commercial markers"
       },
-      "last_success": "2026-09-08T19:20:15.004187+00:00",
-      "last_run_completed": "2026-09-08T20:41:02.643680+00:00",
-      "evidence_policy": "exact lot URL + auction page + exact filtered commercial catalogue result page"
+      "last_success": "2026-09-08T21:17:12.996824+00:00",
+      "last_run_completed": "2026-09-08T21:17:12.996840+00:00",
+      "evidence_policy": "exact lot URL + auction page + exact filtered commercial catalogue result page",
+      "legacy_fallback_policy": "Only failed events; unfiltered exact auction pages; strict commercial evidence required"
     }
   }
 }
