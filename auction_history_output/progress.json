@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-08T21:50:23.189162+00:00",
+  "updated_at": "2026-09-08T21:51:08.226628+00:00",
   "sources": {
     "Allsop Commercial": {
       "status": "CAUGHT UP",
@@ -10,7 +10,7 @@
       "failures": [],
       "auctions_completed": 100,
       "lots_captured": 13792,
-      "last_run_started": "2026-09-08T21:50:13.065413+00:00",
+      "last_run_started": "2026-09-08T21:50:58.793272+00:00",
       "ingestion_method": "Allsop /api/search JSON",
       "completed_auction_ids": [
         "01b61362-e952-11ef-b1ea-0242ac110002",
@@ -190,7 +190,7 @@
         ]
       },
       "remaining_auctions": 0,
-      "last_run_completed": "2026-09-08T21:50:13.065473+00:00"
+      "last_run_completed": "2026-09-08T21:50:58.793330+00:00"
     },
     "Savills": {
       "status": "CAUGHT_UP",
@@ -378,8 +378,38 @@
         "legacy_fallback": "unfiltered server-rendered pages + strict commercial markers"
       },
       "last_success": "2026-09-08T21:17:12.996824+00:00",
-      "last_run_completed": "2026-09-08T21:50:23.188942+00:00",
+      "last_run_completed": "2026-09-08T21:51:07.249178+00:00",
       "evidence_policy": "exact lot URL + auction page + exact filtered commercial catalogue result page"
+    },
+    "Strettons": {
+      "status": "DISCOVERY_FAILED",
+      "auctions_discovered": 0,
+      "auctions_completed": 0,
+      "lots_captured": 0,
+      "earliest_month_reached": null,
+      "latest_month_seen": null,
+      "remaining_discovered_auctions": null,
+      "completed_auction_ids": [],
+      "failures": [
+        {
+          "auction_id": null,
+          "url": "https://www.strettons.co.uk/auctions/past-auctions/",
+          "error": "archive discovery returned zero past-auction events",
+          "at": "2026-09-08T21:51:08.226327+00:00"
+        }
+      ],
+      "discovery": {
+        "archive_pages_seen": 1,
+        "terminal_page_seen": false,
+        "archive_urls_seen": [
+          "https://www.strettons.co.uk/auctions/past-auctions/"
+        ]
+      },
+      "ingestion_method": "Strettons server-rendered past-auction detail pages",
+      "evidence_policy": "exact Strettons lot URL where available + exact past-auction result page",
+      "last_auction": null,
+      "last_success": null,
+      "last_run_completed": "2026-09-08T21:51:08.226521+00:00"
     }
   }
 }
