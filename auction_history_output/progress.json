@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-08T15:19:38.545640+00:00",
+  "updated_at": "2026-09-08T15:40:20.041491+00:00",
   "sources": {
     "Allsop Commercial": {
       "status": "CAUGHT UP",
@@ -10,7 +10,7 @@
       "failures": [],
       "auctions_completed": 100,
       "lots_captured": 13792,
-      "last_run_started": "2026-09-08T15:17:11.408034+00:00",
+      "last_run_started": "2026-09-08T15:40:00.384643+00:00",
       "ingestion_method": "Allsop /api/search JSON",
       "completed_auction_ids": [
         "01b61362-e952-11ef-b1ea-0242ac110002",
@@ -190,48 +190,44 @@
         ]
       },
       "remaining_auctions": 0,
-      "last_run_completed": "2026-09-08T15:17:11.408093+00:00"
+      "last_run_completed": "2026-09-08T15:40:00.384703+00:00"
     },
     "Savills": {
       "status": "BACKFILLING",
       "auctions_discovered": 95,
-      "auctions_completed": 0,
-      "lots_captured": 0,
-      "earliest_month_reached": null,
+      "auctions_completed": 4,
+      "lots_captured": 183,
+      "earliest_month_reached": "2026-07",
       "latest_month_seen": "2026-09",
-      "remaining_auctions": 95,
-      "completed_auction_ids": [],
-      "failures": [
-        {
-          "auction_id": "241",
-          "url": "https://auctions.savills.co.uk/auctions/2-september-2026-241",
-          "error": "RuntimeError('no property rows captured after exhausting paginator')",
-          "at": "2026-09-08T15:17:40.772764+00:00"
-        },
-        {
-          "auction_id": "240",
-          "url": "https://auctions.savills.co.uk/auctions/18-august-2026-240",
-          "error": "RuntimeError('no property rows captured after exhausting paginator')",
-          "at": "2026-09-08T15:18:11.112380+00:00"
-        },
-        {
-          "auction_id": "227",
-          "url": "https://auctions.savills.co.uk/auctions/28--29-july-2026-227",
-          "error": "RuntimeError('no property rows captured after exhausting paginator')",
-          "at": "2026-09-08T15:18:55.837697+00:00"
-        },
-        {
-          "auction_id": "226",
-          "url": "https://auctions.savills.co.uk/auctions/14--15-july-2026-226",
-          "error": "RuntimeError('no property rows captured after exhausting paginator')",
-          "at": "2026-09-08T15:19:38.545211+00:00"
-        }
+      "remaining_auctions": 91,
+      "completed_auction_ids": [
+        "226",
+        "227",
+        "240",
+        "241"
       ],
-      "ingestion_method": "Savills past-auction HTML catalogue pages",
-      "last_auction": null,
-      "last_success": null,
-      "last_run_completed": "2026-09-08T15:19:38.545542+00:00",
-      "evidence_policy": "lot URL + auction page + exact catalogue result page"
+      "failures": [],
+      "ingestion_method": "Savills server-rendered commercial catalogue filter property_type-253",
+      "last_auction": {
+        "auction_id": "226",
+        "label": "14 & 15 July 2026",
+        "url": "https://auctions.savills.co.uk/auctions/14--15-july-2026-226",
+        "auction_date": "2026-07-14",
+        "offered_hint": null,
+        "pages": 1,
+        "page_shapes": [
+          {
+            "page": 1,
+            "rows": 64,
+            "url": "https://auctions.savills.co.uk/auctions/14--15-july-2026-226/page-1/quantity-100/property_type-253/sort-by-0"
+          }
+        ],
+        "unique_rows": 64,
+        "catalogue_filter": "property_type-253"
+      },
+      "last_success": "2026-09-08T15:40:20.041405+00:00",
+      "last_run_completed": "2026-09-08T15:40:20.041410+00:00",
+      "evidence_policy": "exact lot URL + auction page + exact filtered commercial catalogue result page"
     }
   }
 }
