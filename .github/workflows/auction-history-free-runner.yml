@@ -1,6 +1,6 @@
 name: Auction History Free Runner
 
-# runner revision: savills-legacy-repair-v9
+# runner revision: strettons-backfill-v1
 on:
   push:
     branches:
@@ -40,11 +40,14 @@ jobs:
       - name: Keep Allsop caught up
         run: python -c "from auction_history_runner.backfill_allsop_api import main; main(20)"
 
-      - name: Backfill remaining Savills historical auctions
+      - name: Keep Savills caught up
         run: python -c "from auction_history_runner.backfill_savills import main; main(28)"
 
       - name: Repair legacy Savills archive formats conservatively
         run: python -c "from auction_history_runner.backfill_savills_legacy import main; main(20)"
+
+      - name: Backfill Strettons historical auctions
+        run: python -c "from auction_history_runner.backfill_strettons import main; main(8)"
 
       - name: Export canonical multi-source History V2 records and index
         run: python auction_history_runner/export_history_v2.py
@@ -57,6 +60,7 @@ jobs:
           git add auction_history_output/progress.json \
                   auction_history_output/allsop_lots.json \
                   auction_history_output/savills_lots.json \
+                  auction_history_output/strettons_lots.json \
                   auction_history_output/history_v2/allsop_events.json \
                   auction_history_output/history_v2/allsop_index.json \
                   auction_history_output/history_v2/history_events.json \
