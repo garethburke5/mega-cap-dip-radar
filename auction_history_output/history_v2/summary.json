@@ -1,7 +1,13 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-09-07T15:38:00.924120+00:00",
-  "source": "Allsop Commercial",
+  "generated_at": "2026-09-08T15:15:01.381546+00:00",
+  "sources": {
+    "Allsop Commercial": 13792,
+    "Savills": 0
+  },
+  "events_by_source": {
+    "Allsop Commercial": 13792
+  },
   "source_rows": 13792,
   "accepted_events": 13792,
   "unique_event_ids": 13792,
