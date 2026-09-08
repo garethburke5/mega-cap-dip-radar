@@ -12,6 +12,7 @@ POSTCODE_RE = re.compile(r'\b([A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2})\b', re.I)
 SOURCE_FILES = [
     ('Allsop Commercial', OUT / 'allsop_lots.json'),
     ('Savills', OUT / 'savills_lots.json'),
+    ('Strettons', OUT / 'strettons_lots.json'),
 ]
 
 
