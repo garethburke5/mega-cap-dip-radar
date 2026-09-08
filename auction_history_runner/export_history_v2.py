@@ -13,6 +13,7 @@ SOURCE_FILES = [
     ('Allsop Commercial', OUT / 'allsop_lots.json'),
     ('Savills', OUT / 'savills_lots.json'),
     ('Strettons', OUT / 'strettons_lots.json'),
+    ('Auction House Shared Platform', OUT / 'auction_house_lots.json'),
 ]
 
 
@@ -198,15 +199,10 @@ def export():
     raw_rows, source_counts = load_sources()
     events, rejected, by_postcode = build_payload(raw_rows)
     V2.mkdir(parents=True, exist_ok=True)
-
-    # New production multi-source files.
     write_pair(events, rejected, by_postcode, V2 / 'history_events.json', V2 / 'history_index.json', 'Auction Sniper multi-source')
-
-    # Backward-compatible Allsop files while the private app migrates.
     all_all = [r for r in raw_rows if text(r.get('source')) == 'Allsop Commercial']
     a_events, a_rejected, a_index = build_payload(all_all)
     write_pair(a_events, a_rejected, a_index, V2 / 'allsop_events.json', V2 / 'allsop_index.json', 'Allsop Commercial')
-
     sale_count = sum(1 for e in events if e.get('sale_price') is not None)
     evidence_count = sum(1 for e in events if (e.get('evidence') or {}).get('listing_url'))
     source_event_counts = {}
