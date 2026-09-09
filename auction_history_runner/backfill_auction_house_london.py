@@ -22,6 +22,12 @@ COMMERCIAL = re.compile(
     r'public house|\bpub\b|hotel|restaurant|takeaway|business premises|commercial unit|'
     r'development site|garage(?: block)?|investment property|freehold ground rent|'
     r'ground rent|retail property|commercial development)\b', re.I)
+MONTHS = {
+    'jan': 1, 'january': 1, 'feb': 2, 'february': 2, 'mar': 3, 'march': 3,
+    'apr': 4, 'april': 4, 'may': 5, 'jun': 6, 'june': 6, 'jul': 7, 'july': 7,
+    'aug': 8, 'august': 8, 'sep': 9, 'sept': 9, 'september': 9,
+    'oct': 10, 'october': 10, 'nov': 11, 'november': 11, 'dec': 12, 'december': 12,
+}
 
 S = requests.Session()
 S.headers.update({
@@ -56,16 +62,6 @@ def save_json(path, payload):
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding='utf-8')
 
 
-def cash(text):
-    m = re.search(r'£\s*([\d,]+(?:\.\d+)?)', text or '')
-    if not m:
-        return None
-    try:
-        return float(m.group(1).replace(',', ''))
-    except ValueError:
-        return None
-
-
 def parse_result(text):
     t = clean(text)
     low = t.lower()
@@ -89,12 +85,25 @@ def parse_result(text):
 
 
 def parse_date(text):
-    # Auction headings can be ranges such as 19th-20th March 2025. Use first day.
     m = re.search(r'\b(\d{1,2})(?:st|nd|rd|th)?(?:\s*[-–]\s*\d{1,2}(?:st|nd|rd|th)?)?\s+([A-Za-z]+)\s+(20\d{2})\b', text or '', re.I)
     if not m:
         return None
     try:
         return datetime.strptime(f'{m.group(1)} {m.group(2)} {m.group(3)}', '%d %B %Y').date().isoformat()
+    except ValueError:
+        return None
+
+
+def date_from_auction_id(slug):
+    # IDs are authoritative for AHL archive dates: september-2-3-2026, may-13-2026, jul-30-2020.
+    m = re.match(r'^([a-z]+)-(\d{1,2})(?:-(\d{1,2}))?-(20\d{2})$', slug or '', re.I)
+    if not m:
+        return None
+    month = MONTHS.get(m.group(1).lower())
+    if not month:
+        return None
+    try:
+        return datetime(int(m.group(4)), month, int(m.group(2))).date().isoformat()
     except ValueError:
         return None
 
@@ -107,22 +116,11 @@ def discover_auctions(html):
         path = urlparse(url).path.rstrip('/')
         if not AUCTION_URL.match(path):
             continue
-        text = clean(a.get_text(' ', strip=True))
-        parent_text = text
-        node = a
-        for _ in range(4):
-            node = getattr(node, 'parent', None)
-            if node is None:
-                break
-            candidate = clean(node.get_text(' ', strip=True))
-            if 10 <= len(candidate) <= 700:
-                parent_text = candidate
-                if parse_date(candidate):
-                    break
-        date = parse_date(parent_text) or parse_date(text)
         key = path.rsplit('/', 1)[-1]
-        found[key] = {'auction_id': key, 'url': url, 'date': date, 'label': parent_text[:250]}
-    # Newest first; unknown dates last.
+        # Never infer an auction date from a large parent card because tenancy/lease dates appear there too.
+        date = date_from_auction_id(key)
+        label = clean(a.get_text(' ', strip=True))[:250]
+        found[key] = {'auction_id': key, 'url': url, 'date': date, 'label': label}
     return sorted(found.values(), key=lambda x: (x.get('date') or '', x['auction_id']), reverse=True)
 
 
@@ -156,9 +154,32 @@ def lot_cards(html, auction_url):
     return out
 
 
+def exact_address(soup, fallback_text=''):
+    # AHL detail-page <title> is the clean published address followed by "| Auction House London".
+    if soup.title:
+        title = clean(soup.title.get_text(' ', strip=True))
+        title = re.sub(r'\s*\|\s*Auction House London\s*$', '', title, flags=re.I)
+        if POSTCODE.search(title) and len(title) <= 320:
+            return title
+    og = soup.find('meta', attrs={'property': 'og:title'})
+    if og and og.get('content'):
+        title = clean(og.get('content'))
+        title = re.sub(r'\s*\|\s*Auction House London\s*$', '', title, flags=re.I)
+        if POSTCODE.search(title) and len(title) <= 320:
+            return title
+    candidates = []
+    for tag in soup.find_all(['h1','h2','h3','p']):
+        t = clean(tag.get_text(' ', strip=True))
+        if POSTCODE.search(t) and 6 <= len(t) <= 320:
+            candidates.append(t)
+    if candidates:
+        return min(candidates, key=len)
+    pm = POSTCODE.search(fallback_text or '')
+    return clean((fallback_text or '')[:pm.end()]) if pm else None
+
+
 def detail_row(item, auction):
-    card = clean(item['card'])
-    # Commercial/mixed assets are identifiable in catalogue cards. Avoid fetching hundreds of residential details.
+    card = clean(item.get('card'))
     if not COMMERCIAL.search(card):
         return None
     html = get(item['url'])
@@ -168,24 +189,7 @@ def detail_row(item, auction):
     combined = clean(card + ' ' + text)
     if not COMMERCIAL.search(combined):
         return None
-
-    pm = POSTCODE.search(card)
-    address = None
-    if pm:
-        before = card[:pm.end()]
-        before = re.sub(r'^.*?\bLOT\s+\d+[A-Z]?\b', '', before, flags=re.I)
-        # Drop result/type boilerplate before the address where possible.
-        before = re.sub(r'^(?:Sold[^A-Z]*|Unsold[^A-Z]*|Withdrawn|Postponed|Please refer[^A-Z]*)+', '', before, flags=re.I)
-        address = clean(before)
-    if not address or len(address) < 6:
-        # Detail pages publish the address near the top; take the shortest postcode-bearing line/block.
-        candidates = []
-        for tag in soup.find_all(['h1','h2','h3','p','div']):
-            t = clean(tag.get_text(' ', strip=True))
-            if POSTCODE.search(t) and 6 <= len(t) <= 320:
-                candidates.append(t)
-        if candidates:
-            address = min(candidates, key=len)
+    address = exact_address(soup, card)
     if not address:
         return None
 
@@ -228,6 +232,7 @@ def detail_row(item, auction):
             legal_pack = urljoin(item['url'], a.get('href'))
             break
 
+    auction_date = date_from_auction_id(auction['auction_id']) or auction.get('date')
     return {
         'source': 'Auction House London',
         'source_id': item['source_id'],
@@ -238,8 +243,8 @@ def detail_row(item, auction):
         'evidence_url': item['url'],
         'legal_pack_url': legal_pack,
         'address': address,
-        'auction_date': auction.get('date') or parse_date(text),
-        'auction_month': (auction.get('date') or '')[:7] or None,
+        'auction_date': auction_date,
+        'auction_month': auction_date[:7] if auction_date else None,
         'lot_number': lot_number,
         'status': status,
         'guide_price': guide,
@@ -250,6 +255,7 @@ def detail_row(item, auction):
         'description': text[:7000],
         'image_url': image,
         'captured_at': now_iso(),
+        'quality_version': 2,
     }
 
 
@@ -280,15 +286,35 @@ def main(batch_auctions=4):
         progress['updated_at'] = now_iso(); save_json(PROGRESS, progress)
         raise RuntimeError('Auction House London discovery returned zero auctions')
 
+    by_id = {a['auction_id']: a for a in auctions}
     state['auctions_discovered'] = len(auctions)
     dates = [a['date'] for a in auctions if a.get('date')]
     if dates:
-        state['earliest_month_reached'] = min(dates)[:7]
+        state['earliest_archive_month'] = min(dates)[:7]
         state['latest_month_seen'] = max(dates)[:7]
+
+    # Repair any v1 rows before adding more. This prevents polluted lease-expiry dates entering canonical history.
+    repaired = 0
+    repair_failures = 0
+    for sid, old in list(existing.items()):
+        if old.get('quality_version') == 2:
+            continue
+        auction = by_id.get(old.get('auction_id'))
+        if not auction:
+            continue
+        try:
+            row = detail_row({'source_id': sid, 'url': old['url'], 'card': old.get('description') or old.get('address') or 'commercial'}, auction)
+            if row:
+                existing[sid] = row
+                repaired += 1
+        except Exception as exc:
+            repair_failures += 1
+            state.setdefault('failures', []).append({'stage': 'repair', 'source_id': sid, 'url': old.get('url'), 'error': repr(exc), 'at': now_iso()})
+
     pending = [a for a in auctions if a['auction_id'] not in completed]
     work = pending[:max(1, int(batch_auctions))]
     added = 0
-    failures_this_run = 0
+    failures_this_run = repair_failures
 
     for auction in work:
         try:
@@ -310,7 +336,6 @@ def main(batch_auctions=4):
                     per_auction_failures += 1
                     failures_this_run += 1
                     state.setdefault('failures', []).append({'auction_id': auction['auction_id'], 'source_id': item['source_id'], 'url': item['url'], 'error': repr(exc), 'at': now_iso()})
-            # Never mark an auction complete if an exact commercial detail failed.
             if per_auction_failures == 0:
                 completed.add(auction['auction_id'])
                 state['last_success'] = now_iso()
@@ -328,7 +353,11 @@ def main(batch_auctions=4):
     state['auctions_completed'] = len(completed)
     state['lots_captured'] = len(payload['lots'])
     state['remaining_auctions'] = max(0, len(auctions) - len(completed))
+    completed_dates = [by_id[x]['date'] for x in completed if x in by_id and by_id[x].get('date')]
+    if completed_dates:
+        state['earliest_month_reached'] = min(completed_dates)[:7]
     state['last_run_added'] = added
+    state['last_run_repaired'] = repaired
     state['last_run_failures'] = failures_this_run
     state['last_run_completed'] = now_iso()
     if state['remaining_auctions'] == 0 and failures_this_run == 0:
@@ -339,7 +368,7 @@ def main(batch_auctions=4):
         state['status'] = 'RUNNING'
     progress['updated_at'] = now_iso()
     save_json(PROGRESS, progress)
-    print(json.dumps({'source': 'Auction House London', 'discovered': len(auctions), 'completed': len(completed), 'added': added, 'total': len(payload['lots']), 'remaining': state['remaining_auctions'], 'failures': failures_this_run}, indent=2))
+    print(json.dumps({'source': 'Auction House London', 'discovered': len(auctions), 'completed': len(completed), 'added': added, 'repaired': repaired, 'total': len(payload['lots']), 'remaining': state['remaining_auctions'], 'failures': failures_this_run}, indent=2))
     return added
 
 
