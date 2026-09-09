@@ -14,6 +14,7 @@ SOURCE_FILES = [
     ('Savills', OUT / 'savills_lots.json'),
     ('Strettons', OUT / 'strettons_lots.json'),
     ('Auction House Shared Platform', OUT / 'auction_house_lots.json'),
+    ('Auction House London', OUT / 'auction_house_london_lots.json'),
 ]
 
 
