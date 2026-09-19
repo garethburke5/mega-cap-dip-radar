@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-19T00:21:23.112841+00:00",
+  "updated_at": "2026-09-19T05:53:55.949598+00:00",
   "sources": {
     "Allsop Commercial": {
       "status": "CAUGHT UP",
@@ -10,7 +10,7 @@
       "failures": [],
       "auctions_completed": 100,
       "lots_captured": 13792,
-      "last_run_started": "2026-09-19T00:19:53.271091+00:00",
+      "last_run_started": "2026-09-19T05:52:27.414344+00:00",
       "ingestion_method": "Allsop /api/search JSON",
       "completed_auction_ids": [
         "01b61362-e952-11ef-b1ea-0242ac110002",
@@ -190,7 +190,7 @@
         ]
       },
       "remaining_auctions": 0,
-      "last_run_completed": "2026-09-19T00:19:53.271151+00:00"
+      "last_run_completed": "2026-09-19T05:52:27.414411+00:00"
     },
     "Savills": {
       "status": "BACKFILLING",
@@ -349,7 +349,7 @@
         "catalogue_filter": "property_type-253"
       },
       "last_success": "2026-09-16T18:54:22.934094+00:00",
-      "last_run_completed": "2026-09-19T00:20:05.114164+00:00",
+      "last_run_completed": "2026-09-19T05:52:36.451163+00:00",
       "evidence_policy": "exact lot URL + auction page + exact filtered commercial catalogue result page"
     },
     "Strettons": {
@@ -362,12 +362,6 @@
       "remaining_discovered_auctions": null,
       "completed_auction_ids": [],
       "failures": [
-        {
-          "auction_id": null,
-          "url": "https://www.strettons.co.uk/auctions/past-auctions/",
-          "error": "archive discovery returned zero past-auction events",
-          "at": "2026-09-10T18:26:44.549487+00:00"
-        },
         {
           "auction_id": null,
           "url": "https://www.strettons.co.uk/auctions/past-auctions/",
@@ -661,6 +655,12 @@
           "url": "https://www.strettons.co.uk/auctions/past-auctions/",
           "error": "archive discovery returned zero past-auction events",
           "at": "2026-09-19T00:20:13.751649+00:00"
+        },
+        {
+          "auction_id": null,
+          "url": "https://www.strettons.co.uk/auctions/past-auctions/",
+          "error": "archive discovery returned zero past-auction events",
+          "at": "2026-09-19T05:52:45.403755+00:00"
         }
       ],
       "discovery": {
@@ -684,7 +684,7 @@
       "evidence_policy": "exact Strettons lot URL where available + exact past-auction result page",
       "last_auction": null,
       "last_success": null,
-      "last_run_completed": "2026-09-19T00:20:13.751859+00:00"
+      "last_run_completed": "2026-09-19T05:52:45.403935+00:00"
     },
     "Auction House Shared Platform": {
       "status": "DEGRADED",
@@ -2226,14 +2226,38 @@
           "url": "https://www.auctionhouse.co.uk/southwest/auction/past-auctions",
           "error": "RuntimeError('past-auctions page returned zero exact lot links')",
           "at": "2026-09-19T00:21:22.414733+00:00"
+        },
+        {
+          "key": "westyorkshire:1",
+          "url": "https://www.auctionhouse.co.uk/westyorkshire/auction/past-auctions",
+          "error": "RuntimeError('past-auctions page returned zero exact lot links')",
+          "at": "2026-09-19T05:53:03.764672+00:00"
+        },
+        {
+          "key": "eastanglia:1",
+          "url": "https://www.auctionhouse.co.uk/eastanglia/auction/past-auctions",
+          "error": "RuntimeError('past-auctions page returned zero exact lot links')",
+          "at": "2026-09-19T05:53:20.959191+00:00"
+        },
+        {
+          "key": "sussexandhampshire:1",
+          "url": "https://www.auctionhouse.co.uk/sussexandhampshire/auction/past-auctions",
+          "error": "RuntimeError('past-auctions page returned zero exact lot links')",
+          "at": "2026-09-19T05:53:39.343550+00:00"
+        },
+        {
+          "key": "southwest:1",
+          "url": "https://www.auctionhouse.co.uk/southwest/auction/past-auctions",
+          "error": "RuntimeError('past-auctions page returned zero exact lot links')",
+          "at": "2026-09-19T05:53:55.372173+00:00"
         }
       ],
       "regions_completed": [],
       "ingestion_method": "Auction House /auction/past-auctions exact lot pages",
-      "last_run_started": "2026-09-19T00:20:13.976473+00:00",
+      "last_run_started": "2026-09-19T05:52:45.560884+00:00",
       "last_run_added": 0,
       "last_run_failures": 4,
-      "last_run_completed": "2026-09-19T00:21:22.414984+00:00"
+      "last_run_completed": "2026-09-19T05:53:55.372376+00:00"
     },
     "Auction House London": {
       "status": "CAUGHT_UP",
@@ -2256,7 +2280,7 @@
       ],
       "failures": [],
       "ingestion_method": "server-rendered /past-auctions + exact /lot pages",
-      "last_run_started": "2026-09-19T00:21:22.609276+00:00",
+      "last_run_started": "2026-09-19T05:53:55.512918+00:00",
       "auctions_discovered": 13,
       "last_success": "2026-09-09T01:34:08.864852+00:00",
       "last_auction": {
@@ -2269,7 +2293,7 @@
       "remaining_auctions": 0,
       "last_run_added": 0,
       "last_run_failures": 0,
-      "last_run_completed": "2026-09-19T00:21:23.112829+00:00",
+      "last_run_completed": "2026-09-19T05:53:55.949587+00:00",
       "earliest_archive_month": "2026-01",
       "latest_month_seen": "2026-09",
       "earliest_month_reached": "2026-01",
