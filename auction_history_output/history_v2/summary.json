@@ -1,26 +1,26 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-11-13T06:41:27.107607+00:00",
+  "generated_at": "2026-11-13T15:24:34.450983+00:00",
   "sources": {
     "Allsop Commercial": 13792,
     "Savills": 3413,
     "Strettons": 0,
     "Auction House Shared Platform": 0,
-    "Auction House London": 458
+    "Auction House London": 461
   },
   "events_by_source": {
-    "Auction House London": 458,
+    "Auction House London": 461,
     "Savills": 3413,
     "Allsop Commercial": 13792
   },
-  "source_rows": 17663,
-  "accepted_events": 17663,
-  "unique_event_ids": 17663,
+  "source_rows": 17666,
+  "accepted_events": 17666,
+  "unique_event_ids": 17666,
   "rejected": 0,
-  "postcodes_indexed": 11393,
+  "postcodes_indexed": 11394,
   "events_with_sale_price": 8711,
-  "events_with_listing_evidence": 17663,
-  "source_rows_accounted_for": 17663,
+  "events_with_listing_evidence": 17666,
+  "source_rows_accounted_for": 17666,
   "idempotency_ok": true,
   "evidence_coverage_pct": 100.0
 }
