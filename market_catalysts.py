@@ -171,6 +171,99 @@ def outlook(event):
         return "Published forecast: "+forecast+".", "No reliable directional edge established from this forecast alone.", "Consensus estimate, not an independent prediction."
     return "No reliable forecast available.", "No evidence-based directional call yet.", "Insufficient data."
 
+@st.cache_data(ttl=86400)
+def historical_prices(ticker):
+    try:
+        df=yf.download(ticker,period="20y",auto_adjust=True,progress=False,threads=False)
+        c=df["Close"]
+        if isinstance(c,pd.DataFrame): c=c.iloc[:,0]
+        return c.dropna()
+    except Exception:
+        return pd.Series(dtype=float)
+
+@st.cache_data(ttl=86400)
+def earnings_dates(ticker):
+    try:
+        df=yf.Ticker(ticker).get_earnings_dates(limit=100)
+        return [(x.date(),x.hour) for x in df.index] if df is not None else []
+    except Exception:
+        return []
+
+@st.cache_data(ttl=86400)
+def release_dates(series):
+    # FRED release calendar, public CSV-style HTML table; actual dates only.
+    try:
+        tables=pd.read_html("https://fred.stlouisfed.org/releases/calendar?rid="+str(series)+"&view=year")
+        dates=[]
+        for table in tables:
+            for col in table.columns:
+                if "date" in str(col).lower():
+                    dates.extend(pd.to_datetime(table[col],errors="coerce").dropna().dt.date.tolist())
+        return sorted(set(dates))
+    except Exception:
+        return []
+
+def historical_event(event,ticker):
+    c=historical_prices(ticker)
+    if c.empty: return [],"Price history unavailable"
+    days=list(c.index.date)
+    title=event["Event"].lower()
+    cutoff=datetime.now(UK).date()
+    positions=[]
+    if "earnings" in title:
+        company=event["Event"].split()[0]
+        for d,hour in earnings_dates(company):
+            if d>=cutoff: continue
+            # After-close announcements are measured on the next session.
+            candidates=[i for i,x in enumerate(days) if x>d or (x==d and hour<16)]
+            if candidates: positions.append(candidates[0])
+        basis="Past reported earnings dates; announcement timing may be approximate"
+    elif "thanksgiving" in title:
+        for i,d in enumerate(days):
+            thurs=[date(d.year,11,j) for j in range(1,31) if date(d.year,11,j).weekday()==3][3]
+            if d==thurs+timedelta(days=4): positions.append(i)
+        basis="Equivalent Monday after Thanksgiving"
+    elif "month-end" in title:
+        positions=[i for i in range(len(days)-1) if days[i].month!=days[i+1].month]
+        basis="Last trading session of each month"
+    elif "options expiry" in title:
+        positions=[i for i,d in enumerate(days) if d.month in (3,6,9,12) and d.weekday()==4 and 15<=d.day<=21]
+        basis="Third Friday of quarterly expiry months; holiday shifts not included"
+    elif "christmas" in title:
+        positions=[i for i,d in enumerate(days) if d.month==12 and d.day>=24 and (i==0 or days[i-1].day<24)]
+        basis="First trading session on or after 24 December"
+    else:
+        # Never substitute approximate monthly dates for actual release dates.
+        ids=[(("cpi","consumer price"),10),(("ppi","producer price"),46),(("employment situation","non-farm","nonfarm"),50),(("jolts","job openings"),192),(("fomc","federal reserve interest rate","federal funds rate"),101)]
+        rid=next((v for keys,v in ids if any(k in title for k in keys)),None) if "gbp" not in title and "uk " not in title else None
+        if rid is None: return [],"Verified historical event dates not available for this event"
+        dates=set(release_dates(rid))
+        positions=[i for i,d in enumerate(days) if d in dates]
+        basis="Published FRED release dates; available calendar history only"
+    values=[float((c.iloc[i]/c.iloc[i-1]-1)*100) for i in sorted(set(positions)) if i>0 and days[i]<cutoff and c.iloc[i-1]>0]
+    return values,basis
+
+def render_history(event):
+    with st.expander("Historical evidence and likely direction"):
+        tickers=["SPY","QQQ"] if "GBP" not in event["Event"] else ["BARC.L"]
+        tickers+= [t for t in TICKERS if t in event["Shares"].split(", ")][:4]
+        rows=[]
+        for ticker in dict.fromkeys(tickers):
+            values,basis=historical_event(event,ticker)
+            if not values:
+                continue
+            n=len(values)
+            up=100*sum(v>0 for v in values)/n
+            down=100*sum(v<0 for v in values)/n
+            avg=sum(values)/n
+            direction="More often rose" if n>=10 and up>=60 and avg>0 else "More often fell" if n>=10 and down>=60 and avg<0 else "No clear pattern"
+            rows.append({"Share":ticker,"Past events":n,"Rose %":round(up,1),"Fell %":round(down,1),"Average move %":round(avg,2),"Historical direction":direction,"Basis":basis})
+        if rows:
+            st.dataframe(pd.DataFrame(rows),hide_index=True,use_container_width=True)
+            st.caption("Previous close to event-session close. Historical frequency is not a forecast probability; other news can affect returns. Fewer than 10 observations are insufficient for a directional call.")
+        else:
+            st.caption("No verified historical sample available for this event. No historical direction has been invented.")
+
 def render_catalysts():
     st.subheader("Market intelligence · Upcoming catalysts")
     st.caption("Automatic calendar and earnings estimates · UK time · What could make shares rise or fall. These are possibilities, not guarantees.")
@@ -192,23 +285,10 @@ def render_catalysts():
                 st.write("🔴 Could fall: "+event["What could make shares fall"])
                 if event["Source"].startswith("https://"):
                     st.markdown("[Source]("+event["Source"]+")")
+                render_history(event)
                 st.divider()
     else:
         st.warning("No upcoming events returned. Coverage is incomplete.")
-    if any("Monday after Thanksgiving" in e["Event"] for e in rows):
-        st.markdown("### Monday after Thanksgiving — historical evidence")
-        st.caption("Previous 20 years where data exists. Friday close to Monday close; adjusted daily prices. Past performance does not guarantee the next move.")
-        history=thanksgiving_history()
-        if history:
-            st.dataframe(pd.DataFrame(history),hide_index=True,use_container_width=True)
-            for h in history:
-                if h["Share"] in ("SPY","QQQ") and h["Years observed"]>=10:
-                    down=h["Fell (%)"]
-                    up=h["Rose (%)"]
-                    bias="slight tendency to fall" if down>=60 and h["Average move (%)"]<0 else "slight tendency to rise" if up>=60 and h["Average move (%)"]>0 else "no clear historical direction"
-                    st.write(h["Share"]+": "+bias+". Fell in "+str(down)+"% of "+str(h["Years observed"])+" observed years; average move "+str(h["Average move (%)"])+"%.")
-        else:
-            st.info("Historical prices unavailable; no seasonal prediction calculated.")
     st.markdown("### Developing market news")
     news=headlines()
     if not news:
@@ -218,4 +298,4 @@ def render_catalysts():
         st.caption("Shares potentially affected: "+shares+" · "+published)
         st.write("It is not yet clear whether this news will push shares up or down.")
         if link.startswith("https://"): st.markdown("[Original headline]("+link+")")
-    st.caption("Macro feed covers current and next week; earnings estimates cover 30 days where supplied. News is headline-based, not verified full-text analysis. Historical event backtests and advance alerts are not yet implemented.")
+    st.caption("Macro feed covers current and next week; earnings estimates cover 30 days where supplied. News is headline-based, not verified full-text analysis. Historical comparisons are shown where event dates and prices are available; advance alerts are not yet implemented.")
