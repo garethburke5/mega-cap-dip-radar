@@ -265,7 +265,7 @@ def directional_view(event):
         avg=sum(values)/len(values)
         if up>=.60 and avg>0: score+=2
         elif up<=.40 and avg<0: score-=2
-        reasons.append(f"{ticker} rose in {up:.0%} of {len(values)} comparable sessions; average move {avg:+.2f}%.")
+        reasons.append(f"{ {'QQQ': 'Nasdaq-100 (QQQ)', 'SPY': 'S&P 500 (SPY)'}.get(ticker,ticker)} rose in {up:.0%} of {len(values)} comparable sessions; average move {avg:+.2f}%.")
     f,p=numeric(event["Forecast"]),numeric(event["Previous"])
     if f is not None and p is not None:
         if any(k in title for k in ("cpi","ppi","pce","inflation","federal funds rate","bank rate","interest rate decision")) and ticker!="BARC.L":
@@ -292,7 +292,7 @@ def render_history(event):
             down=100*sum(v<0 for v in values)/n
             avg=sum(values)/n
             direction="More often rose" if n>=10 and up>=60 and avg>0 else "More often fell" if n>=10 and down>=60 and avg<0 else "No clear pattern"
-            rows.append({"Share":ticker,"Past events":n,"Rose %":round(up,1),"Fell %":round(down,1),"Average move %":round(avg,2),"Historical direction":direction,"Basis":basis})
+            rows.append({"Share":{"QQQ":"Nasdaq-100 (QQQ)","SPY":"S&P 500 (SPY)"}.get(ticker,ticker),"Past events":n,"Rose %":round(up,1),"Fell %":round(down,1),"Average move %":round(avg,2),"Historical direction":direction,"Basis":basis})
         if rows:
             st.dataframe(pd.DataFrame(rows),hide_index=True,use_container_width=True)
             st.caption("Previous close to event-session close. Historical frequency is not a forecast probability; other news can affect returns. Fewer than 10 observations are insufficient for a directional call.")
@@ -387,6 +387,7 @@ def render_catalysts():
     if rows:
         st.markdown("### Share Sniper market outlook")
         market_summary(rows)
+        st.caption("Why we track the Nasdaq-100 (QQQ): it includes many of our technology shares, such as Nvidia, Broadcom, Alphabet and Tesla. It helps distinguish a wider market sell-off from a problem with an individual company. It is not the benchmark for Barclays or the wider UK market.")
         today=datetime.now(UK).date()
         upcoming=[e for e in rows if e["Date"]<=str(today+timedelta(days=7))]
         signals=[]
