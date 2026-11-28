@@ -117,6 +117,31 @@ def headlines():
             continue
     return out
 
+def numeric(value):
+    try:
+        return float(str(value).strip().replace("%","").replace(",",""))
+    except (ValueError, TypeError):
+        return None
+
+def outlook(event):
+    title=event["Event"].lower()
+    forecast=event["Forecast"]
+    previous=event["Previous"]
+    f,p=numeric(forecast),numeric(previous)
+    if any(k in title for k in ("federal funds rate","bank rate","official bank rate","interest rate decision")):
+        if f is not None and p is not None and "%" in forecast and "%" in previous:
+            delta=round(f-p,2)
+            action=("Keep rates unchanged" if delta==0 else ("Cut" if delta<0 else "Raise")+" rates by "+f"{abs(delta):.2f}"+" percentage points")
+            return action+" to "+forecast+".", ("Technology shares may benefit from lower rates" if delta<0 else "Higher rates may weigh on technology shares" if delta>0 else "No clear direction from the rate decision alone")+". The expected decision may already be reflected in prices; the statement could matter more.", "Based on published calendar forecast, not a separate probability model."
+        return "Rate decision forecast unavailable.", "No reliable directional call without current rate expectations.", "Insufficient data."
+    if any(k in title for k in ("cpi","ppi","pce","inflation","consumer price","producer price")) and f is not None and p is not None:
+        direction="rise" if f>p else "fall" if f<p else "stay unchanged"
+        bias="Potential support for technology shares if inflation cools." if f<p else "Potential pressure on technology shares if inflation rises." if f>p else "No clear directional advantage from the expected reading."
+        return "Inflation reading expected to "+direction+" from "+previous+" to "+forecast+".",bias+" A result matching expectations may already be reflected in prices.","Based on calendar forecast; low confidence in share direction."
+    if forecast:
+        return "Published forecast: "+forecast+".", "No reliable directional edge established from this forecast alone.", "Consensus estimate, not an independent prediction."
+    return "No reliable forecast available.", "No evidence-based directional call yet.", "Insufficient data."
+
 def render_catalysts():
     st.subheader("Market intelligence · Upcoming catalysts")
     st.caption("Automatic calendar and earnings estimates · UK time · What could make shares rise or fall. These are possibilities, not guarantees.")
@@ -130,6 +155,10 @@ def render_catalysts():
                 st.caption(event["Impact"]+" impact · "+event["Shares"]+" · "+event["Status"])
                 if event["Forecast"] or event["Previous"]:
                     st.write("Forecast: "+(event["Forecast"] or "Unavailable")+" | Previous: "+(event["Previous"] or "Unavailable"))
+                prediction, bias, basis = outlook(event)
+                st.markdown("**Expected outcome:** "+prediction)
+                st.write("**Likely market direction:** "+bias)
+                st.caption(basis)
                 st.write("🟢 Could rise: "+event["What could make shares rise"])
                 st.write("🔴 Could fall: "+event["What could make shares fall"])
                 if event["Source"].startswith("https://"):
