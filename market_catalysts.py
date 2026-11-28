@@ -299,6 +299,85 @@ def render_history(event):
         else:
             st.caption("No verified historical sample available for this event. No historical direction has been invented.")
 
+@st.cache_data(ttl=1800)
+def market_context():
+    out={}
+    for ticker in ("QQQ","SPY","^VIX","^TNX","BARC.L"):
+        try:
+            c=yf.download(ticker,period="3mo",auto_adjust=True,progress=False,threads=False)["Close"]
+            if isinstance(c,pd.DataFrame): c=c.iloc[:,0]
+            c=c.dropna()
+            if len(c)>=21:
+                out[ticker]={"last":float(c.iloc[-1]),"week":float((c.iloc[-1]/c.iloc[-6]-1)*100),"month":float((c.iloc[-1]/c.iloc[-21]-1)*100),"date":str(c.index[-1].date()),"change":float(c.iloc[-1]-c.iloc[-6])}
+        except Exception: pass
+    return out
+
+def market_summary(events):
+    data=market_context()
+    q=data.get("QQQ")
+    if not q:
+        st.caption("Current market prices unavailable.")
+        return
+    score=0
+    reasons=[]
+    if q["week"]>1: score+=1
+    elif q["week"]<-1: score-=1
+    reasons.append(f"Nasdaq-100 tracker moved {q['week']:+.1f}% over five sessions and {q['month']:+.1f}% over twenty sessions.")
+    v=data.get("^VIX")
+    if v:
+        if v["change"]>2: score-=1
+        elif v["change"]<-2: score+=1
+        reasons.append(f"Market fear index: {v['last']:.1f}, change {v['change']:+.1f} points over five sessions.")
+    y=data.get("^TNX")
+    if y:
+        if y["change"]>.10: score-=1
+        elif y["change"]<-.10: score+=1
+        reasons.append(f"US ten-year bond yield: {y['last']:.2f}%, change {y['change']:+.2f} percentage points over five sessions.")
+    first=min((e["Date"] for e in events),default="")
+    for e in events:
+        if e["Date"]!=first or "earnings" in e["Event"].lower(): continue
+        view,_,reason=directional_view(e)
+        if view=="Lean towards falling prices": score-=1
+        elif view=="Lean towards rising prices": score+=1
+        else: continue
+        reasons.append(e["Event"]+": "+reason)
+    view="Lean towards a rise" if score>0 else "Lean towards a fall" if score<0 else "Mixed evidence — no clear direction"
+    st.markdown("**US technology market — next session: "+view+"**")
+    st.write(" ".join(reasons))
+    st.caption("Prices through "+q["date"]+". Experimental trend and event model; not calibrated probabilities or a validated trading signal.")
+
+@st.cache_data(ttl=1800)
+def fed_expectation(day):
+    # Monthly futures settle on the average effective overnight rate.
+    # Estimate the post-meeting rate from a dated contract, not a rolling quote.
+    try:
+        import io
+        raw=get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=EFFR")
+        df=pd.read_csv(io.BytesIO(raw))
+        rates=pd.to_numeric(df["EFFR"],errors="coerce").dropna()
+        if rates.empty: return None
+        current=float(rates.iloc[-1])
+        stamp=pd.Timestamp(df.loc[rates.index[-1],df.columns[0]]).date()
+        today=datetime.now(UK).date()
+        if (today-stamp).days>7 or day.month!=today.month and (day-today).days>40: return None
+        code="FGHJKMNQUVXZ"[day.month-1]
+        symbol="ZQ"+code+str(day.year)[-2:]+".CBT"
+        hist=yf.Ticker(symbol).history(period="5d")
+        if hist.empty: return None
+        price=float(hist["Close"].dropna().iloc[-1])
+        quoted=hist.index[-1].date()
+        if (today-quoted).days>5 or not 85<price<100: return None
+        n=calendar.monthrange(day.year,day.month)[1]
+        before=day.day
+        after=n-before
+        if after<5: return None
+        implied=((100-price)*n-current*before)/after
+        delta=implied-current
+        if abs(delta)>.8: return None
+        move=round(delta/.25)*.25
+        return current,delta,move,symbol,str(quoted)
+    except Exception: return None
+
 def render_catalysts():
     st.subheader("Market intelligence · Upcoming catalysts")
     st.caption("Automatic calendar and earnings estimates · UK time · What could make shares rise or fall. These are possibilities, not guarantees.")
@@ -307,6 +386,7 @@ def render_catalysts():
         st.caption("Some macro feeds are unavailable; earnings and seasonal events remain independent. Coverage is incomplete.")
     if rows:
         st.markdown("### Share Sniper market outlook")
+        market_summary(rows)
         today=datetime.now(UK).date()
         upcoming=[e for e in rows if e["Date"]<=str(today+timedelta(days=7))]
         signals=[]
@@ -333,6 +413,15 @@ def render_catalysts():
                     st.write("Expected earnings per share: "+str(round(float(event["Forecast"]),2)) if numeric(event["Forecast"]) is not None else "Expected earnings per share: "+event["Forecast"])
                 elif event["Forecast"] or event["Previous"]:
                     st.write("Forecast: "+(event["Forecast"] or "Unavailable")+" | Previous: "+(event["Previous"] or "Unavailable"))
+                if any(k in event["Event"].lower() for k in ("federal funds rate","federal reserve interest rate decision")):
+                    estimate=fed_expectation(date.fromisoformat(event["Date"]))
+                    if estimate:
+                        current,delta,move,symbol,quoted=estimate
+                        action="hold rates" if move==0 else ("cut" if move<0 else "raise")+" rates by "+f"{abs(move):.2f}"+" percentage points"
+                        st.write("**Futures-implied decision:** "+action+". Current effective rate "+f"{current:.2f}%"+". Implied change "+f"{delta:+.2f}"+" percentage points.")
+                        st.caption("Approximation from "+symbol+" quoted "+quoted+" and FRED EFFR; assumes no other rate changes in the month. Not CME probabilities.")
+                    else:
+                        st.caption("Dated rate futures unavailable; no market-implied decision calculated.")
                 prediction, bias, basis = outlook(event)
                 if event["Forecast"]: st.markdown("**Expected outcome:** "+prediction)
                 view, confidence, reasoning = directional_view(event)
