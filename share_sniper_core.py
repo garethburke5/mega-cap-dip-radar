@@ -1021,6 +1021,11 @@ for _ticker,_cfg in ROCK_BOTTOM.items():
 st.title("🎯 Share Sniper")
 st.caption("Find large, established shares with meaningful corrections and target the rebound — without forcing a trade every day.")
 
+from market_catalysts import render_catalysts
+with st.expander("Upcoming market catalysts · next 30 days", expanded=True):
+    render_catalysts()
+
+
 # ---------- VISUAL HIERARCHY ----------
 # Burgundy is reserved for navigation/section emphasis; green/red remain free for market signals.
 st.markdown("""
