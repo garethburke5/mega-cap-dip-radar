@@ -19,4 +19,11 @@ for old, new in patches:
         raise RuntimeError(f"APP patch mismatch: expected exactly one occurrence of {old[:40]!r}")
     source = source.replace(old, new, 1)
 
+# Reload catalyst module from disk on Streamlit reruns after deployment.
+import importlib
+import sys
+importlib.invalidate_caches()
+if "market_catalysts" in sys.modules:
+    importlib.reload(sys.modules["market_catalysts"])
+
 exec(compile(source, "share_sniper_core.py", "exec"), globals(), globals())
