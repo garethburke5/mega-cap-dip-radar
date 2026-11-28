@@ -306,6 +306,25 @@ def render_catalysts():
     if errors:
         st.caption("Some macro feeds are unavailable; earnings and seasonal events remain independent. Coverage is incomplete.")
     if rows:
+        st.markdown("### Share Sniper market outlook")
+        today=datetime.now(UK).date()
+        upcoming=[e for e in rows if e["Date"]<=str(today+timedelta(days=7))]
+        signals=[]
+        for e in upcoming:
+            view,confidence,reason=directional_view(e)
+            signals.append({"Date":e["Date"],"Event":e["Event"],"View":view,"Evidence":reason})
+        if signals:
+            st.dataframe(pd.DataFrame(signals),hide_index=True,use_container_width=True)
+            first=signals[0]["Date"]
+            active=[x for x in signals if x["Date"]==first and x["View"]!="No clear advantage"]
+            views=set(x["View"] for x in active)
+            if len(views)==1:
+                st.markdown("**Next scheduled event day ("+first+"): "+next(iter(views))+"**")
+                st.caption("Event-based view only; not a full market forecast.")
+            else:
+                st.markdown("**Next scheduled event day: no consistent directional signal**")
+            missing=sum(x["View"]=="No clear advantage" for x in signals)
+            st.caption(str(missing)+" of "+str(len(signals))+" upcoming events have no established directional edge. Missing forecasts limit the outlook.")
         for event in rows:
             with st.container():
                 st.markdown("**"+event["Date"]+" · "+event["UK time"]+" — "+event["Event"]+"**")
@@ -315,15 +334,14 @@ def render_catalysts():
                 elif event["Forecast"] or event["Previous"]:
                     st.write("Forecast: "+(event["Forecast"] or "Unavailable")+" | Previous: "+(event["Previous"] or "Unavailable"))
                 prediction, bias, basis = outlook(event)
-                st.markdown("**Expected outcome:** "+prediction)
+                if event["Forecast"]: st.markdown("**Expected outcome:** "+prediction)
                 view, confidence, reasoning = directional_view(event)
                 st.markdown("**Share Sniper view: "+view+"**")
                 st.write(reasoning)
                 st.caption(confidence+" · Rule-based estimate, not a measured probability.")
-                st.write("**Effect of expected outcome:** "+bias)
-                st.caption(basis)
-                st.write("🟢 Could rise: "+event["What could make shares rise"])
-                st.write("🔴 Could fall: "+event["What could make shares fall"])
+                with st.expander("What could change this view"):
+                    st.write("Upside: "+event["What could make shares rise"])
+                    st.write("Downside: "+event["What could make shares fall"])
                 if event["Source"].startswith("https://"):
                     st.markdown("[Source]("+event["Source"]+")")
                 render_history(event)
