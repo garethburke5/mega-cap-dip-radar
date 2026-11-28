@@ -252,6 +252,32 @@ def historical_event(event,ticker):
     values=[float((c.iloc[i]/c.iloc[i-1]-1)*100) for i in sorted(set(positions)) if i>0 and days[i]<cutoff and c.iloc[i-1]>0]
     return values,basis
 
+@st.cache_data(ttl=1800)
+def directional_view(event):
+    title=event["Event"].lower()
+    ticker="BARC.L" if "gbp" in title or "uk " in title else "QQQ"
+    if "earnings" in title: ticker=event["Event"].split()[0]
+    values,basis=historical_event(event,ticker)
+    score=0
+    reasons=[]
+    if len(values)>=10:
+        up=sum(v>0 for v in values)/len(values)
+        avg=sum(values)/len(values)
+        if up>=.60 and avg>0: score+=2
+        elif up<=.40 and avg<0: score-=2
+        reasons.append(f"{ticker} rose in {up:.0%} of {len(values)} comparable sessions; average move {avg:+.2f}%.")
+    f,p=numeric(event["Forecast"]),numeric(event["Previous"])
+    if f is not None and p is not None:
+        if any(k in title for k in ("cpi","ppi","pce","inflation","federal funds rate","bank rate","interest rate decision")) and ticker!="BARC.L":
+            score+=1 if f<p else -1 if f>p else 0
+            reasons.append("Published forecast points to "+("lower" if f<p else "higher" if f>p else "unchanged")+" inflation or rates. Expected news may already be reflected in prices.")
+    if score>0: view="Lean towards rising prices"
+    elif score<0: view="Lean towards falling prices"
+    else: view="No clear advantage"
+    confidence="Moderate historical support" if abs(score)>=2 and len(values)>=20 else "Low confidence"
+    if not reasons: reasons=["No comparable event history or usable forecast was retrieved. A directional prediction would be guesswork."]
+    return view,confidence," ".join(reasons)
+
 def render_history(event):
     with st.expander("Historical evidence and likely direction"):
         tickers=["SPY","QQQ"] if "GBP" not in event["Event"] else ["BARC.L"]
@@ -290,7 +316,11 @@ def render_catalysts():
                     st.write("Forecast: "+(event["Forecast"] or "Unavailable")+" | Previous: "+(event["Previous"] or "Unavailable"))
                 prediction, bias, basis = outlook(event)
                 st.markdown("**Expected outcome:** "+prediction)
-                st.write("**Likely market direction:** "+bias)
+                view, confidence, reasoning = directional_view(event)
+                st.markdown("**Share Sniper view: "+view+"**")
+                st.write(reasoning)
+                st.caption(confidence+" · Rule-based estimate, not a measured probability.")
+                st.write("**Effect of expected outcome:** "+bias)
                 st.caption(basis)
                 st.write("🟢 Could rise: "+event["What could make shares rise"])
                 st.write("🔴 Could fall: "+event["What could make shares fall"])
