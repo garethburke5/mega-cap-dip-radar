@@ -27,15 +27,15 @@ def assess(title, country=""):
     t = title.lower()
     uk = country in ("GBP","UK")
     if any(k in t for k in ("cpi","ppi","pce","inflation","consumer price","producer price")):
-        return (BANKS if uk else TECH + ", " + BANKS, "High", "Below forecast: lower yields may lift growth shares; banks mixed.", "Above forecast: higher yields may pressure growth; banks face credit/rate trade-offs.")
+        return (BANKS if uk else TECH + ", " + BANKS, "High", "If inflation is lower than expected, technology shares could rise as investors expect lower interest rates. Bank shares could move either way.", "If inflation is higher than expected, technology shares could fall as interest rate cuts become less likely. Banks may earn more interest but face more unpaid loans.")
     if any(k in t for k in ("rate","fomc","powell","monetary","fed chair","bailey")):
-        return (BANKS if uk else TECH + ", " + BANKS, "Very high", "Dovish surprise may lift equities; bank margins may narrow.", "Hawkish surprise may pressure valuations; bank impact depends on yield curve and credit.")
+        return (BANKS if uk else TECH + ", " + BANKS, "Very high", "If the central bank cuts rates or signals earlier cuts than expected, technology shares could rise. Banks may earn less from lending.", "If rates stay higher for longer than expected, technology shares could fall. Banks may earn more from lending, but borrowers could struggle to repay.")
     if any(k in t for k in ("employment","payroll","jobless","jolts","unemployment","adp","gdp","pmi","retail sales")):
-        return (BANKS if uk else TECH + ", " + BANKS, "High", "Resilient growth with cooling inflation supports risk appetite.", "Overheating or recession signals may trigger selling.")
-    return (BANKS if uk else "US watchlist", "High", "Better-than-priced outcome may support shares.", "Adverse surprise may weaken sentiment.")
+        return (BANKS if uk else TECH + ", " + BANKS, "High", "Steady economic growth and falling inflation could encourage investors to buy shares.", "Signs of rising inflation or a weakening economy could cause shares to fall.")
+    return (BANKS if uk else "US watchlist", "High", "Better news than investors expect could push shares higher.", "Worse news than expected could cause shares to fall.")
 
 def row(day, time, title, shares, impact, bull, bear, source, status, forecast="", previous=""):
-    return {"Date":str(day),"UK time":time,"Event":title,"Shares":shares,"Impact":impact,"Upside trigger":bull,"Downside trigger":bear,"Forecast":str(forecast or ""),"Previous":str(previous or ""),"Source":source,"Status":status}
+    return {"Date":str(day),"UK time":time,"Event":title,"Shares":shares,"Impact":impact,"What could make shares rise":bull,"What could make shares fall":bear,"Forecast":str(forecast or ""),"Previous":str(previous or ""),"Source":source,"Status":status}
 
 def macro(url):
     out=[]
@@ -60,7 +60,7 @@ def earnings(ticker):
             if not d: continue
             day=pd.Timestamp(d).date()
             related={"AVGO":"AVGO, NVDA, GOOGL, ARM, QCOM, INTC","NVDA":"NVDA, AVGO, ARM, GOOGL, AMZN","GOOGL":"GOOGL, META, AMZN, AVGO","BARC.L":"BARC.L, BAC","AMZN":"AMZN, GOOGL, META, NVDA"}.get(ticker,ticker)
-            out.append(row(day,"TBC",ticker+" earnings",related,"Very high","Beat expectations and raise guidance: potential rally.","Miss expectations or cut guidance: potential sell-off.", "https://finance.yahoo.com/quote/"+ticker+"/calendar/","Provider estimate; verify company confirmation",c.get("Earnings Average")))
+            out.append(row(day,"TBC",ticker+" earnings",related,"Very high","If profits exceed expectations and the company predicts stronger future sales or profits, shares could rise.","If profits disappoint or the company lowers its outlook, shares could fall.", "https://finance.yahoo.com/quote/"+ticker+"/calendar/","Estimated earnings date; not confirmed by the company",c.get("Earnings Average")))
         return out
     except Exception:
         return []
@@ -70,13 +70,13 @@ def seasonal(today,end):
     for offset in range((end-today).days+1):
         d=today+timedelta(days=offset)
         if d.weekday()==4 and 15<=d.day<=21 and d.month in (3,6,9,12):
-            out.append(row(d,"US session","Quarterly options expiry","US watchlist","High","Position unwinds can amplify rebounds.","Position unwinds can amplify sell-offs.","Calendar rule","Scheduled convention; direction uncertain"))
+            out.append(row(d,"US session","Quarterly options expiry","US watchlist","High","As traders close expiring contracts, rising shares could climb faster.","As traders close expiring contracts, falling shares could drop further.","Calendar rule","Scheduled convention; direction uncertain"))
         if d.day==calendar.monthrange(d.year,d.month)[1]:
             trade=d
             while trade.weekday()>4: trade-=timedelta(days=1)
-            out.append(row(trade,"Market close","Month-end portfolio rebalancing","All watchlist","Medium","Allocation flows may support laggards.","Allocation flows may pressure recent winners.","Calendar rule","Seasonal estimate; holidays may shift timing"))
+            out.append(row(trade,"Market close","Month-end buying and selling by investment funds","All watchlist","Medium","Investment funds may buy shares that have recently performed poorly, helping them recover.","Investment funds may sell shares that have recently risen sharply, causing prices to fall.","Calendar rule","Seasonal estimate; holidays may shift timing"))
         if d.month==12 and d.day==24:
-            out.append(row(d,"Year-end window","Holiday liquidity / tax-loss selling / Santa rally window","US watchlist","Medium","Seasonal buying or rebound in beaten-down shares.","Thin liquidity and tax-loss selling can extend declines.","Calendar rule","Seasonal hypothesis, not a forecast"))
+            out.append(row(d,"Year-end window","Christmas and year-end buying and selling","US watchlist","Medium","End-of-year buying could help shares recover.","Fewer traders and investors selling losing shares for tax reasons could push prices lower.","Calendar rule","Seasonal hypothesis, not a forecast"))
     return out
 
 @st.cache_data(ttl=1800)
@@ -97,7 +97,7 @@ def collect():
     # Independent dated fallback for the December 2026 FOMC meeting.
     d=date(2026,12,9)
     if today<=d<=end and not any(x["Date"]==str(d) and ("federal funds rate" in x["Event"].lower() or "fomc statement" in x["Event"].lower()) for x in rows):
-        rows.append(row(d,"19:00","Federal Reserve policy decision",*assess("FOMC"),"https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm","Published meeting schedule"))
+        rows.append(row(d,"19:00","US Federal Reserve interest rate decision",*assess("FOMC"),"https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm","Published meeting schedule"))
     return sorted([x for x in rows if str(today)<=x["Date"]<=str(end)],key=lambda x:(x["Date"],x["UK time"],x["Event"])),errors
 
 @st.cache_data(ttl=900)
@@ -119,7 +119,7 @@ def headlines():
 
 def render_catalysts():
     st.subheader("Market intelligence · Upcoming catalysts")
-    st.caption("Automatic calendar and earnings estimates · UK time · Conditional impact, not a guaranteed price forecast.")
+    st.caption("Automatic calendar and earnings estimates · UK time · What could make shares rise or fall. These are possibilities, not guarantees.")
     rows,errors=collect()
     if errors:
         st.caption("Some macro feeds are unavailable; earnings and seasonal events remain independent. Coverage is incomplete.")
@@ -130,8 +130,8 @@ def render_catalysts():
                 st.caption(event["Impact"]+" impact · "+event["Shares"]+" · "+event["Status"])
                 if event["Forecast"] or event["Previous"]:
                     st.write("Forecast: "+(event["Forecast"] or "Unavailable")+" | Previous: "+(event["Previous"] or "Unavailable"))
-                st.write("🟢 "+event["Upside trigger"])
-                st.write("🔴 "+event["Downside trigger"])
+                st.write("🟢 Could rise: "+event["What could make shares rise"])
+                st.write("🔴 Could fall: "+event["What could make shares fall"])
                 if event["Source"].startswith("https://"):
                     st.markdown("[Source]("+event["Source"]+")")
                 st.divider()
@@ -143,7 +143,7 @@ def render_catalysts():
         st.caption("News feed currently unavailable.")
     for title,link,shares,published in news:
         st.markdown("**"+title+"**")
-        st.caption("Potential exposure: "+shares+" · "+published)
-        st.write("Direction unconfirmed: assess whether the development improves or worsens earnings, policy or risk expectations.")
+        st.caption("Shares potentially affected: "+shares+" · "+published)
+        st.write("It is not yet clear whether this news will push shares up or down.")
         if link.startswith("https://"): st.markdown("[Original headline]("+link+")")
     st.caption("Macro feed covers current and next week; earnings estimates cover 30 days where supplied. News is headline-based, not verified full-text analysis. Historical event backtests and advance alerts are not yet implemented.")
