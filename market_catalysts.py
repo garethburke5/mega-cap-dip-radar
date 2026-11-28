@@ -109,7 +109,7 @@ def seasonal(today,end):
     return out
 
 @st.cache_data(ttl=1800)
-def collect():
+def collect(version="2026-11-28-v2"):
     today=datetime.now(UK).date()
     end=today+timedelta(days=30)
     rows=seasonal(today,end)
@@ -122,6 +122,15 @@ def collect():
             except Exception: errors.append(url)
         for f in earnings_jobs:
             rows.extend(f.result())
+    # Verified December schedule, retained even if external feeds reject requests.
+    for day,clock,title in [(1,"15:00","US job openings (JOLTS)"),(4,"13:30","US non-farm payrolls (Employment Situation)"),(10,"13:30","US CPI inflation"),(15,"13:30","US PPI inflation")]:
+        d=date(2026,12,day)
+        if today<=d<=end and not any(x["Date"]==str(d) and any(k in x["Event"].lower() for k in {1:["jolts","job openings"],4:["nonfarm","non-farm","employment situation"],10:["cpi","consumer price"],15:["ppi","producer price"]}[day]) for x in rows):
+            rows.append(row(d,clock,title,*assess(title),"https://www.bls.gov/schedule/2026/12_sched_list.htm","Official schedule verified 28 Nov 2026"))
+    # Ensure holiday event survives cached or partial calendars.
+    for event in seasonal(today,end):
+        if not any(x["Date"]==event["Date"] and x["Event"]==event["Event"] for x in rows):
+            rows.append(event)
     # Official calendar links are provenance, not a substitute for populated events.
     # Independent dated fallback for the December 2026 FOMC meeting.
     d=date(2026,12,9)
@@ -140,7 +149,7 @@ def headlines():
             for item in root.findall("./channel/item")[:4]:
                 title=item.findtext("title","")
                 lower=title.lower()
-                shares= BANKS if "barclays" in lower or "bank of england" in lower else TECH
+                shares= "BARC.L" if any(k in lower for k in ("uk banks","u.k. banks","bank of england","lloyds","barclays","boe","major banks")) else TECH
                 out.append((title,item.findtext("link",""),shares,item.findtext("pubDate","")))
         except Exception:
             continue
@@ -275,7 +284,9 @@ def render_catalysts():
             with st.container():
                 st.markdown("**"+event["Date"]+" · "+event["UK time"]+" — "+event["Event"]+"**")
                 st.caption(event["Impact"]+" impact · "+event["Shares"]+" · "+event["Status"])
-                if event["Forecast"] or event["Previous"]:
+                if "earnings" in event["Event"].lower() and event["Forecast"]:
+                    st.write("Expected earnings per share: "+str(round(float(event["Forecast"]),2)) if numeric(event["Forecast"]) is not None else "Expected earnings per share: "+event["Forecast"])
+                elif event["Forecast"] or event["Previous"]:
                     st.write("Forecast: "+(event["Forecast"] or "Unavailable")+" | Previous: "+(event["Previous"] or "Unavailable"))
                 prediction, bias, basis = outlook(event)
                 st.markdown("**Expected outcome:** "+prediction)
@@ -296,6 +307,12 @@ def render_catalysts():
     for title,link,shares,published in news:
         st.markdown("**"+title+"**")
         st.caption("Shares potentially affected: "+shares+" · "+published)
-        st.write("It is not yet clear whether this news will push shares up or down.")
+        lower=title.lower()
+        if shares=="BARC.L" and any(k in lower for k in ("capital requirements","capital rules","capital rule","shakeup")):
+            st.write("Likely positive for Barclays if banks are allowed to hold less capital: more money could be available for lending, dividends and share buybacks. The details and existing expectations matter.")
+        elif "tariff" in lower:
+            st.write("Potentially negative for technology shares: higher import costs could reduce profits and keep interest rates higher. Actual tariff scope and timing matter.")
+        else:
+            st.write("No clear direction from this headline alone.")
         if link.startswith("https://"): st.markdown("[Original headline]("+link+")")
     st.caption("Macro feed covers current and next week; earnings estimates cover 30 days where supplied. News is headline-based, not verified full-text analysis. Historical comparisons are shown where event dates and prices are available; advance alerts are not yet implemented.")
