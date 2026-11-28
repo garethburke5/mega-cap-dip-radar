@@ -65,10 +65,39 @@ def earnings(ticker):
     except Exception:
         return []
 
+@st.cache_data(ttl=86400)
+def thanksgiving_history():
+    results=[]
+    for ticker in ["SPY","QQQ","AVGO","NVDA","GOOGL","TSLA","BARC.L"]:
+        try:
+            df=yf.download(ticker,period="20y",auto_adjust=True,progress=False,threads=False)
+            close=df["Close"]
+            if isinstance(close,pd.DataFrame):
+                close=close.iloc[:,0]
+            close=close.dropna()
+            returns=close.pct_change()
+            samples=[]
+            for year in range(datetime.now(UK).year-20,datetime.now(UK).year+1):
+                thurs=[date(year,11,d) for d in range(1,31) if date(year,11,d).weekday()==3][3]
+                monday=thurs+timedelta(days=4)
+                if monday>=datetime.now(UK).date(): continue
+                matches=returns[returns.index.date==monday].dropna()
+                if len(matches): samples.append(float(matches.iloc[0])*100)
+            if samples:
+                n=len(samples)
+                results.append({"Share":ticker,"Years observed":n,"Fell (%)":round(100*sum(x<0 for x in samples)/n,1),"Rose (%)":round(100*sum(x>0 for x in samples)/n,1),"Average move (%)":round(sum(samples)/n,2)})
+        except Exception:
+            continue
+    return results
+
 def seasonal(today,end):
     out=[]
     for offset in range((end-today).days+1):
         d=today+timedelta(days=offset)
+        if d.month in (11,12):
+            thurs=[date(d.year,11,i) for i in range(1,31) if date(d.year,11,i).weekday()==3][3]
+            if d==thurs+timedelta(days=4):
+                out.append(row(d,"US session","Monday after Thanksgiving","US watchlist","Medium","Shares may recover if buyers return after the holiday.","Shares may fall as normal trading resumes after the holiday.","Historical price analysis","Recurring holiday pattern; see measured results below"))
         if d.weekday()==4 and 15<=d.day<=21 and d.month in (3,6,9,12):
             out.append(row(d,"US session","Quarterly options expiry","US watchlist","High","As traders close expiring contracts, rising shares could climb faster.","As traders close expiring contracts, falling shares could drop further.","Calendar rule","Scheduled convention; direction uncertain"))
         if d.day==calendar.monthrange(d.year,d.month)[1]:
@@ -166,6 +195,20 @@ def render_catalysts():
                 st.divider()
     else:
         st.warning("No upcoming events returned. Coverage is incomplete.")
+    if any("Monday after Thanksgiving" in e["Event"] for e in rows):
+        st.markdown("### Monday after Thanksgiving — historical evidence")
+        st.caption("Previous 20 years where data exists. Friday close to Monday close; adjusted daily prices. Past performance does not guarantee the next move.")
+        history=thanksgiving_history()
+        if history:
+            st.dataframe(pd.DataFrame(history),hide_index=True,use_container_width=True)
+            for h in history:
+                if h["Share"] in ("SPY","QQQ") and h["Years observed"]>=10:
+                    down=h["Fell (%)"]
+                    up=h["Rose (%)"]
+                    bias="slight tendency to fall" if down>=60 and h["Average move (%)"]<0 else "slight tendency to rise" if up>=60 and h["Average move (%)"]>0 else "no clear historical direction"
+                    st.write(h["Share"]+": "+bias+". Fell in "+str(down)+"% of "+str(h["Years observed"])+" observed years; average move "+str(h["Average move (%)"])+"%.")
+        else:
+            st.info("Historical prices unavailable; no seasonal prediction calculated.")
     st.markdown("### Developing market news")
     news=headlines()
     if not news:
